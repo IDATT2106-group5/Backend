@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.model;
+package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
