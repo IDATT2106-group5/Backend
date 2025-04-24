@@ -46,7 +46,7 @@ CREATE TABLE unregistered_household_member (
 CREATE TABLE item (
                       id INT PRIMARY KEY AUTO_INCREMENT,
                       name VARCHAR(255) NOT NULL UNIQUE,
-                      item_type ENUM('LIQUIDS', 'WATER', 'FIRST AID', 'TOOL', 'OTHER') NOT NULL,
+                      item_type ENUM('LIQUIDS', 'FOOD', 'FIRST AID', 'TOOL', 'OTHER') NOT NULL,
                       caloric_amount INT
 );
 
