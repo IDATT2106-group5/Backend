@@ -23,13 +23,14 @@ public class AuthController {
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider tokenProvider;
 
-  public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
+  public AuthController(AuthenticationManager authenticationManager,
+      JwtTokenProvider tokenProvider) {
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
   }
 
   /**
-   * Process login requests and return JWT tokens
+   * Process login requests and return JWT tokens.
    *
    * @param loginRequest containing user credentials
    * @return ResponseEntity with JWT token if authentication successful

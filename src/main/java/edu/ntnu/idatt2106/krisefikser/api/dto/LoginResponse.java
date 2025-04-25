@@ -1,8 +1,11 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
+/**
+ * Data Transfer Object for login requests. This class is used to encapsulate the data sent from the
+ * client to the server when a user attempts to log in.
+ *
+ * @author Snake727
+ */
 public class LoginResponse {
 
   private String token;
