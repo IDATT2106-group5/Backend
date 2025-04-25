@@ -39,6 +39,9 @@ public class User {
   @JoinColumn(name = "household_id")
   private Household household;
 
+  @Column(name = "tlf")
+  private String tlf;
+
   /**
    * Instantiates a new User.
    */
@@ -53,13 +56,16 @@ public class User {
    * @param fullName  the full name
    * @param role      the role
    * @param household the household
+   * @param tlf       the tlf
    */
-  public User(String email, String password, String fullName, Role role, Household household) {
+  public User(String email, String password, String fullName, Role role, Household household,
+              String tlf) {
     this.email = email;
     this.password = password;
     this.fullName = fullName;
     this.role = role;
     this.household = household;
+    this.tlf = tlf;
   }
 
   /**
@@ -170,4 +176,21 @@ public class User {
     this.household = household;
   }
 
+  /**
+   * Gets tlf.
+   *
+   * @return the tlf
+   */
+  public String getTlf() {
+    return tlf;
+  }
+
+  /**
+   * Sets tlf.
+   *
+   * @param tlf the tlf
+   */
+  public void setTlf(String tlf) {
+    this.tlf = tlf;
+  }
 }
