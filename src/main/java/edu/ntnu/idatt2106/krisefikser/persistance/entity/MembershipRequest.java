@@ -1,5 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestStatus;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,7 +13,7 @@ import jakarta.persistence.Table;
 import java.security.Timestamp;
 
 @Entity
-@Table(name = "membership_requests")
+@Table(name = "membership_request")
 public class MembershipRequest {
 
   @Id
@@ -31,11 +33,11 @@ public class MembershipRequest {
 
   @Column
   @Enumerated(EnumType.STRING)
-  private String type;
+  private RequestType type;
 
   @Column
   @Enumerated(EnumType.STRING)
-  private String status;
+  private RequestStatus status;
 
   @Column
   private Timestamp created_at;
