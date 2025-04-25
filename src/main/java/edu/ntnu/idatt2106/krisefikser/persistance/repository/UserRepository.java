@@ -3,7 +3,11 @@ package edu.ntnu.idatt2106.krisefikser.persistance.repository;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Repository for User entities.
@@ -34,4 +38,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
    * @return an Optional containing the User if found
    */
   Optional<User> findByConfirmationToken(String token);
+
+  @Modifying
+  @Transactional
+  @Query("UPDATE User u SET u.household.id = :householdId WHERE u.id = :userId")
+  void updateHouseholdId(@Param("userId") Long userId, @Param("householdId") Long householdId);
 }
