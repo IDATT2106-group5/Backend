@@ -17,6 +17,15 @@ public class KrisefikserApplication {
     System.setProperty("JWT_SECRET", dotenv.get("JWT_SECRET"));
     System.setProperty("JWT_EXPIRATION_MS", dotenv.get("JWT_EXPIRATION_MS"));
 
+    System.setProperty("SPRING_MAIL_HOST", dotenv.get("SPRING_MAIL_HOST"));
+    System.setProperty("SPRING_MAIL_PORT", dotenv.get("SPRING_MAIL_PORT"));
+    System.setProperty("SPRING_MAIL_USERNAME", dotenv.get("SPRING_MAIL_USERNAME"));
+    System.setProperty("SPRING_MAIL_PASSWORD", dotenv.get("SPRING_MAIL_PASSWORD"));
+    System.setProperty("SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH",
+        dotenv.get("SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH"));
+    System.setProperty("SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE",
+        dotenv.get("SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE"));
+
     SpringApplication.run(KrisefikserApplication.class, args);
   }
 }
