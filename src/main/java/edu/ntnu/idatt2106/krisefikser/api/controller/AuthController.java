@@ -1,31 +1,34 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
-import edu.ntnu.idatt2106.krisefikser.service.AuthService;
-import java.util.Map;
-import org.springframework.http.ResponseEntity;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
+import edu.ntnu.idatt2106.krisefikser.service.AuthService;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Controller handling authentication requests such as login.
+ * Controller handling authentication requests.
  */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-  private final AuthService authService;
+
   private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+  private final AuthService authService;
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider tokenProvider;
 
@@ -35,7 +38,7 @@ public class AuthController {
    * @param authService the authentication service
    */
   public AuthController(AuthService authService, AuthenticationManager authenticationManager,
-                        JwtTokenProvider tokenProvider) {
+      JwtTokenProvider tokenProvider) {
     this.authService = authService;
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
@@ -56,7 +59,8 @@ public class AuthController {
       logger.warn("Validation error during registration: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      logger.error("Unexpected error during registration for {}: {}", request.getEmail(), e.getMessage(), e);
+      logger.error("Unexpected error during registration for {}: {}", request.getEmail(),
+          e.getMessage(), e);
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
@@ -85,5 +89,15 @@ public class AuthController {
 
     // Return token in the response
     return ResponseEntity.ok(new LoginResponse(jwt));
+  }
+
+  @GetMapping("/confirm")
+  public ResponseEntity<Map<String, String>> confirmEmail(@RequestParam("token") String token) {
+    try {
+      authService.confirmUser(token);
+      return ResponseEntity.ok(Map.of("message", "Email confirmed successfully"));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
   }
 }

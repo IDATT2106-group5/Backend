@@ -26,4 +26,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
    * @return true if a user with the given email exists, false otherwise
    */
   boolean existsByEmail(String email);
+
+  /**
+   * Find a user by their confirmation token.
+   *
+   * @param token the confirmation token to search for
+   * @return an Optional containing the User if found
+   */
+  Optional<User> findByConfirmationToken(String token);
 }

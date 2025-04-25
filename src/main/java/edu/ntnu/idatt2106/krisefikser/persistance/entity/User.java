@@ -42,6 +42,13 @@ public class User {
   @Column(name = "tlf")
   private String tlf;
 
+  @Column(nullable = false)
+  private boolean confirmed = false;
+
+  @Column(name = "confirmation_token", unique = true)
+  private String confirmationToken;
+
+
   /**
    * Instantiates a new User.
    */
@@ -59,13 +66,14 @@ public class User {
    * @param tlf       the tlf
    */
   public User(String email, String password, String fullName, Role role, Household household,
-              String tlf) {
+      String tlf, boolean confirmed) {
     this.email = email;
     this.password = password;
     this.fullName = fullName;
     this.role = role;
     this.household = household;
     this.tlf = tlf;
+    this.confirmed = confirmed;
   }
 
   /**
@@ -192,5 +200,41 @@ public class User {
    */
   public void setTlf(String tlf) {
     this.tlf = tlf;
+  }
+
+  /**
+   * Checks if user is confirmed.
+   *
+   * @return the boolean
+   */
+  public boolean isConfirmed() {
+    return confirmed;
+  }
+
+  /**
+   * Sets confirmed.
+   *
+   * @param confirmed the confirmed
+   */
+  public void setConfirmed(boolean confirmed) {
+    this.confirmed = confirmed;
+  }
+
+  /**
+   * Gets confirmation token.
+   *
+   * @return the confirmation token
+   */
+  public String getConfirmationToken() {
+    return confirmationToken;
+  }
+
+  /**
+   * Sets confirmation token.
+   *
+   * @param confirmationToken the confirmation token
+   */
+  public void setConfirmationToken(String confirmationToken) {
+    this.confirmationToken = confirmationToken;
   }
 }
