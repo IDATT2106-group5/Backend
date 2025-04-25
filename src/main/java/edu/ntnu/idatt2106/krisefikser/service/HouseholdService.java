@@ -95,12 +95,12 @@ public class HouseholdService {
     }
     if (user.getHousehold() != null) {
       // Remove user from current household if they are in one
-      householdRepository.setNumberOfMembers(user.getHousehold().getId(),
+      householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
           household.getNumberOfMembers() - 1);
     }
     // add user to new household
-    userRepository.editHouseholdId(user.getId(), household.getId());
-    householdRepository.setNumberOfMembers(household.getId(),
+    userRepository.updateHouseholdId(user.getId(), household.getId());
+    householdRepository.updateNumberOfMembers(household.getId(),
         household.getNumberOfMembers() + 1);
   }
 
@@ -114,9 +114,9 @@ public class HouseholdService {
       logger.warn("User {} is not a member of any household", user.getFullName());
       throw new IllegalArgumentException("User is not a member of any household");
     }
-    householdRepository.setNumberOfMembers(user.getHousehold().getId(),
+    householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
         user.getHousehold().getNumberOfMembers() - 1);
-    userRepository.editHouseholdId(user.getId(), null);
+    userRepository.updateHouseholdId(user.getId(), null);
   }
 
   /**
@@ -135,7 +135,7 @@ public class HouseholdService {
     }
 
     unregisteredHouseholdMemberRepository.save(member);
-    householdRepository.setNumberOfMembers(household.getId(),
+    householdRepository.updateNumberOfMembers(household.getId(),
         household.getNumberOfMembers() + 1);
 
     logger.info("Unregistered member {} added to household {}",
@@ -153,7 +153,7 @@ public class HouseholdService {
       logger.warn("Unregistered member {} doesnt belong to any household", member.getFullName());
     }
     unregisteredHouseholdMemberRepository.delete(member);
-    householdRepository.setNumberOfMembers(member.getId(),
+    householdRepository.updateNumberOfMembers(member.getId(),
         member.getHousehold().getNumberOfMembers() - 1);
   }
 }
