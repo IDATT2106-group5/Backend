@@ -7,6 +7,25 @@ public class RegisterRequestDto {
   private String fullName;
   private String email;
   private String password;
+  private String tlf;
+
+  /**
+   * Gets tlf.
+   *
+   * @return the tlf
+   */
+  public String getTlf() {
+    return tlf;
+  }
+
+  /**
+   * Sets tlf.
+   *
+   * @param tlf the tlf
+   */
+  public void setTlf(String tlf) {
+    this.tlf = tlf;
+  }
 
   /**
    * Gets full name.
