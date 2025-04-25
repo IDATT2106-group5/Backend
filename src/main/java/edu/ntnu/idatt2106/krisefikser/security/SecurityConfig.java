@@ -14,6 +14,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Security configuration class for setting up JWT-based authentication and authorization. It
+ * configures the security filter chain, authentication provider, and password encoder.
+ *
+ * @author Snake727
+ */
 @Configuration
 public class SecurityConfig {
 
@@ -21,6 +27,15 @@ public class SecurityConfig {
   private final JwtAuthenticationFilter jwtAuthFilter;
   private final CustomUserDetailsService customUserDetailsService;
 
+  /**
+   * Constructor for SecurityConfig.
+   *
+   * @param jwtAuthEntryPoint        The JWT authentication entry point to handle unauthorized
+   *                                 requests.
+   * @param jwtAuthFilter            The JWT authentication filter to validate incoming requests.
+   * @param customUserDetailsService The custom user details service for loading user-specific
+   *                                 data.
+   */
   public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthEntryPoint,
       JwtAuthenticationFilter jwtAuthFilter,
       CustomUserDetailsService customUserDetailsService) {
@@ -29,6 +44,13 @@ public class SecurityConfig {
     this.customUserDetailsService = customUserDetailsService;
   }
 
+  /**
+   * Configures the security filter chain for the application.
+   *
+   * @param http The HttpSecurity object to configure security settings.
+   * @return The configured SecurityFilterChain.
+   * @throws Exception If a general error occurs during configuration.
+   */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
@@ -54,6 +76,12 @@ public class SecurityConfig {
     return http.build();
   }
 
+  /**
+   * Configures the authentication provider for the application.
+   *
+   * @return The configured AuthenticationProvider.
+   */
+
   @Bean
   public AuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -63,13 +91,13 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
-      throws Exception {
-    return authConfig.getAuthenticationManager();
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
   @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
+      throws Exception {
+    return authConfig.getAuthenticationManager();
   }
 }
