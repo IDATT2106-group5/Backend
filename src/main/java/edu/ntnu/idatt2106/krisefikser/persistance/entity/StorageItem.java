@@ -1,47 +1,48 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "household")
-public class Household {
+@AllArgsConstructor
+@Table(name = "storage_item")
+public class StorageItem {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false, unique = true)
-  private String name;
+  @ManyToOne
+  @JoinColumn(name = "household_id", nullable = false)
+  private Household household;
+
+  @ManyToOne
+  @JoinColumn(name = "item_id", nullable = false)
+  private Item item;
 
   @Column(nullable = false)
-  private String address;
+  private String unit;
 
   @Column(nullable = false)
-  private int numberOfMembers;
+  private Integer amount;
 
-  @OneToOne
-  @JoinColumn(nullable = false)
-  private User owner;
-  
-  @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
-  private List<StorageItem> storageItems = new ArrayList<>();
+  @Column(name = "expiration_date")
+  private LocalDateTime expirationDate;
+
+  @Column(name = "date_added", nullable = false)
+  private LocalDateTime dateAdded = LocalDateTime.now();
 }
