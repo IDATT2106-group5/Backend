@@ -1,17 +1,16 @@
 package edu.ntnu.idatt2106.krisefikser.security;
 
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import java.util.Collection;
+import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
-
 /**
- * CustomUserDetails adapts our User entity to Spring Security's UserDetails interface.
- * This class serves as a bridge between the application's user model and Spring Security's
- * authentication system.
+ * CustomUserDetails adapts our User entity to Spring Security's UserDetails interface. This class
+ * serves as a bridge between the application's user model and Spring Security's authentication
+ * system.
  */
 public class CustomUserDetails implements UserDetails {
 
