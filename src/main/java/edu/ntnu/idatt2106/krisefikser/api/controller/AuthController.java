@@ -1,22 +1,40 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
+<<<<<<< HEAD
 import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.AuthService;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
+=======
+import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+>>>>>>> 3bd6c8b2ea7c0ce32150dc9a6f5bdfe7ec5248fa
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+<<<<<<< HEAD
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Controller for handling authentication requests.
+=======
+
+/**
+ * Controller handling authentication requests such as login.
+>>>>>>> 3bd6c8b2ea7c0ce32150dc9a6f5bdfe7ec5248fa
  */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+<<<<<<< HEAD
   private final AuthService authService;
   private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
@@ -49,3 +67,41 @@ public class AuthController {
     }
   }
 }
+=======
+
+  private final AuthenticationManager authenticationManager;
+  private final JwtTokenProvider tokenProvider;
+
+  public AuthController(AuthenticationManager authenticationManager,
+      JwtTokenProvider tokenProvider) {
+    this.authenticationManager = authenticationManager;
+    this.tokenProvider = tokenProvider;
+  }
+
+  /**
+   * Process login requests and return JWT tokens.
+   *
+   * @param loginRequest containing user credentials
+   * @return ResponseEntity with JWT token if authentication successful
+   */
+  @PostMapping("/login")
+  public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    // Authenticate the user
+    Authentication authentication = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(
+            loginRequest.getEmail(),
+            loginRequest.getPassword()
+        )
+    );
+
+    // Set the authentication object in the security context
+    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    // Generate JWT token
+    String jwt = tokenProvider.generateToken(authentication);
+
+    // Return token in the response
+    return ResponseEntity.ok(new LoginResponse(jwt));
+  }
+}
+>>>>>>> 3bd6c8b2ea7c0ce32150dc9a6f5bdfe7ec5248fa
