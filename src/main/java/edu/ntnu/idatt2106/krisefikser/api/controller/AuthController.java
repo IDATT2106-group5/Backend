@@ -64,26 +64,20 @@ public class AuthController {
   /**
    * Process login requests and return JWT tokens.
    *
-   * @param loginRequest containing user credentials
+   * @param loginRequest - a {@link LoginRequest} containing user credentials
    * @return ResponseEntity with JWT token if authentication successful
    */
   @PostMapping("/login")
-  public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-    // Authenticate the user
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(
-            loginRequest.getEmail(),
-            loginRequest.getPassword()
-        )
-    );
-
-    // Set the authentication object in the security context
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    // Generate JWT token
-    String jwt = tokenProvider.generateToken(authentication);
-
-    // Return token in the response
-    return ResponseEntity.ok(new LoginResponse(jwt));
+  public ResponseEntity<Map<String, LoginResponse>> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    try {
+      LoginResponse response = authService.loginUser(loginRequest);
+      return ResponseEntity.status(201).body(Map.of("token", response));
+    } catch (IllegalArgumentException e) {
+      logger.warn("Validation error during login: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", null));
+    } catch (Exception e) {
+      logger.error("Unexpected error during login for {}: {}", loginRequest.getEmail(), e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", null));
+    }
   }
 }
