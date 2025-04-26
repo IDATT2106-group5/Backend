@@ -13,6 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AuthController {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
@@ -95,9 +97,13 @@ public class AuthController {
   public ResponseEntity<Map<String, String>> confirmEmail(@RequestParam("token") String token) {
     try {
       authService.confirmUser(token);
-      return ResponseEntity.ok(Map.of("message", "Email confirmed successfully"));
+      return ResponseEntity.status(302)
+          .header("Location", "http://localhost:5173/register-success")
+          .build();
     } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+      return ResponseEntity.status(302)
+          .header("Location", "http://localhost:3000/register-failed")
+          .build();
     }
   }
 }
