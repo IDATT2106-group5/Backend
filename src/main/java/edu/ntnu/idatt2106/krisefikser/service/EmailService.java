@@ -1,7 +1,9 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import org.springframework.mail.SimpleMailMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -32,13 +34,21 @@ public class EmailService {
     String subject = "Bekreft e-post for Krisefikser";
     String confirmationUrl =
         "http://localhost:8080/api/auth/confirm?token=" + token;
-    String body = "Hei! Klikk lenken under for å bekrefte e-posten din:\n" + confirmationUrl;
+    String body = "<html><body>" +
+        "<h1>Velkommen til Krisefikser!</h1>" +
+        "<p>Klikk på lenken under for å bekrefte e-posten din:</p>" +
+        "<a href=\"" + confirmationUrl + "\">Bekreft e-post</a>" +
+        "</body></html>";
 
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setTo(toEmail);
-    message.setSubject(subject);
-    message.setText(body);
-
-    mailSender.send(message);
+    MimeMessage message = mailSender.createMimeMessage();
+    try {
+      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+      helper.setTo(toEmail);
+      helper.setSubject(subject);
+      helper.setText(body, true);
+      mailSender.send(message);
+    } catch (MessagingException e) {
+      throw new RuntimeException("Failed to send email", e);
+    }
   }
 }
