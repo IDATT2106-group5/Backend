@@ -7,7 +7,6 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
-
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +30,9 @@ public class AuthService {
   private final JwtTokenProvider tokenProvider;
   private final EmailService emailService;
 
-  public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService
-                     AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
+  public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+      EmailService emailService,
+      AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.emailService = emailService;
@@ -87,10 +87,9 @@ public class AuthService {
    * Handles the login process for a user.
    *
    * @param request The login request containing the user's email and password.
-   * @return        A {@link LoginResponse} containing a JWT token if the login is successful.
+   * @return A {@link LoginResponse} containing a JWT token if the login is successful.
    * @throws IllegalArgumentException If the user is not found or the password is incorrect.
    */
-  @PostMapping("/login")
   public LoginResponse loginUser(LoginRequest request) throws IllegalArgumentException {
     // Find user by email if they exist
     User user = userRepository.findByEmail(request.getEmail())
@@ -99,10 +98,13 @@ public class AuthService {
                                 throw new IllegalArgumentException("No user found with that email");
                               });
     
-    if (user.getPassword() == passwordEncoder.encode(request.getPassword())) {
-      logger.info("User logged in successfully: {}", user.getEmail());
+    // Checks if typed password matches encrypted 
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+      logger.warn("Wrong password for user: {}", request.getEmail());
+      throw new IllegalArgumentException("Wrong password for user");
+    }
 
-      // Authenticate the user
+    try {
       Authentication authentication = authenticationManager.authenticate(
           new UsernamePasswordAuthenticationToken(
               request.getEmail(),
@@ -110,16 +112,16 @@ public class AuthService {
           )
       );
 
-      // Set the authentication object in the security context
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
-      // Generate JWT token
       String jwt = tokenProvider.generateToken(authentication);
 
+      logger.info("User logged in successfully: {}", request.getEmail());
       return new LoginResponse(jwt);
-    } else {
-      logger.warn("Wrong password for user: {}", request.getEmail());
-      throw new IllegalArgumentException("Wrong password for user");
+
+    } catch (Exception e) {
+      logger.warn("Login failed for user {}: {}", request.getEmail(), e.getMessage());
+      throw new IllegalArgumentException("Invalid email or password");
     }
-  };
-};
+  }
+}
