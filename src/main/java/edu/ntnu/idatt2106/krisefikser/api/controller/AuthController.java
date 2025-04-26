@@ -67,15 +67,20 @@ public class AuthController {
   public ResponseEntity<Map<String, String>> authenticateUser(
       @RequestBody LoginRequest loginRequest) {
     try {
+      if (loginRequest == null) { 
+        throw new IllegalArgumentException("Request object is null");
+      }
+
       LoginResponse response = authService.loginUser(loginRequest);
       return ResponseEntity.status(201).body(Map.of("token", response.getToken()));
     } catch (IllegalArgumentException e) {
       logger.warn("Validation error during login: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      logger.error("Unexpected error during login for {}: {}", loginRequest.getEmail(),
-          e.getMessage(), e);
-      return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+      logger.error("Unexpected error during login for {}: {}", 
+                   loginRequest != null ? loginRequest.getEmail() : "null", 
+                   e.getMessage(), e);
+      return ResponseEntity.internalServerError().body(Map.of("error", "An unexpected error occurred"));
     }
   }
 
