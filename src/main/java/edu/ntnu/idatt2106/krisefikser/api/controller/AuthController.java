@@ -3,16 +3,11 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
-import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
 import edu.ntnu.idatt2106.krisefikser.service.AuthService;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,19 +26,14 @@ public class AuthController {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
   private final AuthService authService;
-  private final AuthenticationManager authenticationManager;
-  private final JwtTokenProvider tokenProvider;
 
   /**
    * Constructor for AuthController.
    *
    * @param authService the authentication service
    */
-  public AuthController(AuthService authService, AuthenticationManager authenticationManager,
-      JwtTokenProvider tokenProvider) {
+  public AuthController(AuthService authService) {
     this.authService = authService;
-    this.authenticationManager = authenticationManager;
-    this.tokenProvider = tokenProvider;
   }
 
   /**
@@ -74,16 +64,18 @@ public class AuthController {
    * @return ResponseEntity with JWT token if authentication successful
    */
   @PostMapping("/login")
-  public ResponseEntity<Map<String, LoginResponse>> authenticateUser(@RequestBody LoginRequest loginRequest) {
+  public ResponseEntity<Map<String, String>> authenticateUser(
+      @RequestBody LoginRequest loginRequest) {
     try {
       LoginResponse response = authService.loginUser(loginRequest);
-      return ResponseEntity.status(201).body(Map.of("token", response));
+      return ResponseEntity.status(201).body(Map.of("token", response.getToken()));
     } catch (IllegalArgumentException e) {
       logger.warn("Validation error during login: {}", e.getMessage());
-      return ResponseEntity.badRequest().body(Map.of("error", null));
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      logger.error("Unexpected error during login for {}: {}", loginRequest.getEmail(), e.getMessage(), e);
-      return ResponseEntity.status(500).body(Map.of("error", null));
+      logger.error("Unexpected error during login for {}: {}", loginRequest.getEmail(),
+          e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
     }
   }
 
