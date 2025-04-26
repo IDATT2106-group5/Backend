@@ -31,7 +31,7 @@ public class AuthService {
   private final JwtTokenProvider tokenProvider;
   private final EmailService emailService;
 
-  public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService
+  public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService,
                      AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
@@ -90,7 +90,6 @@ public class AuthService {
    * @return        A {@link LoginResponse} containing a JWT token if the login is successful.
    * @throws IllegalArgumentException If the user is not found or the password is incorrect.
    */
-  @PostMapping("/login")
   public LoginResponse loginUser(LoginRequest request) throws IllegalArgumentException {
     // Find user by email if they exist
     User user = userRepository.findByEmail(request.getEmail())
@@ -99,7 +98,7 @@ public class AuthService {
                                 throw new IllegalArgumentException("No user found with that email");
                               });
     
-    if (user.getPassword() == passwordEncoder.encode(request.getPassword())) {
+    if (user.getPassword().matches(passwordEncoder.encode(request.getPassword()))) {
       logger.info("User logged in successfully: {}", user.getEmail());
 
       // Authenticate the user
