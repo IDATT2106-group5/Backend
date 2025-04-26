@@ -91,6 +91,18 @@ public class AuthService {
    * @throws IllegalArgumentException If the user is not found or the password is incorrect.
    */
   public LoginResponse loginUser(LoginRequest request) throws IllegalArgumentException {
+    // Find user by email if they exist
+    User user = userRepository.findByEmail(request.getEmail())
+                              .orElseThrow(() -> {
+                                logger.warn("User not found during login attempt: {}", request.getEmail());
+                                throw new IllegalArgumentException("No user found with that email");
+                              });
+    
+    // Checks if typed password matches encrypted 
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+      logger.warn("Wrong password for user: {}", request.getEmail());
+      throw new IllegalArgumentException("Wrong password for user");
+    }
 
     try {
       Authentication authentication = authenticationManager.authenticate(
