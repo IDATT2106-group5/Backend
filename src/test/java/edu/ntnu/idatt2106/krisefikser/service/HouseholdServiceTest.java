@@ -1,0 +1,467 @@
+package edu.ntnu.idatt2106.krisefikser.service;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
+
+import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.UnregisteredHouseholdMember;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+
+/**
+ * Unit tests for the HouseholdService class.
+ * This class contains nested test classes for testing various functionalities of the HouseholdService.
+ */
+class HouseholdServiceTest {
+
+  @Mock
+  private HouseholdRepository householdRepository;
+
+  @Mock
+  private UserRepository userRepository;
+
+  @Mock
+  private UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository;
+
+  private HouseholdService householdService;
+
+  /**
+   * Initializes mocks and the HouseholdService instance before each test.
+   */
+  @BeforeEach
+  void setUp() {
+    openMocks(this);
+    householdService = new HouseholdService(householdRepository, userRepository,
+        unregisteredHouseholdMemberRepository);
+  }
+
+  /**
+   * Nested test class for testing the createHousehold functionality.
+   */
+  @Nested
+  class createHouseholdTests {
+    /**
+     * Tests the positive scenario where a household is successfully created.
+     */
+    @Test
+    void createHouseholdPositive() {
+      CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
+      when(request.getName()).thenReturn("TestHousehold");
+      when(request.getAddress()).thenReturn("TestAddress");
+      when(request.getOwnerId()).thenReturn(1L);
+
+      when(householdRepository.findByName("TestHousehold")).thenReturn(Optional.empty());
+      when(userRepository.findById(1L)).thenReturn(Optional.of(new User()));
+
+      // mock save operation so that household ID is set
+      when(householdRepository.save(any(Household.class))).thenAnswer(invocation -> {
+        Household household = invocation.getArgument(0);
+        household.setId(1L);
+        return household;
+      });
+
+      assertDoesNotThrow(() -> householdService.createHousehold(request));
+
+      verify(householdRepository, times(1)).save(any(Household.class));
+      verify(userRepository, times(1)).updateHouseholdId(eq(1L), anyLong());
+    }
+
+    /**
+     * Tests the scenario where a household with a duplicate name is attempted to be created.
+     */
+    @Test
+    void createHouseholdWithDuplicateName() {
+      CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
+      when(request.getName()).thenReturn("TestHousehold");
+
+      when(householdRepository.findByName("TestHousehold")).thenReturn(
+          Optional.of(new Household()));
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.createHousehold(request));
+      assertEquals("Household with this name already exists", exception.getMessage());
+
+      verify(householdRepository, never()).save(any(Household.class));
+    }
+
+    /**
+     * Tests the scenario where the owner ID is null during household creation.
+     */
+    @Test
+    void createHouseholdWithNullOwnerId() {
+      CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
+      when(request.getName()).thenReturn("TestHousehold");
+      when(request.getAddress()).thenReturn("TestAddress");
+      when(request.getOwnerId()).thenReturn(null);
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.createHousehold(request));
+      assertEquals("Owner id must not be null", exception.getMessage());
+
+      verify(householdRepository, never()).save(any(Household.class));
+    }
+
+    /**
+     * Tests the scenario where the owner does not exist in the database.
+     */
+    @Test
+    void createHouseholdWithNonExistentOwner() {
+      CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
+      when(request.getName()).thenReturn("TestHousehold");
+      when(request.getAddress()).thenReturn("TestAddress");
+      when(request.getOwnerId()).thenReturn(1L);
+
+      when(householdRepository.findByName("TestHousehold")).thenReturn(Optional.empty());
+      when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.createHousehold(request));
+      assertEquals("User not found", exception.getMessage());
+
+      verify(householdRepository, never()).save(any(Household.class));
+    }
+  }
+
+  /**
+   * Nested test class for testing the addUserToHousehold functionality.
+   */
+  @Nested
+  class addUserToHouseholdTest {
+    /**
+     * Tests the positive scenario where a user is successfully added to a household.
+     */
+    @Test
+    void addUserToHousehold() {
+      UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
+      when(request.getEmail()).thenReturn("user@example.com");
+      when(request.getHouseholdId()).thenReturn(2L);
+
+      User user = new User();
+      user.setId(1L);
+      user.setHousehold(null);
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+
+      Household household = new Household();
+      household.setId(2L);
+      household.setNumberOfMembers(3);
+      when(householdRepository.findById(2L)).thenReturn(Optional.of(household));
+
+      assertDoesNotThrow(() -> householdService.addUserToHousehold(request));
+
+      verify(userRepository, times(1)).updateHouseholdId(eq(1L), eq(2L));
+      verify(householdRepository, times(1)).updateNumberOfMembers(eq(2L), eq(4));
+    }
+
+    /**
+     * Add user to household throws when user not found.
+     */
+    @Test
+    void addUserToHouseholdThrowsWhenUserNotFound() {
+      UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
+      when(request.getEmail()).thenReturn("nonexistent@example.com");
+
+      when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.addUserToHousehold(request));
+      assertEquals("User not found", exception.getMessage());
+
+      verify(userRepository, times(1)).findByEmail("nonexistent@example.com");
+    }
+
+    /**
+     * Tests the scenario where the household is not found.
+     */
+    @Test
+    void addUserToHouseholdThrowsWhenHouseholdNotFound() {
+      UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
+      when(request.getEmail()).thenReturn("user@example.com");
+      when(request.getHouseholdId()).thenReturn(3L);
+
+      User user = new User();
+      user.setId(1L);
+      user.setHousehold(null);
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+
+      when(householdRepository.findById(3L)).thenReturn(Optional.empty());
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.addUserToHousehold(request));
+      assertEquals("Household not found", exception.getMessage());
+
+      verify(householdRepository, times(1)).findById(3L);
+    }
+
+    /**
+     * Tests the scenario where the user is already a member of the target household.
+     */
+    @Test
+    void addUserToHouseholdThrowsWhenUserAlreadyMemberOfTargetHousehold() {
+      UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
+      when(request.getEmail()).thenReturn("user@example.com");
+      when(request.getHouseholdId()).thenReturn(2L);
+
+      Household currentHousehold = new Household();
+      currentHousehold.setId(2L);
+      currentHousehold.setNumberOfMembers(4);
+      User user = new User();
+      user.setId(1L);
+      user.setHousehold(currentHousehold);
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+      when(householdRepository.findById(2L)).thenReturn(Optional.of(currentHousehold));
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.addUserToHousehold(request));
+      assertEquals("User is already a member of this household", exception.getMessage());
+
+      verify(householdRepository, never()).updateNumberOfMembers(anyLong(), anyInt());
+      verify(userRepository, never()).updateHouseholdId(anyLong(), anyLong());
+    }
+
+    /**
+     * Tests the scenario where the user is moved from one household to another.
+     */
+    @Test
+    void addUserToHouseholdMovesUserFromOldHousehold() {
+      UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
+      when(request.getEmail()).thenReturn("user@example.com");
+      when(request.getHouseholdId()).thenReturn(5L);
+
+      Household oldHousehold = new Household();
+      oldHousehold.setId(3L);
+      oldHousehold.setNumberOfMembers(4);
+      User user = new User();
+      user.setId(1L);
+      user.setHousehold(oldHousehold);
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+
+      Household newHousehold = new Household();
+      newHousehold.setId(5L);
+      newHousehold.setNumberOfMembers(2);
+      when(householdRepository.findById(5L)).thenReturn(Optional.of(newHousehold));
+
+      assertDoesNotThrow(() -> householdService.addUserToHousehold(request));
+
+      verify(householdRepository, times(1))
+          .updateNumberOfMembers(eq(oldHousehold.getId()),
+              eq(oldHousehold.getNumberOfMembers() - 1));
+      verify(userRepository, times(1)).updateHouseholdId(eq(1L), eq(newHousehold.getId()));
+      verify(householdRepository, times(1))
+          .updateNumberOfMembers(eq(newHousehold.getId()),
+              eq(newHousehold.getNumberOfMembers() + 1));
+    }
+
+  }
+
+  /**
+   * Nested test class for testing the removeUserFromHousehold functionality.
+   */
+  @Nested
+  class RemoveUserFromHouseholdTests {
+
+    /**
+     * Tests the positive scenario where a user is successfully removed from a household.
+     */
+    @Test
+    void removeUserFromHouseholdPositive() {
+      User user = new User();
+      user.setId(1L);
+      Household household = new Household();
+      household.setId(2L);
+      household.setNumberOfMembers(3);
+      user.setHousehold(household);
+
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+
+      assertDoesNotThrow(() -> householdService.removeUserFromHousehold("user@example.com"));
+
+      verify(householdRepository, times(1)).updateNumberOfMembers(eq(2L), eq(2));
+      verify(userRepository, times(1)).updateHouseholdId(eq(1L), eq(null));
+    }
+
+    /**
+     * Tests the scenario where the user is not found in the database, and an exception is thrown.
+     */
+    @Test
+    void removeUserFromHouseholdThrowsWhenUserNotFound() {
+      when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.removeUserFromHousehold("nonexistent@example.com"));
+      assertEquals("User not found", exception.getMessage());
+
+      verify(userRepository, times(1)).findByEmail("nonexistent@example.com");
+    }
+
+    /**
+     * Tests the scenario where the user is not a member of any household, and an exception is thrown.
+     */
+    @Test
+    void removeUserFromHouseholdThrowsWhenUserNotInAnyHousehold() {
+      User user = new User();
+      user.setId(1L);
+      user.setHousehold(null);
+
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.removeUserFromHousehold("user@example.com"));
+      assertEquals("User is not a member of any household", exception.getMessage());
+
+      verify(householdRepository, never()).updateNumberOfMembers(anyLong(), anyInt());
+      verify(userRepository, never()).updateHouseholdId(anyLong(), any());
+    }
+  }
+
+  /**
+   * Nested test class for testing the addUnregisteredMemberToHousehold functionality.
+   */
+  @Nested
+  class AddUnregisteredMemberToHouseholdTests {
+
+    /**
+     * Tests the positive scenario where an unregistered member is successfully added to a household.
+     */
+    @Test
+    void addUnregisteredMemberToHouseholdPositive() {
+      UnregisteredMemberHouseholdAssignmentRequestDto request =
+          mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
+      when(request.getFullName()).thenReturn("John Doe");
+      when(request.getHouseholdId()).thenReturn(1L);
+
+      Household household = new Household();
+      household.setId(1L);
+      household.setNumberOfMembers(2);
+
+      when(householdRepository.findById(1L)).thenReturn(Optional.of(household));
+      when(unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId("John Doe", 1L))
+          .thenReturn(Optional.empty());
+
+      assertDoesNotThrow(() -> householdService.addUnregisteredMemberToHousehold(request));
+
+      verify(unregisteredHouseholdMemberRepository, times(1)).save(
+          any(UnregisteredHouseholdMember.class));
+      verify(householdRepository, times(1)).updateNumberOfMembers(eq(1L), eq(3));
+    }
+
+    /**
+     * Tests the scenario where an unregistered member already exists in the household, and an exception is thrown.
+     */
+    @Test
+    void addUnregisteredMemberToHouseholdThrowsWhenMemberAlreadyExists() {
+      UnregisteredMemberHouseholdAssignmentRequestDto request =
+          mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
+      when(request.getFullName()).thenReturn("John Doe");
+      when(request.getHouseholdId()).thenReturn(1L);
+
+      when(unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId("John Doe", 1L))
+          .thenReturn(Optional.of(new UnregisteredHouseholdMember()));
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.addUnregisteredMemberToHousehold(request));
+      assertEquals("Unregistered member already exists in this household", exception.getMessage());
+
+      verify(unregisteredHouseholdMemberRepository, never()).save(
+          any(UnregisteredHouseholdMember.class));
+      verify(householdRepository, never()).updateNumberOfMembers(anyLong(), anyInt());
+    }
+
+    /**
+     * Tests the scenario where the household is not found, and an exception is thrown.
+     */
+    @Test
+    void addUnregisteredMemberToHouseholdThrowsWhenHouseholdNotFound() {
+      UnregisteredMemberHouseholdAssignmentRequestDto request =
+          mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
+      when(request.getFullName()).thenReturn("John Doe");
+      when(request.getHouseholdId()).thenReturn(1L);
+
+      when(householdRepository.findById(1L)).thenReturn(Optional.empty());
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.addUnregisteredMemberToHousehold(request));
+      assertEquals("Household not found", exception.getMessage());
+
+      verify(unregisteredHouseholdMemberRepository, never()).save(
+          any(UnregisteredHouseholdMember.class));
+      verify(householdRepository, never()).updateNumberOfMembers(anyLong(), anyInt());
+    }
+  }
+
+  /**
+   * Nested test class for testing the removeUnregisteredMemberFromHousehold functionality.
+   */
+  @Nested
+  class RemoveUnregisteredMemberFromHouseholdTests {
+
+    /**
+     * Tests the positive scenario where an unregistered member is successfully removed from a household.
+     */
+    @Test
+    void removeUnregisteredMemberFromHouseholdPositive() {
+      UnregisteredMemberHouseholdAssignmentRequestDto request =
+          mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
+      when(request.getFullName()).thenReturn("John Doe");
+      when(request.getHouseholdId()).thenReturn(1L);
+
+      Household household = new Household();
+      household.setId(1L);
+      household.setNumberOfMembers(3);
+
+      UnregisteredHouseholdMember member = new UnregisteredHouseholdMember();
+      member.setFullName("John Doe");
+      member.setHousehold(household);
+
+      when(unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId("John Doe", 1L))
+          .thenReturn(Optional.of(member));
+
+      assertDoesNotThrow(() -> householdService.removeUnregisteredMemberFromHousehold(request));
+
+      verify(unregisteredHouseholdMemberRepository, times(1)).delete(member);
+      verify(householdRepository, times(1)).updateNumberOfMembers(eq(1L), eq(2));
+    }
+
+    /**
+     * Tests the scenario where an unregistered member is not found in the household, and an exception is thrown.
+     */
+    @Test
+    void removeUnregisteredMemberFromHouseholdThrowsWhenMemberNotFound() {
+      UnregisteredMemberHouseholdAssignmentRequestDto request =
+          mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
+      when(request.getFullName()).thenReturn("John Doe");
+      when(request.getHouseholdId()).thenReturn(1L);
+
+      when(unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId("John Doe", 1L))
+          .thenReturn(Optional.empty());
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.removeUnregisteredMemberFromHousehold(request));
+      assertEquals("Unregistered member not found in household", exception.getMessage());
+
+      verify(unregisteredHouseholdMemberRepository, never()).delete(
+          any(UnregisteredHouseholdMember.class));
+      verify(householdRepository, never()).updateNumberOfMembers(anyLong(), anyInt());
+    }
+  }
+}
