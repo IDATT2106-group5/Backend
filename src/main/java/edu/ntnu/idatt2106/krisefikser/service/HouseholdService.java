@@ -193,7 +193,7 @@ public void removeUnregisteredMemberFromHousehold(
   }
 
   unregisteredHouseholdMemberRepository.delete(member);
-  householdRepository.updateNumberOfMembers(member.getId(),
+  householdRepository.updateNumberOfMembers(request.getHouseholdId(),
       member.getHousehold().getNumberOfMembers() - 1);
 }
 }
