@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.enums;
 
-public enum RequestType {
-  JOIN_REQUEST,
-  INVITATION
+public enum Role {
+
+  USER, ADMIN, SUPERADMIN
 }
+

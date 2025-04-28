@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 import java.util.Optional;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.Role;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
