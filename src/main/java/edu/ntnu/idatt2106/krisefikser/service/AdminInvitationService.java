@@ -3,6 +3,8 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,18 +40,30 @@ public class AdminInvitationService {
 
     // Set token expiration (1 hour)
     // Store expiration time in database
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.HOUR, 1);
+    adminUser.setTokenExpiry(calendar.getTime());
 
     userRepository.save(adminUser);
 
     // Send invitation email
+    // At the moment, this is hardcoded, and should be switched out with the frontend URL
+    // when the frontend is ready.
     String invitationLink = "http://yourapp.com/admin/setup?token=" + token;
     emailService.sendAdminInvitation(email, invitationLink);
   }
 
   public boolean validateAdminSetupToken(String token) {
-    // Verify token exists and hasn't expired
     return userRepository.findByConfirmationToken(token)
-        .map(user -> user.getRole() == Role.ADMIN && !user.isConfirmed())
+        .map(user -> {
+          // Check if user is admin, not confirmed, and token hasn't expired
+          boolean isAdmin = user.getRole() == Role.ADMIN;
+          boolean notConfirmed = !user.isConfirmed();
+          boolean notExpired = user.getTokenExpiry() != null &&
+              new Date().before(user.getTokenExpiry());
+
+          return isAdmin && notConfirmed && notExpired;
+        })
         .orElse(false);
   }
 
@@ -57,6 +71,11 @@ public class AdminInvitationService {
     User admin = userRepository.findByConfirmationToken(token)
         .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
+    // Check if token has expired
+    if (admin.getTokenExpiry() == null || new Date().after(admin.getTokenExpiry())) {
+      throw new IllegalArgumentException("Token has expired");
+    }
+    
     // Validate password
     if (!isValidPassword(password)) {
       throw new IllegalArgumentException(

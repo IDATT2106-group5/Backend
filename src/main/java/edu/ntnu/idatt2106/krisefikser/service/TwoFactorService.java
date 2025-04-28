@@ -1,14 +1,20 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import java.security.SecureRandom;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TwoFactorService {
 
+  // OTP validity period in milliseconds (10 minutes)
+  private static final long OTP_VALIDITY_PERIOD = 10 * 60 * 1000;
   private final EmailService emailService;
   private final Random random = new SecureRandom();
+  // Store OTP codes with expiration time (email -> [OTP, expiration timestamp])
+  private final Map<String, Object[]> otpStorage = new ConcurrentHashMap<>();
 
   public TwoFactorService(EmailService emailService) {
     this.emailService = emailService;
@@ -18,17 +24,43 @@ public class TwoFactorService {
     // Generate 6-digit OTP
     String otp = String.format("%06d", random.nextInt(1000000));
 
+    // Calculate expiration time (current time + 10 minutes)
+    long expirationTime = System.currentTimeMillis() + OTP_VALIDITY_PERIOD;
+
+    // Store OTP and its expiration time
+    otpStorage.put(email, new Object[]{otp, expirationTime});
+
     // Send OTP via email
     emailService.sendOtpEmail(email, otp);
 
-    // Store OTP for verification (possibly in Redis with expiration)
     return otp;
   }
 
   public boolean verifyOtp(String email, String providedOtp) {
-    // Verify OTP from storage
-    // ...
+    // Get stored OTP data
+    Object[] otpData = otpStorage.get(email);
 
-    return true; // Replace with actual verification
+    // If no OTP exists for this email
+    if (otpData == null) {
+      return false;
+    }
+
+    String storedOtp = (String) otpData[0];
+    long expirationTime = (long) otpData[1];
+
+    // Check if OTP has expired
+    if (System.currentTimeMillis() > expirationTime) {
+      // Remove expired OTP
+      otpStorage.remove(email);
+      return false;
+    }
+
+    // Check if provided OTP matches stored OTP
+    boolean isValid = storedOtp.equals(providedOtp);
+
+    // Remove OTP after verification attempt (one-time use)
+    otpStorage.remove(email);
+
+    return isValid;
   }
 }

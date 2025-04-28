@@ -46,33 +46,30 @@ public class SecurityConfig {
   }
 
   /**
-   * Configures the security filter chain for the application.
+   * Configures the security filter chain for the application. It sets up JWT-based authentication,
+   * authorization rules, and exception handling.
    *
-   * @param http The HttpSecurity object to configure security settings.
+   * @param http The HttpSecurity object to configure.
    * @return The configured SecurityFilterChain.
-   * @throws Exception If a general error occurs during configuration.
+   * @throws Exception If an error occurs during configuration.
    */
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        // disable CSRF for stateless JWT-based authentication
         .csrf(AbstractHttpConfigurer::disable)
-
-        // handle unauthorized attempts
         .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
-
-        // no session will be created or used by Spring Security
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-        // define authorization rules
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/household/**").permitAll()
+            .requestMatchers("/api/admin/setup").permitAll()
+            .requestMatchers("/api/admin/login/2fa/**").permitAll()
+            .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
+            .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
+            .requestMatchers("/api/household/**")
+            .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
             .anyRequest().authenticated()
         )
-
-        // add JWT filter before the username/password filter
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();

@@ -67,20 +67,30 @@ public class AuthController {
   public ResponseEntity<Map<String, String>> authenticateUser(
       @RequestBody LoginRequest loginRequest) {
     try {
-      if (loginRequest == null) { 
+      if (loginRequest == null) {
         throw new IllegalArgumentException("Request object is null");
       }
 
       LoginResponse response = authService.loginUser(loginRequest);
+
+      // If 2FA is required, inform the client
+      if (response.isRequires2FA()) {
+        return ResponseEntity.ok(Map.of(
+            "requires2FA", "true",
+            "message", "2FA verification required"
+        ));
+      }
+
       return ResponseEntity.status(201).body(Map.of("token", response.getToken()));
     } catch (IllegalArgumentException e) {
       logger.warn("Validation error during login: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      logger.error("Unexpected error during login for {}: {}", 
-                   loginRequest != null ? loginRequest.getEmail() : "null", 
-                   e.getMessage(), e);
-      return ResponseEntity.internalServerError().body(Map.of("error", "An unexpected error occurred"));
+      logger.error("Unexpected error during login for {}: {}",
+          loginRequest != null ? loginRequest.getEmail() : "null",
+          e.getMessage(), e);
+      return ResponseEntity.internalServerError()
+          .body(Map.of("error", "An unexpected error occurred"));
     }
   }
 

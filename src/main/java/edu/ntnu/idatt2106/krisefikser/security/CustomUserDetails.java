@@ -22,9 +22,8 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    // For a simple implementation, we can assign a default role
-    // This can be expanded to use actual roles from the User entity if needed
-    return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    // Return the appropriate authority based on user's role
+    return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
   }
 
   @Override
