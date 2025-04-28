@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,6 +35,7 @@ public class Household {
   private int numberOfMembers;
 
   @OneToOne
+  @JsonBackReference
   @JoinColumn(nullable = false)
   private User owner;
 

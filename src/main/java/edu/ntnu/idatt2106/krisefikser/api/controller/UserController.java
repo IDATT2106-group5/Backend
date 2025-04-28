@@ -33,15 +33,11 @@ public class UserController {
   @GetMapping("/me")
   public ResponseEntity<User> getUser() {
     try {
-      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-      String email = authentication.getName();
-
-      User user = userService.getUserByEmail(email);
+      User user = userService.getUserByEmail();
 
       if (user == null) {
         return ResponseEntity.notFound().build();
       }
-
       return ResponseEntity.ok(user);
     } catch (Exception e) {
       return ResponseEntity.status(500).build();

@@ -4,6 +4,8 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +19,10 @@ public class UserService {
   }
 
 
-  public User getUserByEmail(String email) {
+  public User getUserByEmail() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+
     return userRepository.findByEmail(email)
         .orElseThrow(() -> new RuntimeException("User not found"));
   }
