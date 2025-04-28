@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,17 +28,22 @@ public class UserController {
     this.userService = userService;
   }
 
-  @GetMapping
-  public ResponseEntity<User> getUser(@RequestParam String confirmationToken) {
+
+
+  @GetMapping("/me")
+  public ResponseEntity<User> getUser() {
     try {
-      User user = userService.getUserByConfirmationToken(confirmationToken);
-      LOGGER.info("User found: {}", user.getEmail());
+      Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+      String email = authentication.getName();
+
+      User user = userService.getUserByEmail(email);
+
+      if (user == null) {
+        return ResponseEntity.notFound().build();
+      }
+
       return ResponseEntity.ok(user);
-    } catch (IllegalArgumentException e) {
-      LOGGER.error("User not found: {}", e.getMessage());
-      return ResponseEntity.notFound().build();
     } catch (Exception e) {
-      LOGGER.error("An error occurred while fetching user: ", e);
       return ResponseEntity.status(500).build();
     }
   }
