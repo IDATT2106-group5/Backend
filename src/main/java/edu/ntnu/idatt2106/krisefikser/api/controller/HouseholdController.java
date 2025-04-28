@@ -173,7 +173,7 @@ public class HouseholdController {
 
   @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
   @GetMapping("/household-details")
-  public ResponseEntity<Map<String, Object>> getHouseholdMembers(
+  public ResponseEntity<Map<String, Object>> getHouseholdDetails(
       @RequestParam Long householdId) {
     try {
 
@@ -191,7 +191,6 @@ public class HouseholdController {
 
   @Operation(summary = "Edits a unregistered member in a household",
       description = "Edits a unregistered member in a household with the given ID")
-// File: src/main/java/edu/ntnu/idatt2106/krisefikser/api/controller/HouseholdController.java
   @PostMapping("/edit-unregistered-member")
   public ResponseEntity<String> editUnregisteredMemberInHousehold(@RequestBody EditMemberDto request) {
     try {
