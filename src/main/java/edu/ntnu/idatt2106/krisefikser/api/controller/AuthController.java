@@ -67,7 +67,7 @@ public class AuthController {
   public ResponseEntity<Map<String, String>> authenticateUser(
       @RequestBody LoginRequest loginRequest) {
     try {
-      if (loginRequest == null) { 
+      if (loginRequest == null) {
         throw new IllegalArgumentException("Request object is null");
       }
 
@@ -77,10 +77,11 @@ public class AuthController {
       logger.warn("Validation error during login: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      logger.error("Unexpected error during login for {}: {}", 
-                   loginRequest != null ? loginRequest.getEmail() : "null", 
-                   e.getMessage(), e);
-      return ResponseEntity.internalServerError().body(Map.of("error", "An unexpected error occurred"));
+      logger.error("Unexpected error during login for {}: {}",
+          loginRequest != null ? loginRequest.getEmail() : "null",
+          e.getMessage(), e);
+      return ResponseEntity.internalServerError()
+          .body(Map.of("error", "An unexpected error occurred"));
     }
   }
 
@@ -93,7 +94,7 @@ public class AuthController {
           .build();
     } catch (IllegalArgumentException e) {
       return ResponseEntity.status(302)
-          .header("Location", "http://localhost:3000/register-failed")
+          .header("Location", "http://localhost:5173/register-failed")
           .build();
     }
   }
