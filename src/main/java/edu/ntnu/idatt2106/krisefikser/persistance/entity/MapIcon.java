@@ -1,7 +1,10 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.MapIconType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,8 +21,9 @@ public class MapIcon {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column
-  private String type;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private MapIconType type;
 
   @Column
   private String address;
