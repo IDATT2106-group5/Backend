@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
  * updating, and retrieving storage items. It also provides methods to filter items by type and
  * expiration date.
  */
-
 @Service
 public class StorageService {
 
@@ -40,14 +39,44 @@ public class StorageService {
     this.itemRepository = itemRepository;
   }
 
-  public List<StorageItem> getHouseholdStorage(Long householdId) {
+  /**
+   * Get all storage items for a specific household.
+   *
+   * @param householdId The ID of the household.
+   * @return A list of StorageItem entities.
+   */
+  public List<StorageItem> getStorageItemsByHousehold(Long householdId) {
     return storageItemRepository.findByHouseholdId(householdId);
   }
 
-  public List<StorageItem> getHouseholdStorageByItemType(Long householdId, ItemType itemType) {
+  /**
+   * Get storage items for a specific household filtered by item type.
+   *
+   * @param householdId The ID of the household.
+   * @param itemType    The type of items to filter by.
+   * @return A list of StorageItem entities.
+   */
+  public List<StorageItem> getStorageItemsByHouseholdAndType(Long householdId, ItemType itemType) {
     return storageItemRepository.findByHouseholdIdAndItemItemType(householdId, itemType);
   }
 
+  /**
+   * Get items that will expire before a specific date.
+   *
+   * @param householdId The ID of the household.
+   * @param before      The date before which items will expire.
+   * @return A list of StorageItem entities that will expire before the specified date.
+   */
+  public List<StorageItem> getExpiringItems(Long householdId, LocalDateTime before) {
+    return storageItemRepository.findByHouseholdIdAndExpirationDateBefore(householdId, before);
+  }
+
+  /**
+   * Get items that have already expired.
+   *
+   * @param householdId The ID of the household.
+   * @return A list of StorageItem entities that have already expired.
+   */
   public List<StorageItem> getExpiredItems(Long householdId) {
     return storageItemRepository.findByHouseholdIdAndExpirationDateBefore(
         householdId, LocalDateTime.now());
@@ -81,18 +110,51 @@ public class StorageService {
     storageItem.setUnit(unit);
     storageItem.setAmount(amount);
     storageItem.setExpirationDate(expirationDate);
+    storageItem.setDateAdded(LocalDateTime.now());
 
     return storageItemRepository.save(storageItem);
   }
 
+  /**
+   * Removes an item from storage.
+   *
+   * @param storageItemId The ID of the storage item to be removed.
+   */
   @Transactional
   public void removeItemFromStorage(Long storageItemId) {
     storageItemRepository.deleteById(storageItemId);
   }
 
   /**
-   * Updates the amount of a storage item in the household's storage. This method retrieves the
-   * StorageItem entity by its ID, updates the amount, and saves the changes to the database.
+   * Updates a storage item with new values.
+   *
+   * @param storageItemId  The ID of the storage item to update.
+   * @param unit           The new unit of measurement.
+   * @param amount         The new amount.
+   * @param expirationDate The new expiration date.
+   * @return The updated StorageItem entity.
+   */
+  @Transactional
+  public StorageItem updateStorageItem(Long storageItemId, String unit, Integer amount,
+      LocalDateTime expirationDate) {
+    StorageItem storageItem = storageItemRepository.findById(storageItemId)
+        .orElseThrow(() -> new IllegalArgumentException("Storage item not found"));
+
+    if (unit != null) {
+      storageItem.setUnit(unit);
+    }
+
+    if (amount != null) {
+      storageItem.setAmount(amount);
+    }
+
+    storageItem.setExpirationDate(expirationDate);
+
+    return storageItemRepository.save(storageItem);
+  }
+
+  /**
+   * Updates the amount of a storage item in the household's storage.
    *
    * @param storageItemId The ID of the storage item to be updated.
    * @param newAmount     The new amount to set for the storage item.
