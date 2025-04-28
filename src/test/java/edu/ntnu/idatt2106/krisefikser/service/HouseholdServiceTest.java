@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
@@ -23,6 +24,7 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -462,6 +464,126 @@ class HouseholdServiceTest {
       verify(unregisteredHouseholdMemberRepository, never()).delete(
           any(UnregisteredHouseholdMember.class));
       verify(householdRepository, never()).updateNumberOfMembers(anyLong(), anyInt());
+    }
+  }
+
+  /**
+   * Nested test class for testing the getHouseholdDetails functionality.
+   */
+  @Nested
+  class GetHouseholdDetailsTests {
+
+    /**
+     * Tests the positive scenario where household details are successfully retrieved.
+     */
+    @Test
+    void getHouseholdDetailsPositive() {
+      Long householdId = 1L;
+      Household household = new Household();
+      household.setId(householdId);
+      household.setName("Test Household");
+      household.setNumberOfMembers(3);
+
+      User user = new User();
+      user.setId(1L);
+      user.setFullName("Test User");
+
+      UnregisteredHouseholdMember unregisteredMember = new UnregisteredHouseholdMember();
+      unregisteredMember.setFullName("Unregistered Person");
+
+      when(householdRepository.findById(householdId)).thenReturn(Optional.of(household));
+      when(userRepository.findUsersByHousehold(household)).thenReturn(java.util.List.of(user));
+      when(unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(
+          household))
+          .thenReturn(java.util.List.of(unregisteredMember));
+
+      Map<String, Object> result = householdService.getHouseholdDetails(householdId);
+
+      assertEquals(household, result.get("household"));
+      assertEquals(java.util.List.of(user), result.get("registered members"));
+      assertEquals(java.util.List.of(unregisteredMember), result.get("unregistered members"));
+    }
+
+    /**
+     * Tests the scenario where the household is not found.
+     */
+    @Test
+    void getHouseholdDetailsThrowsWhenHouseholdNotFound() {
+      Long householdId = 1L;
+      when(householdRepository.findById(householdId)).thenReturn(Optional.empty());
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.getHouseholdDetails(householdId));
+      assertEquals("Household not found", exception.getMessage());
+    }
+  }
+
+  /**
+   * Nested test class for testing the editUnregisteredMemberInHousehold functionality.
+   */
+  @Nested
+  class EditUnregisteredMemberInHouseholdTests {
+
+    /**
+     * Tests the positive scenario where an unregistered member is successfully edited.
+     */
+    @Test
+    void editUnregisteredMemberInHouseholdPositive() {
+      EditMemberDto request = mock(EditMemberDto.class);
+      when(request.getFullName()).thenReturn("Old Name");
+      when(request.getNewFullName()).thenReturn("New Name");
+      when(request.getHouseholdId()).thenReturn(1L);
+
+      UnregisteredHouseholdMember member = new UnregisteredHouseholdMember();
+      member.setFullName("Old Name");
+
+      when(unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId("Old Name", 1L))
+          .thenReturn(Optional.of(member));
+
+      assertDoesNotThrow(() -> householdService.editUnregisteredMemberInHousehold(request));
+
+      assertEquals("New Name", member.getFullName());
+      verify(unregisteredHouseholdMemberRepository, times(1)).save(member);
+    }
+
+    /**
+     * Tests the scenario where the unregistered member is not found.
+     */
+    @Test
+    void editUnregisteredMemberInHouseholdThrowsWhenMemberNotFound() {
+      EditMemberDto request = mock(EditMemberDto.class);
+      when(request.getFullName()).thenReturn("Nonexistent Member");
+      when(request.getHouseholdId()).thenReturn(1L);
+
+      when(unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId("Nonexistent Member",
+          1L))
+          .thenReturn(Optional.empty());
+
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> householdService.editUnregisteredMemberInHousehold(request));
+      assertEquals("Unregistered member not found in household", exception.getMessage());
+    }
+
+    /**
+     * Tests the scenario where the new full name is null.
+     */
+    @Test
+    void editUnregisteredMemberInHouseholdKeepsOriginalNameWhenNewNameIsNull() {
+      EditMemberDto request = mock(EditMemberDto.class);
+      when(request.getFullName()).thenReturn("Original Name");
+      when(request.getNewFullName()).thenReturn(null);
+      when(request.getHouseholdId()).thenReturn(1L);
+
+      UnregisteredHouseholdMember member = new UnregisteredHouseholdMember();
+      member.setFullName("Original Name");
+
+      when(unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId("Original Name", 1L))
+          .thenReturn(Optional.of(member));
+
+      assertDoesNotThrow(() -> householdService.editUnregisteredMemberInHousehold(request));
+
+      assertEquals("Original Name", member.getFullName());
+      verify(unregisteredHouseholdMemberRepository, times(1)).save(member);
     }
   }
 }
