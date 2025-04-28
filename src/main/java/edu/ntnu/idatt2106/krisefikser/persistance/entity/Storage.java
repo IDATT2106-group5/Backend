@@ -6,17 +6,20 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.Date;
+
+/**
+ * The type Storage.
+ */
 
 @Table
 @Entity(name = "storage")
 public class Storage {
 
   /**
-   * The storage id
+   * The storage id.
    */
   @Id
   @Column(nullable = false)
@@ -24,7 +27,7 @@ public class Storage {
   private Long id;
 
   /**
-   * The item in the storage
+   * The item in the storage.
    */
 
   @JoinColumn(nullable = false)
@@ -32,20 +35,20 @@ public class Storage {
   private Item item;
 
   /**
-   * The unit of the item in the storage
+   * The unit of the item in the storage.
    */
   @Column(nullable = false)
   private String unit;
 
   /**
-   * The amount of the item in the storage
+   * The amount of the item in the storage.
    */
 
   @Column(nullable = false)
   private int amount;
 
   /**
-   * The expiration date of the item in the storage
+   * The expiration date of the item in the storage.
    */
 
   @Column(nullable = false)

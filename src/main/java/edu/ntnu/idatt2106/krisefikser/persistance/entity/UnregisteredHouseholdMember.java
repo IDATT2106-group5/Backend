@@ -17,20 +17,20 @@ import jakarta.persistence.Table;
 public class UnregisteredHouseholdMember {
 
   /**
-   * The id of the unregistered household member
+   * The id of the unregistered household member.
    */
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   /**
-   * The full name of the unregistered member
+   * The full name of the unregistered member.
    */
   @Column(nullable = false)
   private String fullName;
 
   /**
-   * The household of the unregistered member
+   * The household of the unregistered member.
    */
   @JoinColumn(name = "household_id")
   @OneToOne(optional = false)

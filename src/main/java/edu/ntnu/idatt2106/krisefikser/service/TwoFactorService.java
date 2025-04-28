@@ -6,6 +6,11 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class for handling two-factor authentication (2FA) using One-Time Passwords (OTP). This
+ * service generates OTPs, sends them via email, and verifies user-provided OTPs.
+ */
+
 @Service
 public class TwoFactorService {
 
@@ -20,6 +25,12 @@ public class TwoFactorService {
     this.emailService = emailService;
   }
 
+  /**
+   * Generates a 6-digit OTP, stores it with an expiration time, and sends it to the user's email.
+   *
+   * @param email The email address to send the OTP to.
+   * @return The generated OTP.
+   */
   public String generateAndSendOtp(String email) {
     // Generate 6-digit OTP
     String otp = String.format("%06d", random.nextInt(1000000));
@@ -36,6 +47,14 @@ public class TwoFactorService {
     return otp;
   }
 
+  /**
+   * Verifies the provided OTP against the stored OTP for the given email. If the OTP is valid and
+   * not expired, it removes the OTP from storage.
+   *
+   * @param email       The email address associated with the OTP.
+   * @param providedOtp The OTP provided by the user for verification.
+   * @return True if the OTP is valid and matches the stored OTP; false otherwise.
+   */
   public boolean verifyOtp(String email, String providedOtp) {
     // Get stored OTP data
     Object[] otpData = otpStorage.get(email);

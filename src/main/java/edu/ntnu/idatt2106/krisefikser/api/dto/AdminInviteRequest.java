@@ -13,6 +13,13 @@ public class AdminInviteRequest {
   public AdminInviteRequest() {
   }
 
+  /**
+   * Constructor for AdminInviteRequest.
+   *
+   * @param email    The email address of the new admin.
+   * @param fullName The full name of the new admin.
+   * @param username The predefined username for the new admin.
+   */
   public AdminInviteRequest(String email, String fullName, String username) {
     this.email = email;
     this.fullName = fullName;

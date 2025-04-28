@@ -10,6 +10,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
+/**
+ * The type Storage item.
+ */
+
 @Entity
 @Table(name = "storage_item")
 public class StorageItem {
