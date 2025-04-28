@@ -67,6 +67,7 @@ public class SecurityConfig {
         // define authorization rules
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/household/**").permitAll()
             .anyRequest().authenticated()
         )
 

@@ -1,11 +1,11 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto;
 
-public class UserHouseholdAssignmentRequestDto {
-  private String email;
+public class UnregisteredMemberHouseholdAssignmentRequestDto {
+  private String fullName;
   private Long householdId;
 
-  public String getEmail() {
-    return email;
+  public String getFullName() {
+    return fullName;
   }
 
   public Long getHouseholdId() {
