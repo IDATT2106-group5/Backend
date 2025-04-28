@@ -9,6 +9,8 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,82 +120,96 @@ public class HouseholdService {
         household.getNumberOfMembers() + 1);
   }
 
-/**
- * Removes a registered member from a household.
- *
- * @param email The email of the user to be removed from the household
- * @throws IllegalArgumentException if the user with specified email is not found
- * @throws IllegalArgumentException if the user is not a member of any household
- */
-public void removeUserFromHousehold(String email) {
-  User user = userRepository.findByEmail(email)
-      .orElseThrow(() -> new IllegalArgumentException("User not found"));
-  if (user.getHousehold() == null) {
-    logger.warn("User {} is not a member of any household", user.getFullName());
-    throw new IllegalArgumentException("User is not a member of any household");
-  }
-  householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
-      user.getHousehold().getNumberOfMembers() - 1);
-  userRepository.updateHouseholdId(user.getId(), null);
-}
-
-/**
- * Adds a new unregistered member to a household.
- * <p>
- * This method checks if an unregistered member with the given full name already exists
- * in the specified household. If the member does not exist, it creates a new
- * `UnregisteredHouseholdMember` entity, associates it with the household, and updates
- * the household's number of members.
- *
- * @param request The DTO containing the full name of the unregistered member and the ID
- *                of the household to which the member should be added.
- * @throws IllegalArgumentException if the unregistered member already exists in the
- *                                  specified household or if the household is not found.
- */
-public void addUnregisteredMemberToHousehold(
-    UnregisteredMemberHouseholdAssignmentRequestDto request) {
-  if (unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId(
-      request.getFullName(), request.getHouseholdId()).isPresent()) {
-    logger.warn("Unregistered member {} already exists in household {}", request.getFullName(),
-        householdRepository.findById(request.getHouseholdId()));
-    throw new IllegalArgumentException("Unregistered member already exists in this household");
-  }
-  UnregisteredHouseholdMember member = new UnregisteredHouseholdMember();
-  member.setFullName(request.getFullName());
-  Household household = householdRepository.findById(request.getHouseholdId())
-      .orElseThrow(() -> new IllegalArgumentException("Household not found"));
-  member.setHousehold(household);
-
-  unregisteredHouseholdMemberRepository.save(member);
-  householdRepository.updateNumberOfMembers(request.getHouseholdId(),
-      household.getNumberOfMembers() + 1);
-
-  logger.info("Unregistered member {} added to household {}",
-      unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId(member.getFullName(),
-          household.getId()), household.getName());
-}
-
-/**
- * Removes an unregistered member from a household.
- * <p>
- * This method deletes the unregistered member from the system and updates
- * the household's member count. If the member doesn't belong to any household,
- * a warning is logged but the member is still deleted.
- *
- * @param request The DTO containing the full name and household id of the unregistered member
- */
-public void removeUnregisteredMemberFromHousehold(
-    UnregisteredMemberHouseholdAssignmentRequestDto request) {
-  UnregisteredHouseholdMember member =
-      unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId(request.getFullName(),
-          request.getHouseholdId()).orElseThrow(
-          () -> new IllegalArgumentException("Unregistered member not found in household"));
-  if (member.getHousehold() != null) {
-    logger.warn("Unregistered member {} doesnt belong to any household", request.getFullName());
+  /**
+   * Removes a registered member from a household.
+   *
+   * @param email The email of the user to be removed from the household
+   * @throws IllegalArgumentException if the user with specified email is not found
+   * @throws IllegalArgumentException if the user is not a member of any household
+   */
+  public void removeUserFromHousehold(String email) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    if (user.getHousehold() == null) {
+      logger.warn("User {} is not a member of any household", user.getFullName());
+      throw new IllegalArgumentException("User is not a member of any household");
+    }
+    householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
+        user.getHousehold().getNumberOfMembers() - 1);
+    userRepository.updateHouseholdId(user.getId(), null);
   }
 
-  unregisteredHouseholdMemberRepository.delete(member);
-  householdRepository.updateNumberOfMembers(request.getHouseholdId(),
-      member.getHousehold().getNumberOfMembers() - 1);
-}
+  /**
+   * Adds a new unregistered member to a household.
+   * <p>
+   * This method checks if an unregistered member with the given full name already exists
+   * in the specified household. If the member does not exist, it creates a new
+   * `UnregisteredHouseholdMember` entity, associates it with the household, and updates
+   * the household's number of members.
+   *
+   * @param request The DTO containing the full name of the unregistered member and the ID                of the household to which the member should be added.
+   * @throws IllegalArgumentException if the unregistered member already exists in the                                  specified household or if the household is not found.
+   */
+  public void addUnregisteredMemberToHousehold(
+      UnregisteredMemberHouseholdAssignmentRequestDto request) {
+    if (unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId(
+        request.getFullName(), request.getHouseholdId()).isPresent()) {
+      logger.warn("Unregistered member {} already exists in household {}", request.getFullName(),
+          householdRepository.findById(request.getHouseholdId()));
+      throw new IllegalArgumentException("Unregistered member already exists in this household");
+    }
+    UnregisteredHouseholdMember member = new UnregisteredHouseholdMember();
+    member.setFullName(request.getFullName());
+    Household household = householdRepository.findById(request.getHouseholdId())
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+    member.setHousehold(household);
+
+    unregisteredHouseholdMemberRepository.save(member);
+    householdRepository.updateNumberOfMembers(request.getHouseholdId(),
+        household.getNumberOfMembers() + 1);
+
+    logger.info("Unregistered member {} added to household {}",
+        unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId(member.getFullName(),
+            household.getId()), household.getName());
+  }
+
+  /**
+   * Removes an unregistered member from a household.
+   * <p>
+   * This method deletes the unregistered member from the system and updates
+   * the household's member count. If the member doesn't belong to any household,
+   * a warning is logged but the member is still deleted.
+   *
+   * @param request The DTO containing the full name and household id of the unregistered member
+   */
+  public void removeUnregisteredMemberFromHousehold(
+      UnregisteredMemberHouseholdAssignmentRequestDto request) {
+    UnregisteredHouseholdMember member =
+        unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId(request.getFullName(),
+            request.getHouseholdId()).orElseThrow(
+            () -> new IllegalArgumentException("Unregistered member not found in household"));
+    if (member.getHousehold() != null) {
+      logger.warn("Unregistered member {} doesnt belong to any household", request.getFullName());
+    }
+
+    unregisteredHouseholdMemberRepository.delete(member);
+    householdRepository.updateNumberOfMembers(request.getHouseholdId(),
+        member.getHousehold().getNumberOfMembers() - 1);
+  }
+
+  /**
+   * Gets the members of a household by household id.
+   *
+   * @param householdId the household id
+   * @return the members by household id
+   */
+  public Map<String, Object> getMembersByHouseholdId(Long householdId) {
+    Map<String, Object> resultMap = new HashMap<>();
+    Household household = householdRepository.findById(householdId).orElseThrow(() -> new IllegalArgumentException("Household not found"));
+
+    resultMap.put("registered members", userRepository.findUsersByHousehold(household));
+    resultMap.put("unregistered members", unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(household));
+
+    return resultMap;
+  }
 }
