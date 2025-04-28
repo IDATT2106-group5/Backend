@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+
+
 /**
  * Service for handling authentication-related operations.
  */
@@ -29,15 +31,18 @@ public class AuthService {
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider tokenProvider;
   private final EmailService emailService;
+  private final CaptchaService captchaService;
+
 
   public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
       EmailService emailService,
-      AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
+      AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, CaptchaService captchaService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.emailService = emailService;
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
+    this.captchaService = captchaService;
   }
 
   /**
@@ -46,6 +51,11 @@ public class AuthService {
    * @param request the user to register
    */
   public void registerUser(RegisterRequestDto request) {
+    if (!captchaService.verifyToken(request.getHcaptchaToken())) {
+      logger.warn("hCaptcha validation failed for email: {}", request.getEmail());
+      throw new IllegalArgumentException("hCaptcha verification failed. Please try again.");
+    }
+
     if (userRepository.existsByEmail(request.getEmail())) {
       logger.warn("Email already in use: {}", request.getEmail());
       throw new IllegalArgumentException("Email already in use");

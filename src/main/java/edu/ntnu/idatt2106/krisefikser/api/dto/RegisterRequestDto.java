@@ -10,6 +10,24 @@ public class RegisterRequestDto {
   private String tlf;
 
   /**
+   * Gets a hCaptchaToken
+   * @return hCaptchaToken
+   */
+  public String getHcaptchaToken() {
+    return hCaptchaToken;
+  }
+
+  /**
+   * Sets a hCaptchaToken
+   * @param hCaptchaToken the hCaptchaToken
+   */
+  public void setHcaptchaToken(String hCaptchaToken) {
+    this.hCaptchaToken = hCaptchaToken;
+  }
+
+  private String hCaptchaToken;
+
+  /**
    * Gets tlf.
    *
    * @return the tlf
@@ -80,4 +98,5 @@ public class RegisterRequestDto {
   public void setPassword(String password) {
     this.password = password;
   }
+
 }
