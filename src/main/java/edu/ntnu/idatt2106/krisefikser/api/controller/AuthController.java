@@ -103,7 +103,7 @@ public class AuthController {
           .build();
     } catch (IllegalArgumentException e) {
       return ResponseEntity.status(302)
-          .header("Location", "http://localhost:3000/register-failed")
+          .header("Location", "http://localhost:5173/register-failed")
           .build();
     }
   }

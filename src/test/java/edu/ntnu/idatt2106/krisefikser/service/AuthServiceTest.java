@@ -9,6 +9,18 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
@@ -159,6 +171,91 @@ class AuthServiceTest {
 
       verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
       verifyNoInteractions(tokenProvider);
+    }
+
+    @Test
+    void registerUser_shouldRegisterUser_whenEmailNotExists() {
+      // Arrange
+      String email = "newuser@example.com";
+      String password = "password";
+      String encodedPassword = "encodedPassword";
+      String fullName = "New User";
+      String tlf = "12345678";
+
+      RegisterRequestDto registerRequest = new RegisterRequestDto(fullName, email, password, tlf);
+
+      when(userRepository.existsByEmail(email)).thenReturn(false);
+      when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
+
+      // Act
+      authService.registerUser(registerRequest);
+
+      // Assert
+      verify(userRepository).existsByEmail(email);
+      verify(passwordEncoder).encode(password);
+      verify(userRepository).save(any(User.class));
+      verify(emailService).sendConfirmationEmail(any(String.class), any(String.class));
+    }
+
+    @Test
+    void registerUser_shouldThrowException_whenEmailAlreadyExists() {
+      // Arrange
+      String email = "existinguser@example.com";
+      String password = "password";
+      String fullName = "Existing User";
+      String tlf = "12345678";
+
+      RegisterRequestDto registerRequest = new RegisterRequestDto(fullName, email, password, tlf);
+
+      when(userRepository.existsByEmail(email)).thenReturn(true);
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.registerUser(registerRequest));
+
+      assertEquals("Email already in use", exception.getMessage());
+
+      verify(userRepository).existsByEmail(email);
+      verifyNoInteractions(passwordEncoder);
+      verify(userRepository).existsByEmail(email);
+      verifyNoMoreInteractions(userRepository);
+      verifyNoInteractions(emailService);
+    }
+
+    @Test
+    void confirmUser_shouldConfirmUser_whenTokenIsValid() {
+      // Arrange
+      String token = "valid-token";
+      User user = new User();
+      user.setConfirmed(false);
+      user.setConfirmationToken(token);
+
+      when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.of(user));
+
+      // Act
+      authService.confirmUser(token);
+
+      // Assert
+      assertTrue(user.isConfirmed());
+      assertNull(user.getConfirmationToken());
+      verify(userRepository).findByConfirmationToken(token);
+      verify(userRepository).save(user);
+    }
+
+    @Test
+    void confirmUser_shouldThrowException_whenTokenIsInvalid() {
+      // Arrange
+      String token = "invalid-token";
+
+      when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.empty());
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.confirmUser(token));
+
+      assertEquals("Invalid confirmation token", exception.getMessage());
+      verify(userRepository).findByConfirmationToken(token);
+      verifyNoMoreInteractions(userRepository);
     }
   }
 }

@@ -4,10 +4,19 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
  * The type Register request dto.
  */
 public class RegisterRequestDto {
+
   private String fullName;
   private String email;
   private String password;
   private String tlf;
+
+  public RegisterRequestDto(String fullName, String email, String password, String tlf) {
+    this.fullName = fullName;
+    this.email = email;
+    this.password = password;
+    this.tlf = tlf;
+
+  }
 
   /**
    * Gets tlf.
