@@ -1,6 +1,5 @@
-package edu.ntnu.idatt2106.krisefikser.security;
+package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.service.EmailService;
 import java.security.SecureRandom;
 import java.util.Random;
 import org.springframework.stereotype.Service;
