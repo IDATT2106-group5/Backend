@@ -8,6 +8,7 @@ import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,13 +24,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthService {
 
+  private static final Pattern PASSWORD_PATTERN =
+      Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$");
   private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider tokenProvider;
   private final EmailService emailService;
-
   public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
       EmailService emailService,
       AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider) {
@@ -38,6 +40,10 @@ public class AuthService {
     this.emailService = emailService;
     this.authenticationManager = authenticationManager;
     this.tokenProvider = tokenProvider;
+  }
+
+  public boolean validatePassword(String password) {
+    return PASSWORD_PATTERN.matcher(password).matches();
   }
 
   /**
