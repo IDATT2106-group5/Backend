@@ -25,6 +25,7 @@ public class KrisefikserApplication {
         dotenv.get("SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH"));
     System.setProperty("SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE",
         dotenv.get("SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE"));
+    System.setProperty("hcaptcha.secret", dotenv.get("HCAPTCHA_SECRET"));
 
     SpringApplication.run(KrisefikserApplication.class, args);
   }

@@ -14,6 +14,9 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
 
+/**
+ * The type Membership request.
+ */
 @Entity
 @Table(name = "membership_request")
 public class MembershipRequest {

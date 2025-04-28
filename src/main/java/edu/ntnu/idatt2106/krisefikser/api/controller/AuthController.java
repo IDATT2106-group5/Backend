@@ -72,6 +72,15 @@ public class AuthController {
       }
 
       LoginResponse response = authService.loginUser(loginRequest);
+
+      // If 2FA is required, inform the client
+      if (response.isRequires2Fa()) {
+        return ResponseEntity.ok(Map.of(
+            "requires2FA", "true",
+            "message", "2FA verification required"
+        ));
+      }
+
       return ResponseEntity.status(201).body(Map.of("token", response.getToken()));
     } catch (IllegalArgumentException e) {
       logger.warn("Validation error during login: {}", e.getMessage());
@@ -85,6 +94,12 @@ public class AuthController {
     }
   }
 
+  /**
+   * Confirms the user's email address using a confirmation token.
+   *
+   * @param token The confirmation token sent to the user's email.
+   * @return ResponseEntity with a redirect to the success or failure page.
+   */
   @GetMapping("/confirm")
   public ResponseEntity<Map<String, String>> confirmEmail(@RequestParam("token") String token) {
     try {
