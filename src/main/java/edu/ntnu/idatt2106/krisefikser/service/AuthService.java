@@ -3,8 +3,8 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
 import java.util.UUID;
@@ -93,11 +93,11 @@ public class AuthService {
   public LoginResponse loginUser(LoginRequest request) throws IllegalArgumentException {
     // Find user by email if they exist
     User user = userRepository.findByEmail(request.getEmail())
-                              .orElseThrow(() -> {
-                                logger.warn("User not found during login attempt: {}", request.getEmail());
-                                throw new IllegalArgumentException("No user found with that email");
-                              });
-    
+        .orElseThrow(() -> {
+          logger.warn("User not found during login attempt: {}", request.getEmail());
+          throw new IllegalArgumentException("No user found with that email");
+        });
+
     // Checks if typed password matches encrypted 
     if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       logger.warn("Wrong password for user: {}", request.getEmail());

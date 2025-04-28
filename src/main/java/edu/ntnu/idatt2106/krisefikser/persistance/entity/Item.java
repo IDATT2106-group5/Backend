@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +16,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "item")
 public class Item {
+
   /**
    * The item id
    */

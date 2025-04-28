@@ -1,7 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.repository;
 
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.ItemType;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

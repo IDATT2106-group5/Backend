@@ -2,8 +2,8 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.ItemType;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.ItemRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.StorageItemRepository;
