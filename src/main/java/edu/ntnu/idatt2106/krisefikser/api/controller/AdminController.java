@@ -87,7 +87,7 @@ public class AdminController {
   @PostMapping("/login/2fa/verify")
   public ResponseEntity<?> verifyTwoFactor(@RequestBody TwoFactorVerifyRequest request) {
     try {
-      LoginResponse response = authService.verify2FA(request.getEmail(), request.getOtp());
+      LoginResponse response = authService.verify2Fa(request.getEmail(), request.getOtp());
       return ResponseEntity.ok(Map.of(
           "token", response.getToken(),
           "message", "2FA verification successful"

@@ -39,6 +39,17 @@ public class AuthService {
   private final JwtTokenProvider tokenProvider;
   private final EmailService emailService;
 
+  /**
+   * Constructor for AuthService.
+   *
+   * @param userRepository        The repository for user-related operations.
+   * @param passwordEncoder       The password encoder for hashing passwords.
+   * @param emailService          The service for sending emails.
+   * @param authenticationManager The authentication manager for handling authentication.
+   * @param tokenProvider         The JWT token provider for generating and validating tokens.
+   * @param loginAttemptService   The service for handling login attempts and blocking accounts.
+   * @param twoFactorService      The service for handling two-factor authentication.
+   */
   public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
       EmailService emailService,
       AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider,
@@ -172,7 +183,7 @@ public class AuthService {
    * @return a LoginResponse with JWT token
    * @throws IllegalArgumentException if the code is invalid or user is not an admin
    */
-  public LoginResponse verify2FA(String email, String otpCode) {
+  public LoginResponse verify2Fa(String email, String otpCode) {
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
