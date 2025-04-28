@@ -10,9 +10,13 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.sql.Timestamp;
 
+/**
+ * The type Incident.
+ */
 @Entity
 @Table(name = "incident")
 public class Incident {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
