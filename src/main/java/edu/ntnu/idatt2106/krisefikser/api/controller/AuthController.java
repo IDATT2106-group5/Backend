@@ -67,23 +67,39 @@ public class AuthController {
   public ResponseEntity<Map<String, String>> authenticateUser(
       @RequestBody LoginRequest loginRequest) {
     try {
-      if (loginRequest == null) { 
+      if (loginRequest == null) {
         throw new IllegalArgumentException("Request object is null");
       }
 
       LoginResponse response = authService.loginUser(loginRequest);
+
+      // If 2FA is required, inform the client
+      if (response.isRequires2Fa()) {
+        return ResponseEntity.ok(Map.of(
+            "requires2FA", "true",
+            "message", "2FA verification required"
+        ));
+      }
+
       return ResponseEntity.status(201).body(Map.of("token", response.getToken()));
     } catch (IllegalArgumentException e) {
       logger.warn("Validation error during login: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      logger.error("Unexpected error during login for {}: {}", 
-                   loginRequest != null ? loginRequest.getEmail() : "null", 
-                   e.getMessage(), e);
-      return ResponseEntity.internalServerError().body(Map.of("error", "An unexpected error occurred"));
+      logger.error("Unexpected error during login for {}: {}",
+          loginRequest != null ? loginRequest.getEmail() : "null",
+          e.getMessage(), e);
+      return ResponseEntity.internalServerError()
+          .body(Map.of("error", "An unexpected error occurred"));
     }
   }
 
+  /**
+   * Confirms the user's email address using a confirmation token.
+   *
+   * @param token The confirmation token sent to the user's email.
+   * @return ResponseEntity with a redirect to the success or failure page.
+   */
   @GetMapping("/confirm")
   public ResponseEntity<Map<String, String>> confirmEmail(@RequestParam("token") String token) {
     try {
@@ -93,7 +109,7 @@ public class AuthController {
           .build();
     } catch (IllegalArgumentException e) {
       return ResponseEntity.status(302)
-          .header("Location", "http://localhost:3000/register-failed")
+          .header("Location", "http://localhost:5173/register-failed")
           .build();
     }
   }

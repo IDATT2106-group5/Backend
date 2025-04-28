@@ -12,6 +12,9 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.security.Timestamp;
 
+/**
+ * The type Membership request.
+ */
 @Entity
 @Table(name = "membership_request")
 public class MembershipRequest {
@@ -40,5 +43,5 @@ public class MembershipRequest {
   private RequestStatus status;
 
   @Column
-  private Timestamp created_at;
+  private Timestamp createdAt;
 }

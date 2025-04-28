@@ -33,6 +33,22 @@ public class RegisterRequestDto {
   }
 
   /**
+   * Default constructor for RegisterRequestDto.
+   *
+   * @param fullName The full name of the user.
+   * @param email    The email address of the user.
+   * @param password The password for the user.
+   * @param tlf      The telephone number of the user.
+   */
+  public RegisterRequestDto(String fullName, String email, String password, String tlf) {
+    this.fullName = fullName;
+    this.email = email;
+    this.password = password;
+    this.tlf = tlf;
+
+  }
+
+  /**
    * Gets tlf.
    *
    * @return the tlf

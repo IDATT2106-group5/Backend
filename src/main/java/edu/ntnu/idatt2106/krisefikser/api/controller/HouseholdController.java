@@ -17,18 +17,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for managing household-related operations. This includes creating households,
+ * adding/removing users, and managing unregistered members.
+ */
+
 @Tag(name = "Household", description = "Endpoints for managing a household")
 @RestController
 @RequestMapping("/api/household")
 public class HouseholdController {
-  HouseholdService householdService;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(HouseholdController.class);
+  HouseholdService householdService;
 
   public HouseholdController(HouseholdService householdService) {
     this.householdService = householdService;
   }
 
-  @Operation(summary = "Creates a household", description = "Creates a household with the given name and address for a given user")
+  /**
+   * Creates a new household with the given name and address. The creator automatically becomes the
+   * owner of the household.
+   *
+   * @param request The request containing the name and address of the household.
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Creates a household",
+      description = "Creates a household with the given name and address for a given user")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Household created successfully"),
       @ApiResponse(responseCode = "400", description = "Invalid household data"),
@@ -50,7 +64,14 @@ public class HouseholdController {
     }
   }
 
-  @Operation(summary = "Adds a user to a household", description = "Adds a user to a household with the given ID")
+  /**
+   * Adds a user to a household with the given ID. The user must be registered in the system.
+   *
+   * @param request The request containing the email of the user and the ID of the household.
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Adds a user to a household",
+      description = "Adds a user to a household with the given ID")
   @PostMapping("/add-user")
   public ResponseEntity<String> addUserToHousehold(
       @RequestBody UserHouseholdAssignmentRequestDto request) {
@@ -67,7 +88,16 @@ public class HouseholdController {
     }
   }
 
-  @Operation(summary = "Adds an unregistered member to a household", description = "Adds an unregistered user to a household with the given ID")
+  /**
+   * Adds an unregistered member to a household with the given ID. The user must not be registered
+   * in the system.
+   *
+   * @param request The request containing the full name of the unregistered member and the ID of
+   *                the
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Adds an unregistered member to a household",
+      description = "Adds an unregistered user to a household with the given ID")
   @PostMapping("/add-unregistered-member")
   public ResponseEntity<String> addUnregisteredMemberToHousehold(
       @RequestBody UnregisteredMemberHouseholdAssignmentRequestDto request) {
@@ -84,7 +114,14 @@ public class HouseholdController {
     }
   }
 
-  @Operation(summary = "Removes a user from a household", description = "Removes a user from a household with the given ID")
+  /**
+   * Removes a user from a household with the given ID. The user must be registered in the system.
+   *
+   * @param email The email of the user to be removed from the household.
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Removes a user from a household",
+      description = "Removes a user from a household with the given ID")
   @PostMapping("/remove-user")
   public ResponseEntity<String> removeUserFromHousehold(
       @RequestBody String email) {
@@ -101,7 +138,16 @@ public class HouseholdController {
     }
   }
 
-  @Operation(summary = "Removes an unregistered member from a household", description = "Removes an unregistered user from a household with the given ID")
+  /**
+   * Removes an unregistered member from a household with the given ID. The user must not be
+   * registered in the system.
+   *
+   * @param request The request containing the full name of the unregistered member and the ID of
+   *                the
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Removes an unregistered member from a household",
+      description = "Removes an unregistered user from a household with the given ID")
   @DeleteMapping("/delete-unregistered-member")
   public ResponseEntity<String> removeUnregisteredMemberFromHousehold(
       @RequestBody UnregisteredMemberHouseholdAssignmentRequestDto request) {
