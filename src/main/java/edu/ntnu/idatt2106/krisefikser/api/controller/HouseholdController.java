@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Household", description = "Endpoints for managing a household")
 @RestController
 @RequestMapping("/api/household")
-//@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class HouseholdController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HouseholdController.class);
