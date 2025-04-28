@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-
 /**
  * Service for handling authentication-related operations.
  */
@@ -36,7 +35,8 @@ public class AuthService {
 
   public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
       EmailService emailService,
-      AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider, CaptchaService captchaService) {
+      AuthenticationManager authenticationManager, JwtTokenProvider tokenProvider,
+      CaptchaService captchaService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.emailService = emailService;
@@ -51,7 +51,7 @@ public class AuthService {
    * @param request the user to register
    */
   public void registerUser(RegisterRequestDto request) {
-    if (!captchaService.verifyToken(request.getHcaptchaToken())) {
+    if (!captchaService.verifyToken(request.getHCaptchaToken())) {
       logger.warn("hCaptcha validation failed for email: {}", request.getEmail());
       throw new IllegalArgumentException("hCaptcha verification failed. Please try again.");
     }
@@ -103,11 +103,11 @@ public class AuthService {
   public LoginResponse loginUser(LoginRequest request) throws IllegalArgumentException {
     // Find user by email if they exist
     User user = userRepository.findByEmail(request.getEmail())
-                              .orElseThrow(() -> {
-                                logger.warn("User not found during login attempt: {}", request.getEmail());
-                                throw new IllegalArgumentException("No user found with that email");
-                              });
-    
+        .orElseThrow(() -> {
+          logger.warn("User not found during login attempt: {}", request.getEmail());
+          throw new IllegalArgumentException("No user found with that email");
+        });
+
     // Checks if typed password matches encrypted 
     if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       logger.warn("Wrong password for user: {}", request.getEmail());
