@@ -1,5 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * The type Register request dto.
  */
@@ -9,6 +11,26 @@ public class RegisterRequestDto {
   private String email;
   private String password;
   private String tlf;
+  @JsonProperty("hCaptchaToken")
+  private String hCaptchaToken;
+
+  /**
+   * Gets a hCaptchaToken
+   *
+   * @return hCaptchaToken
+   */
+  public String getHCaptchaToken() {
+    return hCaptchaToken;
+  }
+
+  /**
+   * Sets a hCaptchaToken
+   *
+   * @param hCaptchaToken the hCaptchaToken
+   */
+  public void setHCaptchaToken(String hCaptchaToken) {
+    this.hCaptchaToken = hCaptchaToken;
+  }
 
   /**
    * Default constructor for RegisterRequestDto.
@@ -97,4 +119,5 @@ public class RegisterRequestDto {
   public void setPassword(String password) {
     this.password = password;
   }
+
 }
