@@ -158,7 +158,7 @@ public class AuthService {
       // For admin users, return a flag indicating 2FA is required
       if (user.getRole() == Role.ADMIN || user.getRole() == Role.SUPERADMIN) {
         LoginResponse response = new LoginResponse(null);
-        response.setRequires2FA(true);
+        response.setRequires2Fa(true);
         return response;
       }
 

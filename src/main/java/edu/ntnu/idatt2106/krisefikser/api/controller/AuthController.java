@@ -74,7 +74,7 @@ public class AuthController {
       LoginResponse response = authService.loginUser(loginRequest);
 
       // If 2FA is required, inform the client
-      if (response.isRequires2FA()) {
+      if (response.isRequires2Fa()) {
         return ResponseEntity.ok(Map.of(
             "requires2FA", "true",
             "message", "2FA verification required"
