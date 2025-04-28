@@ -72,6 +72,15 @@ public class AuthController {
       }
 
       LoginResponse response = authService.loginUser(loginRequest);
+
+      // If 2FA is required, inform the client
+      if (response.isRequires2FA()) {
+        return ResponseEntity.ok(Map.of(
+            "requires2FA", "true",
+            "message", "2FA verification required"
+        ));
+      }
+
       return ResponseEntity.status(201).body(Map.of("token", response.getToken()));
     } catch (IllegalArgumentException e) {
       logger.warn("Validation error during login: {}", e.getMessage());

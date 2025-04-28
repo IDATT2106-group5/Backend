@@ -10,6 +10,7 @@ public class LoginResponse {
 
   private String token;
   private String type = "Bearer";
+  private boolean requires2FA;
 
   public LoginResponse(String token) {
     this.token = token;
@@ -29,6 +30,14 @@ public class LoginResponse {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public boolean isRequires2FA() {
+    return requires2FA;
+  }
+
+  public void setRequires2FA(boolean requires2FA) {
+    this.requires2FA = requires2FA;
   }
 
 }

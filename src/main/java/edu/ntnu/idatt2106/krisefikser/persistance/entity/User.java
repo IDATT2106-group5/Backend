@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.Date;
 
 /**
  * The type User.
@@ -47,6 +49,9 @@ public class User {
 
   @Column(name = "confirmation_token", unique = true)
   private String confirmationToken;
+
+  @Column(name = "token_expiry")
+  private Date tokenExpiry;
 
 
   /**
@@ -236,5 +241,23 @@ public class User {
    */
   public void setConfirmationToken(String confirmationToken) {
     this.confirmationToken = confirmationToken;
+  }
+
+  /**
+   * Gets token expiry.
+   *
+   * @return the token expiry
+   */
+  public Date getTokenExpiry() {
+    return tokenExpiry;
+  }
+
+  /**
+   * Sets token expiry.
+   *
+   * @param tokenExpiry the token expiry
+   */
+  public void setTokenExpiry(Date tokenExpiry) {
+    this.tokenExpiry = tokenExpiry;
   }
 }
