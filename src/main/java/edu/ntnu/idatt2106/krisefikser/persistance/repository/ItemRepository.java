@@ -7,6 +7,12 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * The interface Item repository. This interface extends JpaRepository and provides methods to
+ * perform CRUD operations on Item entities. It also includes custom query methods to find items by
+ * name and item type.
+ */
+
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 

@@ -18,7 +18,7 @@ import jakarta.persistence.Table;
 public class Item {
 
   /**
-   * The item id
+   * The item id.
    */
 
   @Id
@@ -26,20 +26,20 @@ public class Item {
   private Long id;
 
   /**
-   * The name of the item
+   * The name of the item.
    */
   @Column
   private String name;
 
   /**
-   * The type of item
+   * The type of item.
    */
   @Column
   @Enumerated(EnumType.STRING)
   private ItemType itemType;
 
   /**
-   * The caloric value of the item
+   * The caloric value of the item.
    */
   @Column
   private int caloricAmount;
