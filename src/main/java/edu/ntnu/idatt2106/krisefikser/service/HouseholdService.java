@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
@@ -48,8 +49,8 @@ public class HouseholdService {
    * @param unregisteredHouseholdMemberRepository the unregistered household member repository
    */
   public HouseholdService(HouseholdRepository householdRepository,
-      UserRepository userRepository,
-      UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
+                          UserRepository userRepository,
+                          UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
     this.householdRepository = householdRepository;
     this.userRepository = userRepository;
     this.unregisteredHouseholdMemberRepository = unregisteredHouseholdMemberRepository;
@@ -203,13 +204,35 @@ public class HouseholdService {
    * @param householdId the household id
    * @return the members by household id
    */
-  public Map<String, Object> getMembersByHouseholdId(Long householdId) {
+  public Map<String, Object> getHouseholdDetails(Long householdId) {
     Map<String, Object> resultMap = new HashMap<>();
-    Household household = householdRepository.findById(householdId).orElseThrow(() -> new IllegalArgumentException("Household not found"));
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
 
+    resultMap.put("household", household);
     resultMap.put("registered members", userRepository.findUsersByHousehold(household));
-    resultMap.put("unregistered members", unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(household));
+    resultMap.put("unregistered members",
+        unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(
+            household));
 
     return resultMap;
+  }
+
+  /**
+   * Edits an unregistered member in a household.
+   *
+   * @param request the request containing the full name of the unregistered member and the new full name
+   */
+
+  public void editUnregisteredMemberInHousehold(EditMemberDto request) {
+    UnregisteredHouseholdMember member = unregisteredHouseholdMemberRepository
+        .findByFullNameAndHouseholdId(request.getFullName(), request.getHouseholdId())
+        .orElseThrow(() -> new IllegalArgumentException("Unregistered member not found in household"));
+
+    if (request.getNewFullName() != null) {
+      member.setFullName(request.getNewFullName());
+    }
+    unregisteredHouseholdMemberRepository.save(member);
+    logger.info("Unregistered member {} edited in household {}", request.getFullName(), request.getHouseholdId());
   }
 }

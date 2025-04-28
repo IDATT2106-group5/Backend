@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
@@ -170,20 +171,39 @@ public class HouseholdController {
     }
   }
 
-  @Operation(summary = "Gets the members of a household", description = "Gets the members of a household with the given ID")
-  @GetMapping("/members")
+  @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
+  @GetMapping("/household-details")
   public ResponseEntity<Map<String, Object>> getHouseholdMembers(
       @RequestParam Long householdId) {
     try {
-      Map<String, Object> members = householdService.getMembersByHouseholdId(householdId);
-      LOGGER.info("Household members retrieved successfully: {}", members);
-      return ResponseEntity.ok(members);
+
+      Map<String, Object> details = householdService.getHouseholdDetails(householdId);
+      LOGGER.info("Household members retrieved successfully: {}", details);
+      return ResponseEntity.ok(details);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during household member retrieval: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
       LOGGER.error("Unexpected error during household member retrieval: {}", e.getMessage(), e);
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
+
+  @Operation(summary = "Edits a unregistered member in a household",
+      description = "Edits a unregistered member in a household with the given ID")
+// File: src/main/java/edu/ntnu/idatt2106/krisefikser/api/controller/HouseholdController.java
+  @PostMapping("/edit-unregistered-member")
+  public ResponseEntity<String> editUnregisteredMemberInHousehold(@RequestBody EditMemberDto request) {
+    try {
+      householdService.editUnregisteredMemberInHousehold(request);
+      LOGGER.info("Unregistered member edited in household successfully: {}", request.getFullName());
+      return ResponseEntity.ok("Unregistered member edited in household successfully");
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during unregistered member edit: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error during unregistered member edit: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body("Internal server error");
     }
   }
 }
