@@ -23,24 +23,28 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Service class for managing household-related operations. This service handles the creation and
- * management of households, including validation and persistence operations.
+ * Service class for managing household-related operations.
+ * This service handles the creation, management, and modification of households,
+ * including validation and persistence operations.
  */
 @Service
 public class HouseholdService {
 
   /**
-   * Logger for this class.
+   * Logger for this class to log important events and errors.
    */
   private static final Logger logger = LoggerFactory.getLogger(HouseholdService.class);
+
   /**
    * Repository for household entity operations.
    */
   private final HouseholdRepository householdRepository;
+
   /**
    * Repository for user entity operations.
    */
   private final UserRepository userRepository;
+
   /**
    * Repository for unregistered household member entity operations.
    */
@@ -49,9 +53,9 @@ public class HouseholdService {
   /**
    * Constructs a new HouseholdService with required repositories.
    *
-   * @param householdRepository                   Repository for household operations
-   * @param userRepository                        Repository for user operations
-   * @param unregisteredHouseholdMemberRepository the unregistered household member repository
+   * @param householdRepository                   Repository for household operations.
+   * @param userRepository                        Repository for user operations.
+   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member operations.
    */
   public HouseholdService(HouseholdRepository householdRepository,
                           UserRepository userRepository,
@@ -62,12 +66,12 @@ public class HouseholdService {
   }
 
   /**
-   * Creates a new household with the given name, address, and creator's user ID. The creator
-   * automatically becomes the owner of the household.
+   * Creates a new household with the given name, address, and creator's user ID.
+   * The creator automatically becomes the owner of the household.
    *
-   * @param request DTO containing household name, address, and owner ID
-   * @throws IllegalArgumentException if a household with the same name already exists
-   * @throws IllegalArgumentException if the specified owner ID does not match any existing user
+   * @param request DTO containing household name, address, and owner ID.
+   * @throws IllegalArgumentException if a household with the same name already exists.
+   * @throws IllegalArgumentException if the specified owner ID does not match any existing user.
    */
   public void createHousehold(CreateHouseholdRequestDto request) {
     if (householdRepository.findByName(request.getName()).isPresent()) {
@@ -93,10 +97,10 @@ public class HouseholdService {
   /**
    * Adds a registered member to a household.
    *
-   * @param request DTO containing the email of the user and the ID of the household
-   * @throws IllegalArgumentException if the user is not found
-   * @throws IllegalArgumentException if the household is not found
-   * @throws IllegalArgumentException if the user is already a member of the specified household
+   * @param request DTO containing the email of the user and the ID of the household.
+   * @throws IllegalArgumentException if the user is not found.
+   * @throws IllegalArgumentException if the household is not found.
+   * @throws IllegalArgumentException if the user is already a member of the specified household.
    */
   public void addUserToHousehold(UserHouseholdAssignmentRequestDto request) {
     User user = userRepository.findByEmail(request.getEmail())
@@ -127,9 +131,9 @@ public class HouseholdService {
   /**
    * Removes a registered member from a household.
    *
-   * @param email The email of the user to be removed from the household
-   * @throws IllegalArgumentException if the user with specified email is not found
-   * @throws IllegalArgumentException if the user is not a member of any household
+   * @param email The email of the user to be removed from the household.
+   * @throws IllegalArgumentException if the user with specified email is not found.
+   * @throws IllegalArgumentException if the user is not a member of any household.
    */
   public void removeUserFromHousehold(String email) {
     User user = userRepository.findByEmail(email)
@@ -151,10 +155,8 @@ public class HouseholdService {
    * `UnregisteredHouseholdMember` entity, associates it with the household, and updates the
    * household's number of members.
    *
-   * @param request The DTO containing the full name of the unregistered member and the ID of the
-   *                household to which the member should be added.
-   * @throws IllegalArgumentException if the unregistered member already exists in the specified
-   *                                  household or if the household is not found.
+   * @param request The DTO containing the full name of the unregistered member and the ID of the household to which the member should be added.
+   * @throws IllegalArgumentException if the unregistered member already exists in the specified household or if the household is not found.
    */
   public void addUnregisteredMemberToHousehold(
       UnregisteredMemberHouseholdAssignmentRequestDto request) {
@@ -186,7 +188,7 @@ public class HouseholdService {
    * system and updates the household's member count. If the member doesn't belong to any household,
    * a warning is logged but the member is still deleted.
    *
-   * @param request The DTO containing the full name and household id of the unregistered member
+   * @param request The DTO containing the full name and household id of the unregistered member.
    */
   public void removeUnregisteredMemberFromHousehold(
       UnregisteredMemberHouseholdAssignmentRequestDto request) {
@@ -206,8 +208,8 @@ public class HouseholdService {
   /**
    * Gets the members of a household by household id.
    *
-   * @param householdId the household id
-   * @return the members by household id
+   * @param householdId the household id.
+   * @return A map containing household details, registered users, and unregistered members.
    */
   public Map<String, Object> getHouseholdDetails(Long householdId) {
     Map<String, Object> resultMap = new HashMap<>();
@@ -230,7 +232,8 @@ public class HouseholdService {
             .collect(Collectors.toList());
 
     List<UnregisteredMemberResponseDto> unregisteredMemberResponseDtos =
-        unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(household).stream()
+        unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(household)
+            .stream()
             .map(unregisteredMember -> new UnregisteredMemberResponseDto(
                 unregisteredMember.getId(),
                 unregisteredMember.getFullName()))
@@ -245,9 +248,8 @@ public class HouseholdService {
   /**
    * Edits an unregistered member in a household.
    *
-   * @param request the request containing the full name of the unregistered member and the new full name
+   * @param request The request containing the full name of the unregistered member and the new full name.
    */
-
   public void editUnregisteredMemberInHousehold(EditMemberDto request) {
     UnregisteredHouseholdMember member = unregisteredHouseholdMemberRepository
         .findByFullNameAndHouseholdId(request.getFullName(), request.getHouseholdId())
