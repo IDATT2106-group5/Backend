@@ -106,10 +106,6 @@ public class HouseholdService {
     User user = userRepository.findByEmail(request.getEmail())
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-    if (user.getId() == null) {
-      throw new IllegalArgumentException("User ID must not be null");
-    }
-
     Household household = householdRepository.findById(request.getHouseholdId())
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
 
