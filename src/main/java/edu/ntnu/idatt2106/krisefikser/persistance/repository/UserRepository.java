@@ -49,4 +49,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
   List<User> getUsersByHousehold(Household household);
 
   Object findUsersByHousehold(Household household);
+
+  Optional<User> getUserByEmail(String email);
 }

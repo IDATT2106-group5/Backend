@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import org.slf4j.Logger;
@@ -19,11 +20,20 @@ public class UserService {
   }
 
 
-  public User getUserByEmail() {
+  public UserResponseDto getCurrentUser() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
 
-    return userRepository.findByEmail(email)
-        .orElseThrow(() -> new RuntimeException("User not found"));
+    User user = userRepository.getUserByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("No user logged in"));
+
+    UserResponseDto userDto = new UserResponseDto(
+        user.getId(),
+        user.getEmail(),
+        user.getFullName(),
+        user.getRole()
+    );
+
+    return userDto;
   }
 }
