@@ -4,6 +4,7 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
@@ -12,7 +13,11 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -198,25 +203,44 @@ public class HouseholdService {
         member.getHousehold().getNumberOfMembers() - 1);
   }
 
-//  /**
-//   * Gets the members of a household by household id.
-//   *
-//   * @param householdId the household id
-//   * @return the members by household id
-//   */
-//  public Map<String, Object> getHouseholdDetails(Long householdId) {
-//    Map<String, Object> resultMap = new HashMap<>();
-//    Household household = householdRepository.findById(householdId)
-//        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
-//
-//    resultMap.put("household", household);
-//    resultMap.put("registered members", userRepository.findUsersByHousehold(household));
-//    resultMap.put("unregistered members",
-//        unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(
-//            household));
-//
-//    return resultMap;
-//  }
+  /**
+   * Gets the members of a household by household id.
+   *
+   * @param householdId the household id
+   * @return the members by household id
+   */
+  public Map<String, Object> getHouseholdDetails(Long householdId) {
+    Map<String, Object> resultMap = new HashMap<>();
+
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+    resultMap.put("household", new HouseholdResponseDto(householdId, household.getName(),
+        household.getAddress(),
+        new UserResponseDto(household.getOwner().getId(), household.getOwner().getEmail(),
+            household.getOwner().getFullName(), household.getOwner()
+            .getRole())));
+
+    List<UserResponseDto> userResponseDtos =
+        userRepository.getUsersByHousehold(household).stream()
+            .map(user -> new UserResponseDto(
+                user.getId(),
+                user.getEmail(),
+                user.getFullName(),
+                user.getRole()))
+            .collect(Collectors.toList());
+
+    List<UnregisteredMemberResponseDto> unregisteredMemberResponseDtos =
+        unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(household).stream()
+            .map(unregisteredMember -> new UnregisteredMemberResponseDto(
+                unregisteredMember.getId(),
+                unregisteredMember.getFullName()))
+            .collect(Collectors.toList());
+
+    resultMap.put("users", userResponseDtos);
+    resultMap.put("unregisteredMembers", unregisteredMemberResponseDtos);
+
+    return resultMap;
+  }
 
   /**
    * Edits an unregistered member in a household.
@@ -236,23 +260,5 @@ public class HouseholdService {
     unregisteredHouseholdMemberRepository.save(member);
     logger.info("Unregistered member {} edited in household {}", request.getFullName(),
         request.getHouseholdId());
-  }
-
-  public HouseholdResponseDto getHouseholdDetails(Long householdId) {
-    Household household = householdRepository.getHouseholdById(householdId)
-        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
-
-    HouseholdResponseDto householdDto = new HouseholdResponseDto(
-        household.getId(),
-        household.getName(),
-        household.getAddress(),
-        new UserResponseDto(
-            household.getOwner().getId(),
-            household.getOwner().getEmail(),
-            household.getOwner().getFullName(),
-        )
-    );
-
-    return householdDto;
   }
 }
