@@ -38,8 +38,8 @@ public class SecurityConfig {
    *                                 data.
    */
   public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthEntryPoint,
-      JwtAuthenticationFilter jwtAuthFilter,
-      CustomUserDetailsService customUserDetailsService) {
+                        JwtAuthenticationFilter jwtAuthFilter,
+                        CustomUserDetailsService customUserDetailsService) {
     this.jwtAuthEntryPoint = jwtAuthEntryPoint;
     this.jwtAuthFilter = jwtAuthFilter;
     this.customUserDetailsService = customUserDetailsService;
@@ -61,15 +61,16 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/admin/setup").permitAll()
-                .requestMatchers("/api/admin/login/2fa/**").permitAll()
-                .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
-                .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
-                .requestMatchers("/api/user/**").permitAll()
-                .requestMatchers("/api/household/**")
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/admin/setup").permitAll()
+            .requestMatchers("/api/admin/login/2fa/**").permitAll()
+            .requestMatchers("/api/membership-requests/**").permitAll()
+            .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
+            .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
+            .requestMatchers("/api/user/**").permitAll()
+            .requestMatchers("/api/household/**")
             .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
-                .anyRequest().authenticated()
+            .anyRequest().authenticated()
         )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
