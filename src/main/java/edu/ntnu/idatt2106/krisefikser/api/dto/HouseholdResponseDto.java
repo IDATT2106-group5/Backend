@@ -7,14 +7,12 @@ public class HouseholdResponseDto {
   private Long id;
   private String name;
   private String address;
-  private int numberOfMembers;
   private UserResponseDto owner;
 
-  public HouseholdResponseDto(Long id, String name, String address, int numberOfMembers, UserResponseDto owner) {
+  public HouseholdResponseDto(Long id, String name, String address, UserResponseDto owner) {
     this.id = id;
     this.name = name;
     this.address = address;
-    this.numberOfMembers = numberOfMembers;
     this.owner = owner;
   }
 

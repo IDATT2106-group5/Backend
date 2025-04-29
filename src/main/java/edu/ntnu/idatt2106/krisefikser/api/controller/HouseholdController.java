@@ -201,26 +201,9 @@ public class HouseholdController {
   @GetMapping("/{householdId}")
   public ResponseEntity<HouseholdResponseDto> getHousehold(@PathVariable Long householdId) {
     try {
-      Household household = householdService.getHouseholdById(householdId);
+      HouseholdResponseDto response = householdService.getHouseholdDetails(householdId);
 
-      if (household == null) {
-        return ResponseEntity.notFound().build();
-      }
-
-      HouseholdResponseDto householdDto = new HouseholdResponseDto(
-          household.getId(),
-          household.getName(),
-          household.getAddress(),
-          household.getNumberOfMembers(),
-          new UserResponseDto(
-              household.getOwner().getId(),
-              household.getOwner().getEmail(),
-              household.getOwner().getFullName(),
-              household.getOwner().getRole()
-          )
-      );
-
-      return ResponseEntity.ok(householdDto);
+      return ResponseEntity.ok(response);
 
     } catch (Exception e) {
       LOGGER.error("Error fetching household", e);
