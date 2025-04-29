@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,16 +32,28 @@ public class UserController {
 
 
   @GetMapping("/me")
-  public ResponseEntity<User> getUser() {
+  public ResponseEntity<UserResponseDto> getUser() {
     try {
+
       User user = userService.getUserByEmail();
 
       if (user == null) {
         return ResponseEntity.notFound().build();
       }
-      return ResponseEntity.ok(user);
+
+      UserResponseDto userDto = new UserResponseDto(
+          user.getId(),
+          user.getEmail(),
+          user.getFullName(),
+          user.getRole()
+      );
+
+      return ResponseEntity.ok(userDto);
+
     } catch (Exception e) {
+      LOGGER.error("Error fetching current user", e);
       return ResponseEntity.status(500).build();
     }
   }
+
 }

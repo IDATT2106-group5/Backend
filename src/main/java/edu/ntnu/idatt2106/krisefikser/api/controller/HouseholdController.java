@@ -1,9 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.*;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -13,14 +11,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller for managing household-related operations. This includes creating households,
@@ -205,4 +196,36 @@ public class HouseholdController {
       return ResponseEntity.status(500).body("Internal server error");
     }
   }
+
+
+  @GetMapping("/{householdId}")
+  public ResponseEntity<HouseholdResponseDto> getHousehold(@PathVariable Long householdId) {
+    try {
+      Household household = householdService.getHouseholdById(householdId);
+
+      if (household == null) {
+        return ResponseEntity.notFound().build();
+      }
+
+      HouseholdResponseDto householdDto = new HouseholdResponseDto(
+          household.getId(),
+          household.getName(),
+          household.getAddress(),
+          household.getNumberOfMembers(),
+          new UserResponseDto(
+              household.getOwner().getId(),
+              household.getOwner().getEmail(),
+              household.getOwner().getFullName(),
+              household.getOwner().getRole()
+          )
+      );
+
+      return ResponseEntity.ok(householdDto);
+
+    } catch (Exception e) {
+      LOGGER.error("Error fetching household", e);
+      return ResponseEntity.status(500).build();
+    }
+  }
+
 }
