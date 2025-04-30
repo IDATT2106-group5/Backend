@@ -1,7 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.LoginRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
