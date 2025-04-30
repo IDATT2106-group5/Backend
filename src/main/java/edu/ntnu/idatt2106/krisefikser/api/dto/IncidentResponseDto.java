@@ -1,52 +1,21 @@
-package edu.ntnu.idatt2106.krisefikser.persistance.entity;
+package edu.ntnu.idatt2106.krisefikser.api.dto;
 
-import edu.ntnu.idatt2106.krisefikser.persistance.enums.Severity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
-/**
- * The type Incident.
- */
-@Entity
-@Table(name = "incident")
-public class Incident {
+public class IncidentResponseDto {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @Column
   private String name;
-  @Column
   private String description;
-  @Column
-  private Double latitude;
-
-  @Column
-  private Double longitude;
-
-  @Column
-  private Double impactRadius;
-
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private Severity severity;
-  @Column
+  private double latitude;
+  private double longitude;
+  private double impactRadius;
+  private String severity;
   private LocalDateTime startedAt;
-  @Column
   private LocalDateTime endedAt;
-
-  @Column(name = "scenario_id")
   private Long scenarioId;
 
-  // Getters and Setters
+  // Getters and setters
   public Long getId() {
     return id;
   }
@@ -71,35 +40,35 @@ public class Incident {
     this.description = description;
   }
 
-  public Double getLatitude() {
+  public double getLatitude() {
     return latitude;
   }
 
-  public void setLatitude(Double latitude) {
+  public void setLatitude(double latitude) {
     this.latitude = latitude;
   }
 
-  public Double getLongitude() {
+  public double getLongitude() {
     return longitude;
   }
 
-  public void setLongitude(Double longitude) {
+  public void setLongitude(double longitude) {
     this.longitude = longitude;
   }
 
-  public Double getImpactRadius() {
+  public double getImpactRadius() {
     return impactRadius;
   }
 
-  public void setImpactRadius(Double impactRadius) {
+  public void setImpactRadius(double impactRadius) {
     this.impactRadius = impactRadius;
   }
 
-  public Severity getSeverity() {
+  public String getSeverity() {
     return severity;
   }
 
-  public void setSeverity(Severity severity) {
+  public void setSeverity(String severity) {
     this.severity = severity;
   }
 
@@ -126,5 +95,5 @@ public class Incident {
   public void setScenarioId(Long scenarioId) {
     this.scenarioId = scenarioId;
   }
-
 }
+
