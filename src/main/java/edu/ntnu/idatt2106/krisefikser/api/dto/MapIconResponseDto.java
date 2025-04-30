@@ -1,47 +1,34 @@
-package edu.ntnu.idatt2106.krisefikser.persistance.entity;
+package edu.ntnu.idatt2106.krisefikser.api.dto;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.MapIcon;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.MapIconType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
 /**
- * The type Map icon.
+ * DTO for sending MapIcon data to clients.
  */
-@Entity
-@Table(name = "map_icon")
-public class MapIcon {
+public class MapIconResponseDto {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
   private MapIconType type;
-
-  @Column
   private String address;
-
-  @Column
   private Double latitude;
-
-  @Column
   private Double longitude;
-
-  @Column(length = 1000)
   private String description;
-
-  @Column
   private String openingHours;
-
-  @Column(length = 255)
   private String contactInfo;
+
+  public static MapIconResponseDto fromEntity(MapIcon mapIcon) {
+    MapIconResponseDto dto = new MapIconResponseDto();
+    dto.setId(mapIcon.getId());
+    dto.setType(mapIcon.getType());
+    dto.setAddress(mapIcon.getAddress());
+    dto.setLatitude(mapIcon.getLatitude());
+    dto.setLongitude(mapIcon.getLongitude());
+    dto.setDescription(mapIcon.getDescription());
+    dto.setOpeningHours(mapIcon.getOpeningHours());
+    dto.setContactInfo(mapIcon.getContactInfo());
+    return dto;
+  }
 
   /**
    * Gets the ID of the map icon.
@@ -62,18 +49,18 @@ public class MapIcon {
   }
 
   /**
-   * Gets the MapIconType of the map icon.
+   * Gets the type of the map icon.
    *
-   * @return the MapIconType of the map icon
+   * @return the type of the map icon
    */
   public MapIconType getType() {
     return type;
   }
 
   /**
-   * Sets the MapIconType of the map icon.
+   * Sets the type of the map icon.
    *
-   * @param type the MapIconType of the map icon
+   * @param type the type of the map icon
    */
   public void setType(MapIconType type) {
     this.type = type;
