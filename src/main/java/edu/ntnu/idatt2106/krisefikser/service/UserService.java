@@ -40,12 +40,12 @@ public class UserService {
     return userDto;
   }
 
-  public HouseholdResponseDto getCurrentHousehold() {
+  public HouseholdResponseDto getHousehold(Long userId) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
 
-    User user = userRepository.getUserByEmail(email)
-        .orElseThrow(() -> new IllegalArgumentException("No user logged in"));
+    User user = userRepository.getUsersById(userId)
+        .orElseThrow(() -> new IllegalArgumentException("No user found"));
 
     Household household = user.getHousehold();
 

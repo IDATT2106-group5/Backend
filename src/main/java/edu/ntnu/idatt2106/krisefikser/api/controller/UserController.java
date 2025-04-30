@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,10 +57,11 @@ public class UserController {
     }
   }
 
-  @GetMapping("/me/household")
-  public ResponseEntity<?> getHousehold() {
+  @GetMapping("/me/household7{userId}")
+  public ResponseEntity<?> getHousehold(@PathVariable Long userId) {
     try {
-      HouseholdResponseDto household = userService.getCurrentHousehold();
+      HouseholdResponseDto household = userService.getHousehold(userId);
+      LOGGER.info("Fetched household: {}", household.getName());
       LOGGER.info("Fetched info for current user");
       return ResponseEntity.ok(household);
     } catch (IllegalArgumentException e) {
