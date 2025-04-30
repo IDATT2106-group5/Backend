@@ -196,7 +196,7 @@ public class HouseholdController {
     try {
       householdService.editUnregisteredMemberInHousehold(request);
       LOGGER.info("Unregistered member edited in household successfully: {}",
-          request.getFullName());
+          request.getNewFullName());
       return ResponseEntity.ok("Unregistered member edited in household successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during unregistered member edit: {}", e.getMessage());

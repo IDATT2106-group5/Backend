@@ -4,7 +4,7 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
  * The type Edit member dto.
  */
 public class EditMemberDto {
-  private String fullName;
+  private Long memberId;
   private String newFullName;
   private Long householdId;
 
@@ -17,13 +17,8 @@ public class EditMemberDto {
     return householdId;
   }
 
-  /**
-   * Gets full name.
-   *
-   * @return the full name
-   */
-  public String getFullName() {
-    return fullName;
+  public Long getMemberId() {
+    return memberId;
   }
 
   /**

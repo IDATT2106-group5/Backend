@@ -22,6 +22,7 @@ public interface UnregisteredHouseholdMemberRepository
    */
   Optional<UnregisteredHouseholdMember> findByFullNameAndHouseholdId(String fullName,
                                                                      Long householdId);
+  Optional<UnregisteredHouseholdMember> findById(Long id);
 
   List<UnregisteredHouseholdMember> findUnregisteredHouseholdMembersByHousehold(Household household);
 }
