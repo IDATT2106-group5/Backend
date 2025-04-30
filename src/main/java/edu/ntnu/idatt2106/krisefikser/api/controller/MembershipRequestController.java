@@ -29,12 +29,29 @@ public class MembershipRequestController {
   }
 
   @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
-  @GetMapping("/active")
-  public ResponseEntity<Map<String, Object>> getActiveMembershipRequests(
+  @GetMapping("/invitations/received")
+  public ResponseEntity<Map<String, Object>> getActiveInvitations(
       @RequestBody GetUserInfoRequestDto request) {
     try {
       Map<String, Object> result = Map.of(
-          "active requests", membershipRequestService.getActiveRequestsByUser(request.getUserId()));
+          "active invitations", membershipRequestService.getReceivedInvitationsByUser(request.getUserId()));
+      LOGGER.info("Retrieved active membership requests for user: {}", request.getUserId());
+      return ResponseEntity.ok(result);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error retrieving requests: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error retrieving requests: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
+  @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
+  @GetMapping("/invitations/sent")
+  public ResponseEntity<Map<String, Object>> getActiveRequests(
+      @RequestBody GetUserInfoRequestDto request) {
+    try {
+      Map<String, Object> result = Map.of(
+          "active invitations", membershipRequestService.getSentInvitationsByUser(request.getUserId()));
       LOGGER.info("Retrieved active membership requests for user: {}", request.getUserId());
       return ResponseEntity.ok(result);
     } catch (IllegalArgumentException e) {

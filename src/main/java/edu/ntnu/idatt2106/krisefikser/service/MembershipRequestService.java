@@ -125,12 +125,12 @@ public class MembershipRequestService {
   }
 
   /**
-   * Get active requests by user.
+   * Get sent invitations by user.
    *
    * @param userId the user id
-   * @return the active requests by user
+   * @return the active invitations by user
    */
-  public List<MembershipRequest> getActiveRequestsByUser(Long userId) {
+  public List<MembershipRequest> getSentInvitationsByUser(Long userId) {
     // Check if the user exists
     if (!userRepository.existsById(userId)) {
       throw new IllegalArgumentException("User not found");
@@ -140,6 +140,24 @@ public class MembershipRequestService {
     User user = userRepository.findById(userId).orElse(null);
 
     // Get the active requests for the user
-    return membershipRequestRepository.findAllByReceiverAndStatus(user, RequestStatus.PENDING);
+    return membershipRequestRepository.findAllBySenderAndTypeAndStatus(user, RequestType.INVITATION, RequestStatus.PENDING);
+  }
+  /**
+   * Get received invitations by user.
+   *
+   * @param userId the user id
+   * @return the active invitations by user
+   */
+  public List<MembershipRequest> getReceivedInvitationsByUser(Long userId) {
+    // Check if the user exists
+    if (!userRepository.existsById(userId)) {
+      throw new IllegalArgumentException("User not found");
+    }
+
+    // Get the user
+    User user = userRepository.findById(userId).orElse(null);
+
+    // Get the active requests for the user
+    return membershipRequestRepository.findAllByReceiverAndTypeAndStatus(user, RequestType.INVITATION, RequestStatus.PENDING);
   }
 }
