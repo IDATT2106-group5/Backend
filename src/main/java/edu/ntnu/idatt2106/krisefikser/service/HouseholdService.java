@@ -1,8 +1,8 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
@@ -97,13 +97,13 @@ public class HouseholdService {
   /**
    * Adds a registered member to a household.
    *
-   * @param request DTO containing the email of the user and the ID of the household.
+   * @param request DTO containing the id of the user and the ID of the household.
    * @throws IllegalArgumentException if the user is not found.
    * @throws IllegalArgumentException if the household is not found.
    * @throws IllegalArgumentException if the user is already a member of the specified household.
    */
   public void addUserToHousehold(UserHouseholdAssignmentRequestDto request) {
-    User user = userRepository.findByEmail(request.getEmail())
+    User user = userRepository.findById(request.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
     Household household = householdRepository.findById(request.getHouseholdId())
@@ -127,16 +127,21 @@ public class HouseholdService {
   /**
    * Removes a registered member from a household.
    *
-   * @param email The email of the user to be removed from the household.
-   * @throws IllegalArgumentException if the user with specified email is not found.
+   * @param userId      the user id
+   * @param householdId the household id
+   * @throws IllegalArgumentException if the user with specified id is not found.
    * @throws IllegalArgumentException if the user is not a member of any household.
    */
-  public void removeUserFromHousehold(String email) {
-    User user = userRepository.findByEmail(email)
+  public void removeUserFromHousehold(Long userId, Long householdId) {
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
     if (user.getHousehold() == null) {
       logger.warn("User {} is not a member of any household", user.getFullName());
       throw new IllegalArgumentException("User is not a member of any household");
+    }
+    if (!user.getHousehold().getId().equals(householdId)) {
+      logger.warn("User {} is not a member of household", user.getFullName());
+      throw new IllegalArgumentException("User is not a member of this household");
     }
     householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
         user.getHousehold().getNumberOfMembers() - 1);

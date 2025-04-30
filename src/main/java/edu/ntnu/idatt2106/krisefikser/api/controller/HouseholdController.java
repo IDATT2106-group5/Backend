@@ -5,7 +5,6 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.RemoveUnregist
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.RemoveUserRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,7 +91,7 @@ public class HouseholdController {
       @RequestBody UserHouseholdAssignmentRequestDto request) {
     try {
       householdService.addUserToHousehold(request);
-      LOGGER.info("User added to household successfully: {}", request.getEmail());
+      LOGGER.info("User added to household successfully: {}", request.getUserId());
       return ResponseEntity.ok("User added to household successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during user addition: {}", e.getMessage());
@@ -138,10 +137,10 @@ public class HouseholdController {
       description = "Removes a user from a household with the given ID")
   @PostMapping("/remove-user")
   public ResponseEntity<String> removeUserFromHousehold(
-      @RequestBody RemoveUserRequestDto request) {
+      @RequestBody UserHouseholdAssignmentRequestDto request) {
     try {
-      householdService.removeUserFromHousehold(request.getEmail());
-      LOGGER.info("User removed from household successfully: {}", request.getEmail());
+      householdService.removeUserFromHousehold(request.getUserId(), request.getHouseholdId());
+      LOGGER.info("User removed from household successfully: {}", request.getUserId());
       return ResponseEntity.ok("User removed from household successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during user removal: {}", e.getMessage());
