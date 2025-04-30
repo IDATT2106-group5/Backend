@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -183,7 +182,7 @@ public class HouseholdController {
    * @return the household details
    */
   @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
-  @GetMapping("/details")
+  @PostMapping("/details")
   public ResponseEntity<Map<String, Object>> getHouseholdDetails(
       @RequestBody GetUserInfoRequestDto request) {
     try {
