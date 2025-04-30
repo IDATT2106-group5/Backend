@@ -64,6 +64,7 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/admin/setup").permitAll()
             .requestMatchers("/api/admin/login/2fa/**").permitAll()
+            .requestMatchers("/api/map-icons**").permitAll()
             .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
             .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
             .requestMatchers("/api/household/**")
