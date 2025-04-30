@@ -184,20 +184,18 @@ public class HouseholdService {
    * system and updates the household's member count. If the member doesn't belong to any household,
    * a warning is logged but the member is still deleted.
    *
-   * @param request The DTO containing the full name and household id of the unregistered member.
+   * @param memberId the member id
    */
-  public void removeUnregisteredMemberFromHousehold(
-      UnregisteredMemberHouseholdAssignmentRequestDto request) {
+  public void removeUnregisteredMemberFromHousehold(Long memberId) {
     UnregisteredHouseholdMember member =
-        unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId(request.getFullName(),
-            request.getHouseholdId()).orElseThrow(
-            () -> new IllegalArgumentException("Unregistered member not found in household"));
+        unregisteredHouseholdMemberRepository.findById(memberId).orElseThrow(
+            () -> new IllegalArgumentException("Unregistered member not found"));
     if (member.getHousehold() != null) {
-      logger.warn("Unregistered member {} doesnt belong to any household", request.getFullName());
+      logger.warn("Unregistered member doesnt belong to any household");
     }
 
     unregisteredHouseholdMemberRepository.delete(member);
-    householdRepository.updateNumberOfMembers(request.getHouseholdId(),
+    householdRepository.updateNumberOfMembers(member.getHousehold().getId(),
         member.getHousehold().getNumberOfMembers() - 1);
   }
 

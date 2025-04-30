@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller for managing household-related operations. This includes creating households,
  * adding/removing users, and managing unregistered members.
  */
-
 @Tag(name = "Household", description = "Endpoints for managing a household")
 @RestController
 @RequestMapping("/api/household")
@@ -34,8 +33,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class HouseholdController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HouseholdController.class);
+  /**
+   * The Household service.
+   */
   HouseholdService householdService;
 
+  /**
+   * Instantiates a new Household controller.
+   *
+   * @param householdService the household service
+   */
   public HouseholdController(HouseholdService householdService) {
     this.householdService = householdService;
   }
@@ -98,8 +105,7 @@ public class HouseholdController {
    * Adds an unregistered member to a household with the given ID. The user must not be registered
    * in the system.
    *
-   * @param request The request containing the full name of the unregistered member and the ID of
-   *                the
+   * @param request The request containing the full name of the unregistered member and the ID of                the
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Adds an unregistered member to a household",
@@ -148,19 +154,17 @@ public class HouseholdController {
    * Removes an unregistered member from a household with the given ID. The user must not be
    * registered in the system.
    *
-   * @param request The request containing the full name of the unregistered member and the ID of
-   *                the household.
+   * @param memberId the member id
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes an unregistered member from a household",
       description = "Removes an unregistered user from a household with the given ID")
-  @DeleteMapping("/delete-unregistered-member")
+  @DeleteMapping("/delete-unregistered-member/{memberId}")
   public ResponseEntity<String> removeUnregisteredMemberFromHousehold(
-      @RequestBody UnregisteredMemberHouseholdAssignmentRequestDto request) {
+      @PathVariable Long memberId) {
     try {
-      householdService.removeUnregisteredMemberFromHousehold(request);
-      LOGGER.info("Unregistered member removed from household successfully: {}",
-          request.getFullName());
+      householdService.removeUnregisteredMemberFromHousehold(memberId);
+      LOGGER.info("Unregistered member removed from household successfully" );
       return ResponseEntity.ok("Unregistered member removed from household successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during unregistered member removal: {}", e.getMessage());
@@ -171,6 +175,12 @@ public class HouseholdController {
     }
   }
 
+  /**
+   * Gets household details.
+   *
+   * @param userId the user id
+   * @return the household details
+   */
   @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
   @GetMapping("/details/{userId}")
   public ResponseEntity<Map<String, Object>> getHouseholdDetails(
