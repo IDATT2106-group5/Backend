@@ -204,23 +204,31 @@ public class HouseholdService {
   /**
    * Gets the members of a household by household id.
    *
-   * @param householdId the household id.
+   * @param userId the user id.
    * @return A map containing household details, registered users, and unregistered members.
    */
-  public Map<String, Object> getHouseholdDetails(Long householdId) {
+  public Map<String, Object> getHouseholdDetails(Long userId) {
     Map<String, Object> resultMap = new HashMap<>();
 
-    Household household = householdRepository.findById(householdId)
-        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
-    resultMap.put("household", new HouseholdResponseDto(householdId, household.getName(),
+    User user = userRepository.findById(userId).orElseThrow(
+        () -> new IllegalArgumentException("User not found"));
+    Household household = user.getHousehold();
+    resultMap.put("household", new HouseholdResponseDto(
+        household.getId(),
+        household.getName(),
         household.getAddress(),
-        new UserResponseDto(household.getOwner().getId(), household.getOwner().getEmail(),
-            household.getOwner().getFullName(), household.getOwner()
-                .getTlf(), household.getOwner().getRole())));
+        new UserResponseDto(
+            household.getOwner().getId(),
+            household.getOwner().getEmail(),
+            household.getOwner().getFullName(),
+            household.getOwner().getTlf(),
+            household.getOwner().getRole()
+        )
+    ));
 
     List<UserResponseDto> userResponseDtos =
         userRepository.getUsersByHousehold(household).stream()
-            .map(user -> new UserResponseDto(
+            .map(u -> new UserResponseDto(
                 user.getId(),
                 user.getEmail(),
                 user.getFullName(),

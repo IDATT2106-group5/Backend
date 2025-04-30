@@ -16,7 +16,19 @@ public class HouseholdResponseDto {
     this.owner = owner;
   }
 
-  public Long getId() { return id; }
-  public String getName() { return name; }
-  public String getAddress() { return address; }
+  public Long getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public UserResponseDto getOwner() {
+    return owner;
+  }
 }

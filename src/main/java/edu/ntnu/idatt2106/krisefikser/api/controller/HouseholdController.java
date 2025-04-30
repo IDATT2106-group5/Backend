@@ -172,11 +172,11 @@ public class HouseholdController {
   }
 
   @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
-  @GetMapping("/details/{householdId}")
+  @GetMapping("/details/{userId}")
   public ResponseEntity<Map<String, Object>> getHouseholdDetails(
-      @PathVariable Long householdId) {
+      @PathVariable Long userId) {
     try {
-      Map<String, Object> details = householdService.getHouseholdDetails(householdId);
+      Map<String, Object> details = householdService.getHouseholdDetails(userId);
       LOGGER.info("Household members retrieved successfully: {}", details);
       return ResponseEntity.ok(details);
     } catch (IllegalArgumentException e) {
