@@ -349,24 +349,19 @@ class HouseholdControllerTest {
      * Tests the positive scenario where an unregistered member is successfully removed from a household.
      */
     @Test
-    void removeUnregisteredMemberFromHousehold_ValidRequest_ReturnsOk() {
+    void removeUnregisteredMemberFromHousehold_ValidMemberId_ReturnsOk() {
       // Arrange
-      UnregisteredMemberHouseholdAssignmentRequestDto request =
-          mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
-      when(request.getFullName()).thenReturn("John Doe");
-      when(request.getHouseholdId()).thenReturn(1L);
-
-      doNothing().when(householdService).removeUnregisteredMemberFromHousehold(
-          any(UnregisteredMemberHouseholdAssignmentRequestDto.class));
+      Long memberId = 1L;
+      doNothing().when(householdService).removeUnregisteredMemberFromHousehold(memberId);
 
       // Act
       ResponseEntity<String> response =
-          householdController.removeUnregisteredMemberFromHousehold(request);
+          householdController.removeUnregisteredMemberFromHousehold(memberId);
 
       // Assert
       assertEquals(HttpStatus.OK, response.getStatusCode());
       assertEquals("Unregistered member removed from household successfully", response.getBody());
-      verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(request);
+      verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(memberId);
     }
 
     /**
@@ -375,23 +370,19 @@ class HouseholdControllerTest {
     @Test
     void removeUnregisteredMemberFromHousehold_ValidationException_ReturnsBadRequest() {
       // Arrange
-      UnregisteredMemberHouseholdAssignmentRequestDto request =
-          mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
-      when(request.getFullName()).thenReturn("John Doe");
-
-      String errorMessage = "Household ID is required";
+      Long memberId = -1L;
+      String errorMessage = "Invalid member ID";
       doThrow(new IllegalArgumentException(errorMessage))
-          .when(householdService).removeUnregisteredMemberFromHousehold(
-              any(UnregisteredMemberHouseholdAssignmentRequestDto.class));
+          .when(householdService).removeUnregisteredMemberFromHousehold(memberId);
 
       // Act
       ResponseEntity<String> response =
-          householdController.removeUnregisteredMemberFromHousehold(request);
+          householdController.removeUnregisteredMemberFromHousehold(memberId);
 
       // Assert
       assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
       assertEquals(errorMessage, response.getBody());
-      verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(request);
+      verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(memberId);
     }
 
     /**
@@ -400,23 +391,38 @@ class HouseholdControllerTest {
     @Test
     void removeUnregisteredMemberFromHousehold_UnexpectedException_ReturnsInternalServerError() {
       // Arrange
-      UnregisteredMemberHouseholdAssignmentRequestDto request =
-          mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
-      when(request.getFullName()).thenReturn("John Doe");
-      when(request.getHouseholdId()).thenReturn(1L);
-
+      Long memberId = 1L;
       doThrow(new RuntimeException("Database error"))
-          .when(householdService).removeUnregisteredMemberFromHousehold(
-              any(UnregisteredMemberHouseholdAssignmentRequestDto.class));
+          .when(householdService).removeUnregisteredMemberFromHousehold(memberId);
 
       // Act
       ResponseEntity<String> response =
-          householdController.removeUnregisteredMemberFromHousehold(request);
+          householdController.removeUnregisteredMemberFromHousehold(memberId);
 
       // Assert
       assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
       assertEquals("Internal server error", response.getBody());
-      verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(request);
+      verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(memberId);
+    }
+
+    /**
+     * Tests the scenario where a null member ID is provided.
+     */
+    @Test
+    void removeUnregisteredMemberFromHousehold_NullMemberId_ReturnsBadRequest() {
+      // Arrange
+      Long memberId = null;
+      doThrow(new IllegalArgumentException("Member ID cannot be null"))
+          .when(householdService).removeUnregisteredMemberFromHousehold(memberId);
+
+      // Act
+      ResponseEntity<String> response =
+          householdController.removeUnregisteredMemberFromHousehold(memberId);
+
+      // Assert
+      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+      assertEquals("Member ID cannot be null", response.getBody());
+      verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(memberId);
     }
   }
 
@@ -490,7 +496,7 @@ class HouseholdControllerTest {
     void editUnregisteredMemberInHousehold_ValidRequest_ReturnsOk() {
       // Arrange
       EditMemberDto request = mock(EditMemberDto.class);
-      when(request.getFullName()).thenReturn("John Doe");
+      when(request.getNewFullName()).thenReturn("John Doe");
       when(request.getHouseholdId()).thenReturn(1L);
 
       doNothing().when(householdService)
@@ -513,7 +519,7 @@ class HouseholdControllerTest {
     void editUnregisteredMemberInHousehold_ValidationException_ReturnsBadRequest() {
       // Arrange
       EditMemberDto request = mock(EditMemberDto.class);
-      when(request.getFullName()).thenReturn("John Doe");
+      when(request.getNewFullName()).thenReturn("John Doe");
 
       String errorMessage = "Household ID is required";
       doThrow(new IllegalArgumentException(errorMessage))
@@ -536,7 +542,7 @@ class HouseholdControllerTest {
     void editUnregisteredMemberInHousehold_UnexpectedException_ReturnsInternalServerError() {
       // Arrange
       EditMemberDto request = mock(EditMemberDto.class);
-      when(request.getFullName()).thenReturn("John Doe");
+      when(request.getNewFullName()).thenReturn("John Doe");
       when(request.getHouseholdId()).thenReturn(1L);
 
       doThrow(new RuntimeException("Database error"))
