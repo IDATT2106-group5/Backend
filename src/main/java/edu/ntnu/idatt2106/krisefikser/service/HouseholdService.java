@@ -257,7 +257,7 @@ public class HouseholdService {
    */
   public void editUnregisteredMemberInHousehold(EditMemberDto request) {
     UnregisteredHouseholdMember member = unregisteredHouseholdMemberRepository
-        .findByFullNameAndHouseholdId(request.getFullName(), request.getHouseholdId())
+        .findById(request.getMemberId())
         .orElseThrow(
             () -> new IllegalArgumentException("Unregistered member not found in household"));
 
@@ -265,7 +265,7 @@ public class HouseholdService {
       member.setFullName(request.getNewFullName());
     }
     unregisteredHouseholdMemberRepository.save(member);
-    logger.info("Unregistered member {} edited in household {}", request.getFullName(),
+    logger.info("Unregistered member {} edited in household {}", request.getNewFullName(),
         request.getHouseholdId());
   }
 }
