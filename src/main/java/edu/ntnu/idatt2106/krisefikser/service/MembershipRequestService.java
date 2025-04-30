@@ -1,6 +1,8 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.MembershipRequest;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
@@ -44,15 +46,10 @@ public class MembershipRequestService {
    * @param request the request
    */
   public void sendInvitation(MembershipRequestDto request) {
-    // Check if the user and household exist
-    if (!userRepository.existsByEmail(request.getUserEmail())) {
-      throw new IllegalArgumentException("User not found");
-    }
-    if (!householdRepository.existsByName(request.getHouseholdName())) {
-      throw new IllegalArgumentException("Household not found");
-    }
-    User receiver = userRepository.findByEmail(request.getUserEmail()).orElse(null);
-    Household household = householdRepository.findByName(request.getHouseholdName()).orElse(null);
+    User receiver = userRepository.findById(request.getUserId()).orElseThrow(
+        () -> new IllegalArgumentException("User not found"));
+    Household household = householdRepository.findById(request.getHouseholdId()).orElseThrow(
+        () -> new IllegalArgumentException("Household not found"));
 
     // Create and save the membership request
     MembershipRequest membershipRequest = new MembershipRequest();
@@ -72,15 +69,10 @@ public class MembershipRequestService {
    * @param request the request
    */
   public void sendJoinRequest(MembershipRequestDto request) {
-    // Check if the user and household exist
-    if (!userRepository.existsByEmail(request.getUserEmail())) {
-      throw new IllegalArgumentException("User not found");
-    }
-    if (!householdRepository.existsByName(request.getHouseholdName())) {
-      throw new IllegalArgumentException("Household not found");
-    }
-    User sender = userRepository.findByEmail(request.getUserEmail()).orElse(null);
-    Household household = householdRepository.findByName(request.getHouseholdName()).orElse(null);
+    User sender = userRepository.findById(request.getUserId())
+        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    Household household = householdRepository.findById(request.getHouseholdId())
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
 
     // Create and save the membership request
     MembershipRequest membershipRequest = new MembershipRequest();
@@ -130,7 +122,7 @@ public class MembershipRequestService {
    * @param userId the user id
    * @return the active invitations by user
    */
-  public List<MembershipRequest> getSentInvitationsByUser(Long userId) {
+  public List<MembershipRequestResponseDto> getSentInvitationsByUser(Long userId) {
     // Check if the user exists
     if (!userRepository.existsById(userId)) {
       throw new IllegalArgumentException("User not found");
@@ -140,15 +132,30 @@ public class MembershipRequestService {
     User user = userRepository.findById(userId).orElse(null);
 
     // Get the active requests for the user
-    return membershipRequestRepository.findAllBySenderAndTypeAndStatus(user, RequestType.INVITATION, RequestStatus.PENDING);
+    return membershipRequestRepository.findAllBySenderAndTypeAndStatus(user,
+        RequestType.INVITATION, RequestStatus.PENDING).stream().map(invitation ->
+        new MembershipRequestResponseDto(
+            invitation.getId(),
+            invitation.getHousehold().getId(),
+            new UserResponseDto(invitation.getSender().getId(), invitation.getSender().getEmail(),
+                invitation.getSender().getFullName(), invitation.getSender().getTlf(),
+                invitation.getSender().getRole()),
+            new UserResponseDto(invitation.getReceiver().getId(),
+                invitation.getReceiver().getEmail(), invitation.getReceiver().getFullName(),
+                invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
+            invitation.getType(),
+            invitation.getStatus()
+        )
+    ).toList();
   }
+
   /**
    * Get received invitations by user.
    *
    * @param userId the user id
    * @return the active invitations by user
    */
-  public List<MembershipRequest> getReceivedInvitationsByUser(Long userId) {
+  public List<MembershipRequestResponseDto> getReceivedInvitationsByUser(Long userId) {
     // Check if the user exists
     if (!userRepository.existsById(userId)) {
       throw new IllegalArgumentException("User not found");
@@ -158,6 +165,20 @@ public class MembershipRequestService {
     User user = userRepository.findById(userId).orElse(null);
 
     // Get the active requests for the user
-    return membershipRequestRepository.findAllByReceiverAndTypeAndStatus(user, RequestType.INVITATION, RequestStatus.PENDING);
+    return membershipRequestRepository.findAllByReceiverAndTypeAndStatus(user,
+        RequestType.INVITATION, RequestStatus.PENDING).stream().map(invitation ->
+        new MembershipRequestResponseDto(
+            invitation.getId(),
+            invitation.getHousehold().getId(),
+            new UserResponseDto(invitation.getSender().getId(), invitation.getSender().getEmail(),
+                invitation.getSender().getFullName(), invitation.getSender().getTlf(),
+                invitation.getSender().getRole()),
+            new UserResponseDto(invitation.getReceiver().getId(),
+                invitation.getReceiver().getEmail(), invitation.getReceiver().getFullName(),
+                invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
+            invitation.getType(),
+            invitation.getStatus()
+        )
+    ).toList();
   }
 }

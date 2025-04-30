@@ -1,7 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.MembershipRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.RequestOperationDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.RequestOperationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +10,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +28,7 @@ public class MembershipRequestController {
   }
 
   @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
-  @GetMapping("/invitations/received")
+  @PostMapping("/invitations/received")
   public ResponseEntity<Map<String, Object>> getActiveInvitations(
       @RequestBody GetUserInfoRequestDto request) {
     try {
@@ -46,7 +45,7 @@ public class MembershipRequestController {
     }
   }
   @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
-  @GetMapping("/invitations/sent")
+  @PostMapping("/invitations/sent")
   public ResponseEntity<Map<String, Object>> getActiveRequests(
       @RequestBody GetUserInfoRequestDto request) {
     try {
@@ -68,7 +67,7 @@ public class MembershipRequestController {
   public ResponseEntity<String> sendInvitation(@RequestBody MembershipRequestDto request) {
     try {
       membershipRequestService.sendInvitation(request);
-      LOGGER.info("Invitation sent successfully: {}", request.getUserEmail());
+      LOGGER.info("Invitation sent successfully");
       return ResponseEntity.ok("Invitation sent successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Invitation failed: {}", e.getMessage());
@@ -84,7 +83,7 @@ public class MembershipRequestController {
   public ResponseEntity<String> sendJoinRequest(@RequestBody MembershipRequestDto request) {
     try {
       membershipRequestService.sendJoinRequest(request);
-      LOGGER.info("Join request sent successfully: {}", request.getUserEmail());
+      LOGGER.info("Join request sent successfully");
       return ResponseEntity.ok("Join request sent successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Join request failed: {}", e.getMessage());
@@ -113,7 +112,7 @@ public class MembershipRequestController {
 
   @Operation(summary = "Accept a membership request", description = "Accepts a membership request with the given ID")
   @PostMapping("/accept")
-  public ResponseEntity<String> acceptRequest(@RequestParam RequestOperationDto request) {
+  public ResponseEntity<String> acceptRequest(@RequestBody RequestOperationDto request) {
     try {
       membershipRequestService.acceptRequest(request.getRequestId());
       LOGGER.info("Request accepted successfully: {}", request.getRequestId());
