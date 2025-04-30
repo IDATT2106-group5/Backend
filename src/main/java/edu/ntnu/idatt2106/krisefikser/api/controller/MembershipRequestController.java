@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.RequestOperationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,10 +80,10 @@ public class MembershipRequestController {
 
   @Operation(summary = "Decline a membership request", description = "Declines a membership request with the given ID")
   @PostMapping("/decline")
-  public ResponseEntity<String> declineRequest(@RequestParam Long requestId) {
+  public ResponseEntity<String> declineRequest(@RequestBody RequestOperationDto request) {
     try {
-      membershipRequestService.declineRequest(requestId);
-      LOGGER.info("Request declined successfully: {}", requestId);
+      membershipRequestService.declineRequest(request.getRequestId());
+      LOGGER.info("Request declined successfully: {}", request.getRequestId());
       return ResponseEntity.ok("Request declined successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Request decline failed: {}", e.getMessage());
@@ -95,10 +96,10 @@ public class MembershipRequestController {
 
   @Operation(summary = "Accept a membership request", description = "Accepts a membership request with the given ID")
   @PostMapping("/accept")
-  public ResponseEntity<String> acceptRequest(@RequestParam Long requestId) {
+  public ResponseEntity<String> acceptRequest(@RequestParam RequestOperationDto request) {
     try {
-      membershipRequestService.acceptRequest(requestId);
-      LOGGER.info("Request accepted successfully: {}", requestId);
+      membershipRequestService.acceptRequest(request.getRequestId());
+      LOGGER.info("Request accepted successfully: {}", request.getRequestId());
       return ResponseEntity.ok("Request accepted successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Request acceptance failed: {}", e.getMessage());
