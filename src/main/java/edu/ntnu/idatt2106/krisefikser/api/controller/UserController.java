@@ -1,6 +1,8 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UserResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;
@@ -33,24 +35,39 @@ public class UserController {
     this.userService = userService;
   }
 
-/**
- * Retrieves the details of the currently authenticated user.
- *
- * @return a ResponseEntity containing the user details as a UserResponseDto
- * or an appropriate error response
- */
-@GetMapping("/me")
-public ResponseEntity<?> getUser() {
-  try {
-    UserResponseDto userDto = userService.getCurrentUser();
-    LOGGER.info("Fetched info for current user {}", userDto.getFullName());
-    return ResponseEntity.ok(userDto);
-  } catch (IllegalArgumentException e) {
-    LOGGER.warn("Error fetching current user: {}", e.getMessage());
-    return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-  } catch (Exception e) {
-    LOGGER.error("Error fetching current user", e);
-    return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+  /**
+   * Retrieves the details of the currently authenticated user.
+   *
+   * @return a ResponseEntity containing the user details as a UserResponseDto
+   * or an appropriate error response
+   */
+  @GetMapping("/me")
+  public ResponseEntity<?> getUser() {
+    try {
+      UserResponseDto userDto = userService.getCurrentUser();
+      LOGGER.info("Fetched info for current user {}", userDto.getFullName());
+      return ResponseEntity.ok(userDto);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Error fetching current user: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Error fetching current user", e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
   }
-}
+
+  @GetMapping("/me/household")
+  public ResponseEntity<?> getHousehold() {
+    try {
+      HouseholdResponseDto household = userService.getCurrentHousehold();
+      LOGGER.info("Fetched info for current user");
+      return ResponseEntity.ok(household);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Error fetching current user: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Error fetching current user", e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
 }
