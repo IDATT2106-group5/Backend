@@ -294,4 +294,18 @@ public class HouseholdService {
     householdRepository.save(household);
     logger.info("Household owner changed to {}", newOwner.getFullName());
   }
+
+  public void editHousehold(EditHouseholdRequestDto request) {
+    Household household = householdRepository.findById(request.getHouseholdId())
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+    if (request.getName() != null) {
+      household.setName(request.getName());
+    }
+    if (request.getAddress() != null) {
+      household.setAddress(request.getAddress());
+    }
+    householdRepository.save(household);
+  }
+
+
 }

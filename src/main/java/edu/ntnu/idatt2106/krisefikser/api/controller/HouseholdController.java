@@ -248,4 +248,29 @@ public class HouseholdController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
+
+  /**
+   * Edits a household's details.
+   *
+   * @param request the request
+   * @return the response entity
+   */
+  @Operation(summary = "Edits the details of a household",
+      description = "Edits the details of a household with the given ID")
+  @PostMapping("/edit")
+  public ResponseEntity<String> editHousehold(
+      @RequestBody EditHouseholdRequestDto request) {
+    try {
+      householdService.editHousehold(request);
+      LOGGER.info("Household edited successfully: {}", request.getName());
+      return ResponseEntity.ok("Household edited successfully");
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during household edit: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error during household edit: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body("Internal server error");
+    }
+  }
+
 }
