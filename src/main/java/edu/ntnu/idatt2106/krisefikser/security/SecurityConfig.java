@@ -68,8 +68,8 @@ public class SecurityConfig {
             .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
             .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
             .requestMatchers("/api/user/**").permitAll()
-            .requestMatchers("/api/household/**").permitAll()
-//            .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
+            .requestMatchers("/api/household/**")
+            .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
             .anyRequest().authenticated()
         )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
