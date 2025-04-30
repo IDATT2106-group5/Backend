@@ -8,6 +8,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
@@ -43,8 +45,9 @@ public class Incident {
   @Column
   private LocalDateTime endedAt;
 
-  @Column(name = "scenario_id")
-  private Long scenarioId;
+  @ManyToOne
+  @JoinColumn(name = "scenario_id", referencedColumnName = "id")
+  private Scenario scenario;
 
   // Getters and Setters
   public Long getId() {
@@ -119,12 +122,11 @@ public class Incident {
     this.endedAt = endedAt;
   }
 
-  public Long getScenarioId() {
-    return scenarioId;
+  public Scenario getScenario() {
+    return scenario;
   }
 
-  public void setScenarioId(Long scenarioId) {
-    this.scenarioId = scenarioId;
+  public void setScenario(Scenario scenario) {
+    this.scenario = scenario;
   }
-
 }
