@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
@@ -270,5 +271,27 @@ public class HouseholdService {
     unregisteredHouseholdMemberRepository.save(member);
     logger.info("Unregistered member {} edited in household {}", request.getNewFullName(),
         request.getHouseholdId());
+  }
+
+  /**
+   * Changes the owner of a household.
+   *
+   * @param request the request
+   */
+  public void changeHouseholdOwner(UserHouseholdAssignmentRequestDto request) {
+    User newOwner = userRepository.findById(request.getUserId())
+        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    Household household = householdRepository.findById(request.getHouseholdId())
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+
+    if (household.getOwner().getId().equals(newOwner.getId())) {
+      logger.warn("User {} is already the owner of household {}", newOwner.getFullName(),
+          household.getName());
+      throw new IllegalArgumentException("User is already the owner of this household");
+    }
+
+    household.setOwner(newOwner);
+    householdRepository.save(household);
+    logger.info("Household owner changed to {}", newOwner.getFullName());
   }
 }

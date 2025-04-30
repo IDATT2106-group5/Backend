@@ -1,8 +1,10 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.RemoveUnregisteredMemberRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.RemoveUnregisteredMemberRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
@@ -220,6 +222,30 @@ public class HouseholdController {
     } catch (Exception e) {
       LOGGER.error("Unexpected error during unregistered member edit: {}", e.getMessage(), e);
       return ResponseEntity.status(500).body("Internal server error");
+    }
+  }
+
+  /**
+   * Changes the owner of a household.
+   *
+   * @param request the request
+   * @return the response entity
+   */
+  @Operation(summary = "Changes the owner of a household",
+      description = "Changes the owner of a household with the given ID")
+  @PostMapping("/change-owner")
+  public ResponseEntity<?> changeHouseholdOwner(
+      @RequestBody UserHouseholdAssignmentRequestDto request) {
+    try {
+      householdService.changeHouseholdOwner(request);
+      LOGGER.info("Household owner changed successfully: {}", request.getUserId());
+      return ResponseEntity.ok("Household owner changed successfully");
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during household owner change: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error during household owner change: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
 }
