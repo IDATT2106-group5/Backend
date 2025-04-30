@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.user;
 
 /**
  * Data Transfer Object (DTO) for login requests. This class is used to encapsulate the data sent

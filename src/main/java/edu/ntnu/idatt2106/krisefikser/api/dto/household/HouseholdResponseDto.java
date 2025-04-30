@@ -1,4 +1,6 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.household;
+
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 
 /**
  * A simple DTO for Household, to avoid infinite loops and expose only safe data.

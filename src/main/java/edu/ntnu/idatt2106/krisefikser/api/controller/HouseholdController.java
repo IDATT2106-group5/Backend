@@ -1,9 +1,12 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.RemoveUnregisteredMemberRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.RemoveUserRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,7 +107,7 @@ public class HouseholdController {
    * Adds an unregistered member to a household with the given ID. The user must not be registered
    * in the system.
    *
-   * @param request The request containing the full name of the unregistered member and the ID of                the
+   * @param request The request containing the full name of the unregistered member and the ID the
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Adds an unregistered member to a household",
@@ -129,17 +131,17 @@ public class HouseholdController {
   /**
    * Removes a user from a household with the given ID. The user must be registered in the system.
    *
-   * @param email The email of the user to be removed from the household.
+   * @param request the request
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes a user from a household",
       description = "Removes a user from a household with the given ID")
   @PostMapping("/remove-user")
   public ResponseEntity<String> removeUserFromHousehold(
-      @RequestBody String email) {
+      @RequestBody RemoveUserRequestDto request) {
     try {
-      householdService.removeUserFromHousehold(email);
-      LOGGER.info("User removed from household successfully: {}", email);
+      householdService.removeUserFromHousehold(request.getEmail());
+      LOGGER.info("User removed from household successfully: {}", request.getEmail());
       return ResponseEntity.ok("User removed from household successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during user removal: {}", e.getMessage());
@@ -154,17 +156,17 @@ public class HouseholdController {
    * Removes an unregistered member from a household with the given ID. The user must not be
    * registered in the system.
    *
-   * @param memberId the member id
+   * @param request the request
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes an unregistered member from a household",
       description = "Removes an unregistered user from a household with the given ID")
-  @DeleteMapping("/delete-unregistered-member/{memberId}")
-  public ResponseEntity<String> removeUnregisteredMemberFromHousehold(
-      @PathVariable Long memberId) {
+  @DeleteMapping("/delete-unregistered-member")
+  public ResponseEntity<String> removeUnregisteredMemberFromHousehold(@RequestBody
+                                                                      RemoveUnregisteredMemberRequestDto request) {
     try {
-      householdService.removeUnregisteredMemberFromHousehold(memberId);
-      LOGGER.info("Unregistered member removed from household successfully" );
+      householdService.removeUnregisteredMemberFromHousehold(request.getMemberId());
+      LOGGER.info("Unregistered member removed from household successfully");
       return ResponseEntity.ok("Unregistered member removed from household successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during unregistered member removal: {}", e.getMessage());
@@ -178,15 +180,15 @@ public class HouseholdController {
   /**
    * Gets household details.
    *
-   * @param userId the user id
+   * @param request the request
    * @return the household details
    */
   @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
-  @GetMapping("/details/{userId}")
+  @GetMapping("/details")
   public ResponseEntity<Map<String, Object>> getHouseholdDetails(
-      @PathVariable Long userId) {
+      @RequestBody GetUserInfoRequestDto request) {
     try {
-      Map<String, Object> details = householdService.getHouseholdDetails(userId);
+      Map<String, Object> details = householdService.getHouseholdDetails(request.getUserId());
       LOGGER.info("Household members retrieved successfully: {}", details);
       return ResponseEntity.ok(details);
     } catch (IllegalArgumentException e) {
@@ -198,6 +200,12 @@ public class HouseholdController {
     }
   }
 
+  /**
+   * Edit unregistered member in household response entity.
+   *
+   * @param request the request
+   * @return the response entity
+   */
   @Operation(summary = "Edits a unregistered member in a household",
       description = "Edits a unregistered member in a household with the given ID")
   @PostMapping("/edit-unregistered-member")

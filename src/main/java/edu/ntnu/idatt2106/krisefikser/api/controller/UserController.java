@@ -1,6 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.UserResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.Map;

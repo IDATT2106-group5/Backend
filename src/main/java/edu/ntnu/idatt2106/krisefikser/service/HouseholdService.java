@@ -1,12 +1,12 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.HouseholdResponseDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberResponseDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UserResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.UnregisteredHouseholdMember;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;

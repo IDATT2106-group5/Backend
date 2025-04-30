@@ -10,10 +10,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import java.util.List;
 import java.util.Map;
