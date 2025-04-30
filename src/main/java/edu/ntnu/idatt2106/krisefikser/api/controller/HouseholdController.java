@@ -149,7 +149,7 @@ public class HouseholdController {
    * registered in the system.
    *
    * @param request The request containing the full name of the unregistered member and the ID of
-   *                the
+   *                the household.
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes an unregistered member from a household",

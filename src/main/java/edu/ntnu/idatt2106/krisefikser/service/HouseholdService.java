@@ -216,7 +216,7 @@ public class HouseholdService {
         household.getAddress(),
         new UserResponseDto(household.getOwner().getId(), household.getOwner().getEmail(),
             household.getOwner().getFullName(), household.getOwner()
-            .getRole())));
+                .getTlf(), household.getOwner().getRole())));
 
     List<UserResponseDto> userResponseDtos =
         userRepository.getUsersByHousehold(household).stream()
@@ -224,6 +224,7 @@ public class HouseholdService {
                 user.getId(),
                 user.getEmail(),
                 user.getFullName(),
+                user.getTlf(),
                 user.getRole()))
             .collect(Collectors.toList());
 

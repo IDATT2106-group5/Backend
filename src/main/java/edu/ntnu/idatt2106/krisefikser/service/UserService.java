@@ -31,6 +31,7 @@ public class UserService {
         user.getId(),
         user.getEmail(),
         user.getFullName(),
+        user.getTlf(),
         user.getRole()
     );
 
