@@ -1,5 +1,3 @@
-// File: `src/main/java/edu/ntnu/idatt2106/krisefikser/api/controller/MembershipRequestController.java`
-
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.MembershipRequestDto;

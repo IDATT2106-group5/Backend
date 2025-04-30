@@ -38,8 +38,8 @@ public class SecurityConfig {
    *                                 data.
    */
   public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthEntryPoint,
-      JwtAuthenticationFilter jwtAuthFilter,
-      CustomUserDetailsService customUserDetailsService) {
+                        JwtAuthenticationFilter jwtAuthFilter,
+                        CustomUserDetailsService customUserDetailsService) {
     this.jwtAuthEntryPoint = jwtAuthEntryPoint;
     this.jwtAuthFilter = jwtAuthFilter;
     this.customUserDetailsService = customUserDetailsService;
@@ -67,6 +67,7 @@ public class SecurityConfig {
             .requestMatchers("/api/membership-requests/**").permitAll()
             .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
             .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
+            .requestMatchers("/api/user/**").permitAll()
             .requestMatchers("/api/household/**")
             .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
             .anyRequest().authenticated()

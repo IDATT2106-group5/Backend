@@ -71,7 +71,7 @@ public class User {
    * @param tlf       the tlf
    */
   public User(String email, String password, String fullName, Role role, Household household,
-      String tlf, boolean confirmed) {
+      String tlf, boolean confirmed, Date tokenExpiry) {
     this.email = email;
     this.password = password;
     this.fullName = fullName;
@@ -79,6 +79,7 @@ public class User {
     this.household = household;
     this.tlf = tlf;
     this.confirmed = confirmed;
+    this.tokenExpiry = tokenExpiry;
   }
 
   /**

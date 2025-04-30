@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
@@ -8,10 +9,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Household", description = "Endpoints for managing a household")
 @RestController
 @RequestMapping("/api/household")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class HouseholdController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(HouseholdController.class);
@@ -143,7 +149,7 @@ public class HouseholdController {
    * registered in the system.
    *
    * @param request The request containing the full name of the unregistered member and the ID of
-   *                the
+   *                the household.
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes an unregistered member from a household",
@@ -161,6 +167,42 @@ public class HouseholdController {
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
       LOGGER.error("Unexpected error during unregistered member removal: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body("Internal server error");
+    }
+  }
+
+  @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
+  @GetMapping("/details/{userId}")
+  public ResponseEntity<Map<String, Object>> getHouseholdDetails(
+      @PathVariable Long userId) {
+    try {
+      Map<String, Object> details = householdService.getHouseholdDetails(userId);
+      LOGGER.info("Household members retrieved successfully: {}", details);
+      return ResponseEntity.ok(details);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during household member retrieval: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error during household member retrieval: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
+
+  @Operation(summary = "Edits a unregistered member in a household",
+      description = "Edits a unregistered member in a household with the given ID")
+  @PostMapping("/edit-unregistered-member")
+  public ResponseEntity<String> editUnregisteredMemberInHousehold(
+      @RequestBody EditMemberDto request) {
+    try {
+      householdService.editUnregisteredMemberInHousehold(request);
+      LOGGER.info("Unregistered member edited in household successfully: {}",
+          request.getFullName());
+      return ResponseEntity.ok("Unregistered member edited in household successfully");
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during unregistered member edit: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error during unregistered member edit: {}", e.getMessage(), e);
       return ResponseEntity.status(500).body("Internal server error");
     }
   }
