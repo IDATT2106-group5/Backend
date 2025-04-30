@@ -229,11 +229,11 @@ public class HouseholdService {
     List<UserResponseDto> userResponseDtos =
         userRepository.getUsersByHousehold(household).stream()
             .map(u -> new UserResponseDto(
-                user.getId(),
-                user.getEmail(),
-                user.getFullName(),
-                user.getTlf(),
-                user.getRole()))
+                u.getId(),
+                u.getEmail(),
+                u.getFullName(),
+                u.getTlf(),
+                u.getRole()))
             .collect(Collectors.toList());
 
     List<UnregisteredMemberResponseDto> unregisteredMemberResponseDtos =
