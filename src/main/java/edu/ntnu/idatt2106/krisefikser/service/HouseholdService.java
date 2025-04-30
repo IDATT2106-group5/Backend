@@ -307,5 +307,27 @@ public class HouseholdService {
     householdRepository.save(household);
   }
 
+  /**
+   * Gets a household by its ID.
+   *
+   * @param householdId
+   * @return HouseholdResponseDto containing household details.
+   */
 
+  public HouseholdResponseDto getHousehold(Long householdId) {
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+    return new HouseholdResponseDto(
+        household.getId(),
+        household.getName(),
+        household.getAddress(),
+        new UserResponseDto(
+            household.getOwner().getId(),
+            household.getOwner().getEmail(),
+            household.getOwner().getFullName(),
+            household.getOwner().getTlf(),
+            household.getOwner().getRole()
+        )
+    );
+  }
 }

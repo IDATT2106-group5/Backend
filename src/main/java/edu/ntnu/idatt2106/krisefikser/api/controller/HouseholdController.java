@@ -273,4 +273,28 @@ public class HouseholdController {
     }
   }
 
+  /**
+   * Search for a household by household id.
+   *
+   * @param request the request
+   * @return the response entity
+   */
+  @Operation(summary = "Search for a household by household id",
+        description = "Search for a household by household id")
+    @PostMapping("/search")
+  public ResponseEntity<?> searchHouseholdById(
+      @RequestBody Map<String, Long> request) {
+    try {
+      HouseholdResponseDto household = householdService.getHousehold(request.get("householdId"));
+      LOGGER.info("Household found successfully: {}", household);
+      return ResponseEntity.ok(household);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during household search: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error during household search: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body("Internal server error");
+    }
+  }
+
 }
