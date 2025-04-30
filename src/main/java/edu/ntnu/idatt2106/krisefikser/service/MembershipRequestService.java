@@ -127,16 +127,17 @@ public class MembershipRequestService {
   /**
    * Get active requests by user.
    *
-   * @param email the users email
+   * @param userId the user id
+   * @return the active requests by user
    */
-  public List<MembershipRequest> getActiveRequestsByUser(String email) {
+  public List<MembershipRequest> getActiveRequestsByUser(Long userId) {
     // Check if the user exists
-    if (!userRepository.existsByEmail(email)) {
+    if (!userRepository.existsById(userId)) {
       throw new IllegalArgumentException("User not found");
     }
 
     // Get the user
-    User user = userRepository.findByEmail(email).orElse(null);
+    User user = userRepository.findById(userId).orElse(null);
 
     // Get the active requests for the user
     return membershipRequestRepository.findAllByReceiverAndStatus(user, RequestStatus.PENDING);

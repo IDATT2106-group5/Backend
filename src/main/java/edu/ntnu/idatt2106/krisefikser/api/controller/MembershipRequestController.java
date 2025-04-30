@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,11 +30,11 @@ public class MembershipRequestController {
   @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
   @GetMapping("/active")
   public ResponseEntity<Map<String, Object>> getActiveMembershipRequests(
-      @RequestParam String userEmail) {
+      @RequestBody GetUserInfoRequestDto request) {
     try {
       Map<String, Object> result = Map.of(
-          "active requests", membershipRequestService.getActiveRequestsByUser(userEmail));
-      LOGGER.info("Retrieved active membership requests for user: {}", userEmail);
+          "active requests", membershipRequestService.getActiveRequestsByUser(request.getUserId()));
+      LOGGER.info("Retrieved active membership requests for user: {}", request.getUserId());
       return ResponseEntity.ok(result);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving requests: {}", e.getMessage());
