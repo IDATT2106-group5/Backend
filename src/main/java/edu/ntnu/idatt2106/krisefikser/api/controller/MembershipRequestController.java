@@ -12,6 +12,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "MembershipRequest", description = "Endpoints for managing membership requests")
 @RestController
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequestMapping("/api/membership-requests")
 public class MembershipRequestController {
   private final MembershipRequestService membershipRequestService;
@@ -46,13 +48,29 @@ public class MembershipRequestController {
     }
   }
 
-  @Operation(summary = "Gets all active join requests sent to a user", description = "Retrieves all active join requests sent to a user")
+  @Operation(summary = "Gets all active join requests sent to a household", description = "Retrieves all active join requests sent to a household")
   @PostMapping("/join-requests/received")
   public ResponseEntity<?> getActiveJoinRequests(
       @RequestBody Map<String, Long> request) {
     try {
       List<MembershipRequestResponseDto> requests =
           membershipRequestService.getReceivedJoinRequestsByHousehold(request.get("householdId"));
+      return ResponseEntity.ok(requests);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error retrieving join requests: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error retrieving join requests: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
+  @Operation(summary = "Gets all accepted join requests sent to a household", description = "Retrieves all accepted join requests sent to a household")
+  @PostMapping("/join-requests/received/accepted")
+  public ResponseEntity<?> getActiveAcceptedJoinRequests(
+      @RequestBody Map<String, Long> request) {
+    try {
+      List<MembershipRequestResponseDto> requests =
+          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold(request.get("householdId"));
       return ResponseEntity.ok(requests);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving join requests: {}", e.getMessage());

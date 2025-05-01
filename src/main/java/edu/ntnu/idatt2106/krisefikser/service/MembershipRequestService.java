@@ -192,8 +192,32 @@ public class MembershipRequestService {
    */
   public List<MembershipRequestResponseDto> getReceivedJoinRequestsByHousehold(Long householdId) {
     List<MembershipRequest> requests =
-        membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId, RequestType.JOIN_REQUEST,
+        membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId,
+            RequestType.JOIN_REQUEST,
             RequestStatus.PENDING);
+
+    return requests.stream().map(request ->
+        new MembershipRequestResponseDto(
+            request.getId(),
+            request.getHousehold().getId(),
+            new UserResponseDto(request.getSender().getId(), request.getSender().getEmail(),
+                request.getSender().getFullName(), request.getSender().getTlf(),
+                request.getSender().getRole()),
+            new UserResponseDto(request.getReceiver().getId(),
+                request.getReceiver().getEmail(), request.getReceiver().getFullName(),
+                request.getReceiver().getTlf(), request.getReceiver().getRole()),
+            request.getType(),
+            request.getStatus(),
+            request.getCreated_at()
+        )
+    ).toList();
+  }
+
+  public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold(Long householdId) {
+    List<MembershipRequest> requests =
+        membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId,
+            RequestType.JOIN_REQUEST,
+            RequestStatus.ACCEPTED);
 
     return requests.stream().map(request ->
         new MembershipRequestResponseDto(
