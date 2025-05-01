@@ -1,9 +1,8 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.HouseholdResponseDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.UserResponseDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import org.slf4j.Logger;

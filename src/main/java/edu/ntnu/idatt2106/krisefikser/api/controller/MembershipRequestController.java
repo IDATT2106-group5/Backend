@@ -163,7 +163,7 @@ public class MembershipRequestController {
     }
   }
   @Operation(summary = "Accept a membership request", description = "Accepts a membership request with the given ID")
-  @PostMapping("/accept")
+  @PostMapping("/cancel")
   public ResponseEntity<String> cancelRequest(@RequestBody RequestOperationDto request) {
     try {
       membershipRequestService.cancelRequest(request.getRequestId());
