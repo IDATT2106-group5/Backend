@@ -3,6 +3,8 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Scenario;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Severity;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 /**
@@ -10,14 +12,18 @@ import java.time.LocalDateTime;
  */
 public class IncidentRequestDto {
 
+  @NotBlank
   private String name;
   private String description;
+  @NotNull
   private double latitude;
+  @NotNull
   private double longitude;
   private double impactRadius;
   private String severity;
   private LocalDateTime startedAt;
   private LocalDateTime endedAt;
+  @NotNull
   private Long scenarioId;
 
   public Incident toEntity(Scenario scenario) {

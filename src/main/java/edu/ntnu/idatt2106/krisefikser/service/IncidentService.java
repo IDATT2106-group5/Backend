@@ -1,10 +1,13 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Scenario;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.Severity;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.IncidentRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.ScenarioRepository;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -52,5 +55,57 @@ public class IncidentService {
 
     Incident incident = request.toEntity(scenario);
     incidentRepository.save(incident);
+    logger.info("Incident created successfully: {}", incident.getName());
+  }
+
+  public void updateIncident(Long id, IncidentRequestDto request) {
+    Incident incident = incidentRepository.findById(id)
+        .orElseThrow(() -> {
+          logger.error("Incident not found with ID: {}", id);
+          return new IllegalArgumentException("Incident not found with ID: " + id);
+        });
+
+    if (request.getScenarioId() == null) {
+      logger.error("Scenario ID is required when updating an incident.");
+      throw new IllegalArgumentException("Scenario ID is required when updating an incident.");
+    }
+
+    Scenario scenario = scenarioRepository.findById(request.getScenarioId())
+        .orElseThrow(() -> {
+          logger.error("Scenario not found with ID: {}", request.getScenarioId());
+          return new IllegalArgumentException(
+              "Scenario not found with ID: " + request.getScenarioId());
+        });
+
+    incident.setName(request.getName());
+    incident.setDescription(request.getDescription());
+    incident.setLatitude(request.getLatitude());
+    incident.setLongitude(request.getLongitude());
+    incident.setImpactRadius(request.getImpactRadius());
+    incident.setSeverity(Severity.valueOf(request.getSeverity().toUpperCase()));
+    incident.setStartedAt(request.getStartedAt());
+    incident.setEndedAt(request.getEndedAt());
+    incident.setScenario(scenario);
+
+    incidentRepository.save(incident);
+    logger.info("Incident with ID {} updated successfully", id);
+  }
+
+  public void deleteIncident(Long id) {
+    if (!incidentRepository.existsById(id)) {
+      logger.error("Incident not found with ID: {}", id);
+      throw new IllegalArgumentException("Incident not found with ID: " + id);
+    }
+
+    incidentRepository.deleteById(id);
+    logger.info("Incident with ID {} deleted successfully", id);
+  }
+
+  public List<IncidentResponseDto> getAllIncidents() {
+    logger.info("Fetching all incidents");
+    return incidentRepository.findAll()
+        .stream()
+        .map(IncidentResponseDto::fromEntity)
+        .toList();
   }
 }
