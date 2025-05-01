@@ -37,4 +37,10 @@ public class UserService {
 
     return userDto;
   }
+
+  public Long checkIfMailExists(String email) {
+    User user = userRepository.getUserByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("No user with this email"));
+    return user.getId();
+  }
 }

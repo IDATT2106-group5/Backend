@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,24 +35,40 @@ public class UserController {
     this.userService = userService;
   }
 
-/**
- * Retrieves the details of the currently authenticated user.
- *
- * @return a ResponseEntity containing the user details as a UserResponseDto
- * or an appropriate error response
- */
-@GetMapping("/me")
-public ResponseEntity<?> getUser() {
-  try {
-    UserResponseDto userDto = userService.getCurrentUser();
-    LOGGER.info("Fetched info for current user {}", userDto.getFullName());
-    return ResponseEntity.ok(userDto);
-  } catch (IllegalArgumentException e) {
-    LOGGER.warn("Error fetching current user: {}", e.getMessage());
-    return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-  } catch (Exception e) {
-    LOGGER.error("Error fetching current user", e);
-    return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+  /**
+   * Retrieves the details of the currently authenticated user.
+   *
+   * @return a ResponseEntity containing the user details as a UserResponseDto
+   * or an appropriate error response
+   */
+  @GetMapping("/me")
+  public ResponseEntity<?> getUser() {
+    try {
+      UserResponseDto userDto = userService.getCurrentUser();
+      LOGGER.info("Fetched info for current user {}", userDto.getFullName());
+      return ResponseEntity.ok(userDto);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Error fetching current user: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Error fetching current user", e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
   }
-}
+
+  @PostMapping("/check-mail")
+  public ResponseEntity<?> verifyIfMailExists(@RequestBody Map<String, String> request) {
+    try {
+      String email = request.get("email");
+      userService.checkIfMailExists(email);
+      LOGGER.info("Email {} exists", email);
+      return ResponseEntity.ok(Map.of("userId", userService.checkIfMailExists(email)));
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error checking email: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error checking email: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
 }
