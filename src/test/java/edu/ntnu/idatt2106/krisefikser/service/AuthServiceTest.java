@@ -2,23 +2,20 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-
+import static org.mockito.Mockito.when;
+import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
 import java.util.Optional;
@@ -168,6 +165,10 @@ class AuthServiceTest {
       verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
       verifyNoInteractions(tokenProvider);
     }
+  }
+
+  @Nested
+  class RegisterUserTests {
 
     @Test
     void registerUser_shouldRegisterUser_whenEmailNotExists() {
