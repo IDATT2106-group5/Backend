@@ -6,14 +6,24 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class StorageItemResponseDto {
+  Long itemId;
   ItemResponseDto item;
   Long householdId;
   String unit;
   int amount;
   LocalDateTime expiration;
 
-  public StorageItemResponseDto(ItemResponseDto item, Long householdId, String unit, int amount,
+  public Long getItemId() {
+    return itemId;
+  }
+
+  public void setItemId(Long itemId) {
+    this.itemId = itemId;
+  }
+
+  public StorageItemResponseDto(Long itemId, ItemResponseDto item, Long householdId, String unit, int amount,
                                 LocalDateTime expiration) {
+    this.itemId = itemId;
     this.item = item;
     this.householdId = householdId;
     this.unit = unit;

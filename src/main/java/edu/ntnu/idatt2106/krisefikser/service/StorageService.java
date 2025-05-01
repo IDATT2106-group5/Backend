@@ -50,6 +50,7 @@ public class StorageService {
   public List<StorageItemResponseDto> getStorageItemsByHousehold(Long householdId) {
     return storageItemRepository.findByHouseholdId(householdId).stream().map(
         storageItem -> new StorageItemResponseDto(
+            storageItem.getId(),
             new ItemResponseDto(
                 storageItem.getItem().getName(),
                 storageItem.getItem().getCaloricAmount(),
