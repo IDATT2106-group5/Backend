@@ -1,11 +1,13 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.RequestOperationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "MembershipRequest", description = "Endpoints for managing membership requests")
@@ -29,32 +30,33 @@ public class MembershipRequestController {
 
   @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
   @PostMapping("/invitations/received")
-  public ResponseEntity<Map<String, Object>> getActiveInvitations(
+  public ResponseEntity<?> getActiveInvitations(
       @RequestBody GetUserInfoRequestDto request) {
     try {
-      Map<String, Object> result = Map.of(
-          "active invitations", membershipRequestService.getReceivedInvitationsByUser(request.getUserId()));
-      LOGGER.info("Retrieved active membership requests for user: {}", request.getUserId());
-      return ResponseEntity.ok(result);
+      List<MembershipRequestResponseDto> member =
+          membershipRequestService.getReceivedInvitationsByUser(request.getUserId());
+      LOGGER.info("Retrieved received invitations for user: {}", request.getUserId());
+      return ResponseEntity.ok(member);
     } catch (IllegalArgumentException e) {
-      LOGGER.warn("Validation error retrieving requests: {}", e.getMessage());
+      LOGGER.warn("Validation error retrieving received invitations: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
       LOGGER.error("Unexpected error retrieving requests: {}", e.getMessage(), e);
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
+
   @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
   @PostMapping("/invitations/sent")
-  public ResponseEntity<Map<String, Object>> getActiveRequests(
+  public ResponseEntity<?> getActiveRequests(
       @RequestBody GetUserInfoRequestDto request) {
     try {
-      Map<String, Object> result = Map.of(
-          "active invitations", membershipRequestService.getSentInvitationsByUser(request.getUserId()));
-      LOGGER.info("Retrieved active membership requests for user: {}", request.getUserId());
-      return ResponseEntity.ok(result);
+      List<MembershipRequestResponseDto> member =
+          membershipRequestService.getReceivedInvitationsByUser(request.getUserId());
+      LOGGER.info("Retrieved sent membership invitations for user: {}", request.getUserId());
+      return ResponseEntity.ok(member);
     } catch (IllegalArgumentException e) {
-      LOGGER.warn("Validation error retrieving requests: {}", e.getMessage());
+      LOGGER.warn("Validation error retrieving sent invitations: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
       LOGGER.error("Unexpected error retrieving requests: {}", e.getMessage(), e);
