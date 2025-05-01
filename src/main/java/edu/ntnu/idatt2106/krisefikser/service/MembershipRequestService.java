@@ -144,8 +144,9 @@ public class MembershipRequestService {
                 invitation.getReceiver().getEmail(), invitation.getReceiver().getFullName(),
                 invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
             invitation.getType(),
-            invitation.getStatus()
-        )
+            invitation.getStatus(),
+            invitation.getCreated_at()
+            )
     ).toList();
   }
 
@@ -177,7 +178,8 @@ public class MembershipRequestService {
                 invitation.getReceiver().getEmail(), invitation.getReceiver().getFullName(),
                 invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
             invitation.getType(),
-            invitation.getStatus()
+            invitation.getStatus(),
+            invitation.getCreated_at()
         )
     ).toList();
   }

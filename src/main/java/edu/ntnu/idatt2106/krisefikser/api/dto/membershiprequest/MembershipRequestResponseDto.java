@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestStatus;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
+import java.sql.Timestamp;
 
 public class MembershipRequestResponseDto {
   Long id;
@@ -11,16 +12,26 @@ public class MembershipRequestResponseDto {
   UserResponseDto recipient;
   RequestType requestType;
   RequestStatus status;
+  Timestamp sentAt;
 
   public MembershipRequestResponseDto(Long id, Long householdId, UserResponseDto sender,
                                       UserResponseDto recipient,
-                                      RequestType requestType, RequestStatus status) {
+                                      RequestType requestType, RequestStatus status, Timestamp sentAt) {
     this.id = id;
     this.householdId = householdId;
     this.sender = sender;
     this.recipient = recipient;
     this.requestType = requestType;
+    this.sentAt = sentAt;
     this.status = status;
+  }
+
+  public Timestamp getSentAt() {
+    return sentAt;
+  }
+
+  public void setSentAt(Timestamp sentAt) {
+    this.sentAt = sentAt;
   }
 
   public Long getId() {
