@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -29,10 +30,12 @@ public class Notification {
   /**
    * The type of notification.
    */
-  private String type;
+  private NotificationType type;
 
   /**
    * The read status of the notification.
    */
   private boolean read;
+
+
 }
