@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.StorageItemResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
 import edu.ntnu.idatt2106.krisefikser.service.StorageService;
@@ -31,9 +32,9 @@ public class StorageController {
   }
 
   @GetMapping("/household/{householdId}")
-  public ResponseEntity<List<StorageItem>> getStorageItemsByHousehold(
+  public ResponseEntity<List<StorageItemResponseDto>> getStorageItemsByHousehold(
       @PathVariable Long householdId) {
-    List<StorageItem> storageItems = storageService.getStorageItemsByHousehold(householdId);
+    List<StorageItemResponseDto> storageItems = storageService.getStorageItemsByHousehold(householdId);
     return ResponseEntity.ok(storageItems);
   }
 

@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.StorageItemResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
@@ -45,8 +46,16 @@ public class StorageService {
    * @param householdId The ID of the household.
    * @return A list of StorageItem entities.
    */
-  public List<StorageItem> getStorageItemsByHousehold(Long householdId) {
-    return storageItemRepository.findByHouseholdId(householdId);
+  public List<StorageItemResponseDto> getStorageItemsByHousehold(Long householdId) {
+    return storageItemRepository.findByHouseholdId(householdId).stream().map(
+        storageItem -> new StorageItemResponseDto(
+            storageItem.getItem(),
+            storageItem.getHousehold().getId(),
+            storageItem.getUnit(),
+            storageItem.getAmount(),
+            storageItem.getExpirationDate()
+        )).toList(
+    );
   }
 
   /**
