@@ -162,4 +162,19 @@ public class MembershipRequestController {
       return ResponseEntity.status(500).body("Internal server error");
     }
   }
+  @Operation(summary = "Accept a membership request", description = "Accepts a membership request with the given ID")
+  @PostMapping("/accept")
+  public ResponseEntity<String> cancelRequest(@RequestBody RequestOperationDto request) {
+    try {
+      membershipRequestService.cancelRequest(request.getRequestId());
+      LOGGER.info("Request accepted successfully: {}", request.getRequestId());
+      return ResponseEntity.ok("Request accepted successfully");
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Request acceptance failed: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error accepting request: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body("Internal server error");
+    }
+  }
 }

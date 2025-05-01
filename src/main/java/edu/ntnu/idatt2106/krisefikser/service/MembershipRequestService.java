@@ -102,6 +102,21 @@ public class MembershipRequestService {
   }
 
   /**
+   * Cancel a membership request.
+   *
+   * @param requestId the request id
+   */
+  public void cancelRequest(Long requestId) {
+    // Check if the request exists
+    if (!membershipRequestRepository.existsById(requestId)) {
+      throw new IllegalArgumentException("Request not found");
+    }
+
+    // Update the request status to "accepted"
+    membershipRequestRepository.updateStatusById(requestId, RequestStatus.CANCELLED);
+  }
+
+  /**
    * Reject a membership request.
    *
    * @param requestId the request id
@@ -213,7 +228,8 @@ public class MembershipRequestService {
     ).toList();
   }
 
-  public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold(Long householdId) {
+  public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold(
+      Long householdId) {
     List<MembershipRequest> requests =
         membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId,
             RequestType.JOIN_REQUEST,
