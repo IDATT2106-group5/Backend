@@ -6,13 +6,13 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class StorageItemResponseDto {
-  Item item;
+  ItemResponseDto item;
   Long householdId;
   String unit;
   int amount;
   LocalDateTime expiration;
 
-  public StorageItemResponseDto(Item item, Long householdId, String unit, int amount,
+  public StorageItemResponseDto(ItemResponseDto item, Long householdId, String unit, int amount,
                                 LocalDateTime expiration) {
     this.item = item;
     this.householdId = householdId;
@@ -21,7 +21,7 @@ public class StorageItemResponseDto {
     this.expiration = expiration;
   }
 
-  public Item getItem() {
+  public ItemResponseDto getItem() {
     return item;
   }
 
@@ -41,7 +41,7 @@ public class StorageItemResponseDto {
     return expiration;
   }
 
-  public void setItem(Item item) {
+  public void setItem(ItemResponseDto item) {
     this.item = item;
   }
 
