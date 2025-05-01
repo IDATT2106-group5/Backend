@@ -1,7 +1,13 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Scenario;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.Severity;
 import java.time.LocalDateTime;
 
+/**
+ * The Incident request dto.
+ */
 public class IncidentRequestDto {
 
   private String name;
@@ -13,6 +19,21 @@ public class IncidentRequestDto {
   private LocalDateTime startedAt;
   private LocalDateTime endedAt;
   private Long scenarioId;
+
+  public Incident toEntity(Scenario scenario) {
+    Incident incident = new Incident();
+    incident.setName(this.name);
+    incident.setDescription(this.description);
+    incident.setLatitude(this.latitude);
+    incident.setLongitude(this.longitude);
+    incident.setImpactRadius(this.impactRadius);
+    incident.setSeverity(Severity.valueOf(this.severity.toUpperCase()));
+    incident.setStartedAt(this.startedAt);
+    incident.setEndedAt(this.endedAt);
+    incident.setScenario(scenario);
+    return incident;
+  }
+
 
   // Getters and setters
   public String getName() {

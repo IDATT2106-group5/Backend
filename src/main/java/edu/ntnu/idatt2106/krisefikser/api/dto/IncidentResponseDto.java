@@ -1,7 +1,11 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
 import java.time.LocalDateTime;
 
+/**
+ * The Incident response dto.
+ */
 public class IncidentResponseDto {
 
   private Long id;
@@ -14,6 +18,27 @@ public class IncidentResponseDto {
   private LocalDateTime startedAt;
   private LocalDateTime endedAt;
   private Long scenarioId;
+
+  /**
+   * Converts an Incident entity to an IncidentResponseDto.
+   *
+   * @param incident the Incident entity
+   * @return the IncidentResponseDto
+   */
+  public static IncidentResponseDto fromEntity(Incident incident) {
+    IncidentResponseDto dto = new IncidentResponseDto();
+    dto.setId(incident.getId());
+    dto.setName(incident.getName());
+    dto.setDescription(incident.getDescription());
+    dto.setLatitude(incident.getLatitude());
+    dto.setLongitude(incident.getLongitude());
+    dto.setImpactRadius(incident.getImpactRadius());
+    dto.setSeverity(incident.getSeverity().name());
+    dto.setStartedAt(incident.getStartedAt());
+    dto.setEndedAt(incident.getEndedAt());
+    dto.setScenarioId(incident.getScenario() != null ? incident.getScenario().getId() : null);
+    return dto;
+  }
 
   // Getters and setters
   public Long getId() {
