@@ -146,7 +146,7 @@ public class MembershipRequestService {
             invitation.getType(),
             invitation.getStatus(),
             invitation.getCreated_at()
-            )
+        )
     ).toList();
   }
 
@@ -183,4 +183,33 @@ public class MembershipRequestService {
         )
     ).toList();
   }
+
+  /**
+   * Get active join requests by householdID.
+   *
+   * @param householdId the household id
+   * @return the active join requests by user
+   */
+  public List<MembershipRequestResponseDto> getReceivedJoinRequestsByHousehold(Long householdId) {
+    List<MembershipRequest> requests =
+        membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId, RequestType.JOIN_REQUEST,
+            RequestStatus.PENDING);
+
+    return requests.stream().map(request ->
+        new MembershipRequestResponseDto(
+            request.getId(),
+            request.getHousehold().getId(),
+            new UserResponseDto(request.getSender().getId(), request.getSender().getEmail(),
+                request.getSender().getFullName(), request.getSender().getTlf(),
+                request.getSender().getRole()),
+            new UserResponseDto(request.getReceiver().getId(),
+                request.getReceiver().getEmail(), request.getReceiver().getFullName(),
+                request.getReceiver().getTlf(), request.getReceiver().getRole()),
+            request.getType(),
+            request.getStatus(),
+            request.getCreated_at()
+        )
+    ).toList();
+  }
+
 }

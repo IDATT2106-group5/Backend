@@ -46,6 +46,23 @@ public class MembershipRequestController {
     }
   }
 
+  @Operation(summary = "Gets all active join requests sent to a user", description = "Retrieves all active join requests sent to a user")
+  @PostMapping("/join-requests/received")
+  public ResponseEntity<?> getActiveJoinRequests(
+      @RequestBody Map<String, Long> request) {
+    try {
+      List<MembershipRequestResponseDto> requests =
+          membershipRequestService.getReceivedJoinRequestsByHousehold(request.get("householdId"));
+      return ResponseEntity.ok(requests);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error retrieving join requests: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error retrieving join requests: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
+
   @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
   @PostMapping("/invitations/sent")
   public ResponseEntity<?> getActiveRequests(
