@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipInviteDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.RequestOperationDto;
@@ -47,6 +48,7 @@ public class MembershipRequestController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
+
 
   @Operation(summary = "Gets all active join requests sent to a household", description = "Retrieves all active join requests sent to a household")
   @PostMapping("/join-requests/received")
@@ -101,10 +103,10 @@ public class MembershipRequestController {
 
   @Operation(summary = "Send a membership invitation", description = "Sends a membership invitation to a user for a given household")
   @PostMapping("/send-invitation")
-  public ResponseEntity<String> sendInvitation(@RequestBody MembershipRequestDto request) {
+  public ResponseEntity<String> sendInvitation(@RequestBody MembershipInviteDto request) {
     try {
-      membershipRequestService.sendInvitation(request);
-      LOGGER.info("Invitation sent successfully");
+      membershipRequestService.sendInvitation(request.getEmail(), request.getHouseholdId());
+      LOGGER.info("Invitation sent successfully to {}", request.getEmail());
       return ResponseEntity.ok("Invitation sent successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Invitation failed: {}", e.getMessage());
@@ -112,6 +114,24 @@ public class MembershipRequestController {
     } catch (Exception e) {
       LOGGER.error("Unexpected error during invitation: {}", e.getMessage(), e);
       return ResponseEntity.status(500).body("Internal server error");
+    }
+  }
+
+  @Operation(summary = "Get all invitations sent by a household", description = "Returns all membership invitations sent from a household to users")
+  @PostMapping("/invitations/sent/by-household")
+  public ResponseEntity<?> getInvitationsSentByHousehold(@RequestBody MembershipInviteDto request) {
+    try {
+      Long householdId = request.getHouseholdId();
+      List<MembershipRequestResponseDto> invitations =
+          membershipRequestService.getInvitationsSentByHousehold(householdId);
+      LOGGER.info("Retrieved sent invitations for household: {}", householdId);
+      return ResponseEntity.ok(invitations);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error retrieving sent invitations: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error retrieving sent invitations: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
 
