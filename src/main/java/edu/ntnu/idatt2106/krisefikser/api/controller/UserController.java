@@ -57,7 +57,7 @@ public class UserController {
     }
   }
 
-  @GetMapping("/me/household7{userId}")
+  @GetMapping("/me/household/{userId}")
   public ResponseEntity<?> getHousehold(@PathVariable Long userId) {
     try {
       HouseholdResponseDto household = userService.getHousehold(userId);
