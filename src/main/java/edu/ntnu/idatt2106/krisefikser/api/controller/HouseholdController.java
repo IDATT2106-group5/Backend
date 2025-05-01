@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -161,9 +160,9 @@ public class HouseholdController {
    */
   @Operation(summary = "Removes an unregistered member from a household",
       description = "Removes an unregistered user from a household with the given ID")
-  @DeleteMapping("/delete-unregistered-member")
-  public ResponseEntity<String> removeUnregisteredMemberFromHousehold(@RequestBody
-                                                                      RemoveUnregisteredMemberRequestDto request) {
+  @PostMapping("/delete-unregistered-member")
+  public ResponseEntity<String> removeUnregisteredMemberFromHousehold(
+      @RequestBody RemoveUnregisteredMemberRequestDto request) {
     try {
       householdService.removeUnregisteredMemberFromHousehold(request.getMemberId());
       LOGGER.info("Unregistered member removed from household successfully");
@@ -280,8 +279,8 @@ public class HouseholdController {
    * @return the response entity
    */
   @Operation(summary = "Search for a household by household id",
-        description = "Search for a household by household id")
-    @PostMapping("/search")
+      description = "Search for a household by household id")
+  @PostMapping("/search")
   public ResponseEntity<?> searchHouseholdById(
       @RequestBody Map<String, Long> request) {
     try {
