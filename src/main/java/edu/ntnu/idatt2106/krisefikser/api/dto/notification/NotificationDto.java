@@ -1,18 +1,17 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto.notification;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import java.time.LocalDateTime;
 
 public class NotificationDto {
-  private String type;
-  private String message;
+  private NotificationType type;
   private Long recipientId;
   private LocalDateTime timestamp;
   private boolean read;
 
-  public NotificationDto(String type, String message, Long recipientId, LocalDateTime timestamp,
+  public NotificationDto(NotificationType type, Long recipientId, LocalDateTime timestamp,
                          boolean read) {
     this.type = type;
-    this.message = message;
     this.recipientId = recipientId;
     this.timestamp = timestamp;
     this.read = read;
@@ -21,21 +20,14 @@ public class NotificationDto {
   public NotificationDto() {
   }
 
-  public String getType() {
+  public NotificationType getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(NotificationType type) {
     this.type = type;
   }
 
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
 
   public Long getRecipientId() {
     return recipientId;
