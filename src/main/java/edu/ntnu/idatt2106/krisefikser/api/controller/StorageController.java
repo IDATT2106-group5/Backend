@@ -75,7 +75,7 @@ public class StorageController {
     return ResponseEntity.ok(storageItem);
   }
 
-  @DeleteMapping("/{storageItemId}")
+  @PostMapping("/{storageItemId}")
   public ResponseEntity<Void> removeItemFromStorage(@PathVariable Long storageItemId) {
     storageService.removeItemFromStorage(storageItemId);
     return ResponseEntity.ok().build();
