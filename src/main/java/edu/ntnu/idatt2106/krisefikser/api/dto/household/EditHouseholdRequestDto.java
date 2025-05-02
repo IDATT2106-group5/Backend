@@ -5,15 +5,27 @@ public class EditHouseholdRequestDto {
   private String name;
   private String address;
 
-  public String getAddress() {
-    return address;
+  public Long getHouseholdId() {
+    return householdId;
+  }
+
+  public void setHouseholdId(Long householdId) {
+    this.householdId = householdId;
   }
 
   public String getName() {
     return name;
   }
 
-  public Long getHouseholdId() {
-    return householdId;
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public void setAddress(String address) {
+    this.address = address;
   }
 }

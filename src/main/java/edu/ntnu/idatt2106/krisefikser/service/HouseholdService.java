@@ -21,6 +21,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 /**
@@ -150,6 +153,44 @@ public class HouseholdService {
   }
 
   /**
+   * Removes the current authenticated user from their household.
+   *
+   * @throws IllegalArgumentException if the user is not found or is not a member of any household.
+   */
+  public void leaveCurrentUserFromHousehold() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserDetails userDetails = (UserDetails) auth.getPrincipal();
+    String email = userDetails.getUsername();
+
+    logger.info("User attempting to leave household: {}", email);
+
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("Authenticated user not found in database: {}", email);
+          return new IllegalArgumentException("Authenticated user not found");
+        });
+
+    if (user.getHousehold() == null) {
+      logger.warn("User {} is not a member of any household", user.getFullName());
+      throw new IllegalArgumentException("You are not a member of any household.");
+    }
+
+    if (user.getHousehold().getOwner().getId().equals(user.getId())) {
+      logger.warn("User {} is the owner and cannot leave the household without transferring ownership", user.getFullName());
+      throw new IllegalArgumentException("Owner cannot leave the household. Transfer ownership first.");
+    }
+
+    logger.info("User {} is leaving household with ID {}", user.getFullName(), user.getHousehold().getId());
+
+    householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
+        user.getHousehold().getNumberOfMembers() - 1);
+
+    userRepository.updateHouseholdId(user.getId(), null);
+
+    logger.info("User {} has been removed from the household", user.getFullName());
+  }
+
+  /**
    * Adds a new unregistered member to a household.
    *
    * <p>This method checks if an unregistered member with the given full name already exists in the
@@ -227,6 +268,7 @@ public class HouseholdService {
             household.getOwner().getFullName(),
             household.getOwner().getTlf(),
             household.getOwner().getRole()
+
         )
     ));
 

@@ -151,6 +151,20 @@ public class HouseholdController {
     }
   }
 
+  @Operation(summary = "Allows a user to leave their household",
+      description = "Authenticated user leaves their current household, if not the owner")
+  @PostMapping("/leave")
+  public ResponseEntity<String> leaveHousehold() {
+    try {
+      householdService.leaveCurrentUserFromHousehold();
+      return ResponseEntity.ok("Du har forlatt husstanden.");
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("Uventet feil under utmelding fra husstand.");
+    }
+  }
+
   /**
    * Removes an unregistered member from a household with the given ID. The user must not be
    * registered in the system.
