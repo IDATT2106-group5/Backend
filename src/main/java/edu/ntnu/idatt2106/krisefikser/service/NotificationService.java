@@ -2,7 +2,8 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.CreateNotificationRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;import edu.ntnu.idatt2106.krisefikser.persistance.entity.Notification;
+import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Notification;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.NotificationRepository;
@@ -45,9 +46,9 @@ public class NotificationService {
    * @param userId       the user id
    * @param notification the notification
    */
-  public void sendPrivateNotification(String userId, NotificationDto notification) {
+  public void sendPrivateNotification(Long userId, NotificationDto notification) {
     messagingTemplate.convertAndSendToUser(
-        userId,
+        String.valueOf(userId),
         "/queue/notifications",
         notification
     );
@@ -68,8 +69,11 @@ public class NotificationService {
    * @param householdId  the household id
    * @param notification the notification
    */
-  public void sendHouseholdNotification(String householdId, NotificationDto notification) {
-    messagingTemplate.convertAndSend("/topic/household/" + householdId, notification);
+  public void sendHouseholdNotification(Long householdId, NotificationDto notification) {
+    messagingTemplate.convertAndSend(
+        "/topic/household/"
+            + householdId,
+        notification);
   }
 
   /**
@@ -103,34 +107,51 @@ public class NotificationService {
     Notification notificationEntity = new Notification();
     notificationEntity.setType(notification.getType());
     notificationEntity.setIsRead(notification.isRead());
+    notificationEntity.setTimestamp(LocalDateTime.now());
+    notificationEntity.setMessage(notification.getMessage());
     List<User> users = userRepository.getUsersByHouseholdId(householdId);
 
     users.forEach(user -> {
       notificationEntity.setUser(user);
       notificationRepository.save(notificationEntity);
-      sendHouseholdNotification(notification.getRecipientId().toString(), notification);
     });
   }
 
   public List<NotificationResponseDto> getUserNotifications(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    List<Notification> notifications = notificationRepository.findAllByUserIdOrderByTimestampDesc(userId);
+    List<Notification> notifications =
+        notificationRepository.findAllByUserIdOrderByTimestampDesc(userId);
     return notifications.stream()
         .map(notification -> new NotificationResponseDto(
             notification.getId(),
             notification.getType(),
             notification.getUser().getId(),
             notification.getTimestamp(),
+            notification.getMessage(),
             notification.getIsRead()))
         .toList();
   }
 
-  public void saveNotification(CreateNotificationRequestDto notificationRequest, NotificationType type) {
+  public void saveNotification(CreateNotificationRequestDto notificationRequest,
+                               NotificationType type) {
     Notification notification = new Notification();
     notification.setType(type);
     notification.setIsRead(false);
     notification.setTimestamp(LocalDateTime.now());
+    notification.setUser(userRepository.findById(notificationRequest.getRecipientId())
+        .orElseThrow(() -> new IllegalArgumentException("User not found")));
+
+    notificationRepository.save(notification);
+  }
+
+  public void saveUserNotification(NotificationDto notificationRequest,
+                               NotificationType type) {
+    Notification notification = new Notification();
+    notification.setType(type);
+    notification.setIsRead(false);
+    notification.setTimestamp(LocalDateTime.now());
+    notification.setMessage(notificationRequest.getMessage());
     notification.setUser(userRepository.findById(notificationRequest.getRecipientId())
         .orElseThrow(() -> new IllegalArgumentException("User not found")));
 

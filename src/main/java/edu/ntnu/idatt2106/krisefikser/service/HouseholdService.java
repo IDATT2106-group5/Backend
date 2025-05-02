@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberResponseDto;
@@ -11,6 +12,7 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.UnregisteredHouseholdMember;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
@@ -45,6 +47,11 @@ public class HouseholdService {
   private final HouseholdRepository householdRepository;
 
   /**
+   * Notification service for sending notifications.
+   */
+  private final NotificationService notificationService;
+
+  /**
    * Repository for user entity operations.
    */
   private final UserRepository userRepository;
@@ -62,9 +69,11 @@ public class HouseholdService {
    * @param unregisteredHouseholdMemberRepository Repository for unregistered household member operations.
    */
   public HouseholdService(HouseholdRepository householdRepository,
+                          NotificationService notificationService,
                           UserRepository userRepository,
                           UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
     this.householdRepository = householdRepository;
+    this.notificationService = notificationService;
     this.userRepository = userRepository;
     this.unregisteredHouseholdMemberRepository = unregisteredHouseholdMemberRepository;
   }
@@ -96,6 +105,15 @@ public class HouseholdService {
     userRepository.updateHouseholdId(request.getOwnerId(), household.getId());
     logger.info("Household created successfully: {}", householdRepository.findByName(
         request.getName()));
+
+    // Send notification to the users in the household.
+    NotificationDto notification = new NotificationDto();
+    notification.setMessage("Household created successfully");
+    notification.setType(NotificationType.HOUSEHOLD);
+    notification.setRead(false);
+
+    notificationService.saveHouseholdNotification(notification, household.getId());
+    notificationService.sendPrivateNotification(household.getOwner().getId(), notification);
   }
 
   /**
@@ -388,7 +406,7 @@ public class HouseholdService {
   /**
    * Gets a household by its ID.
    *
-   * @param householdId
+   * @param householdId the id of the household
    * @return HouseholdResponseDto containing household details.
    */
 

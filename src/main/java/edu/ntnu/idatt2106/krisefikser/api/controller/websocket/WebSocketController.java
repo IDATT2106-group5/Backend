@@ -21,7 +21,7 @@ public class WebSocketController {
     public void processNotification(@Payload NotificationDto notification) {
         if (notification.getRecipientId() != null) {
             notificationService.sendPrivateNotification(
-                notification.getRecipientId().toString(), notification);
+                notification.getRecipientId(), notification);
         } else {
             notificationService.broadcastNotification(notification);
         }
