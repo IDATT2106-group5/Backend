@@ -9,7 +9,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootTest
-@ContextConfiguration(classes = {TestConfig.class, TestJwtConfig.class})
+@ContextConfiguration(classes = {TestConfig.class})
 @ActiveProfiles("test")
 class KrisefikserApplicationTests {
 
