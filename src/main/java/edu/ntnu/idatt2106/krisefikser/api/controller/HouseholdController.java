@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.DeleteHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
@@ -151,6 +152,11 @@ public class HouseholdController {
     }
   }
 
+  /**
+   * Allows a user to leave their household. The user must not be the owner of the household.
+   *
+   * @return A response entity indicating the result of the operation.
+   */
   @Operation(summary = "Allows a user to leave their household",
       description = "Authenticated user leaves their current household, if not the owner")
   @PostMapping("/leave")
@@ -162,6 +168,29 @@ public class HouseholdController {
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
       return ResponseEntity.status(500).body("Uventet feil under utmelding fra husstand.");
+    }
+  }
+
+  /**
+   * Deletes a household with the given ID. The user must be the owner of the household.
+   *
+   * @param request the request
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Deletes a household", description = "Deletes the household with the given ID")
+  @PostMapping("/delete")
+  public ResponseEntity<String> deleteHousehold(@RequestBody DeleteHouseholdRequestDto request) {
+    try {
+      householdService.deleteHousehold(request.getHouseholdId(), request.getOwnerId());
+      LOGGER.info("Household deleted successfully: householdId={}, ownerId={}", request.getHouseholdId(), request.getOwnerId());
+      return ResponseEntity.ok("Household deleted successfully");
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during household deletion: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error during household deletion: householdId={}, ownerId={}, message={}",
+          request.getHouseholdId(), request.getOwnerId(), e.getMessage(), e);
+      return ResponseEntity.status(500).body("Internal server error");
     }
   }
 
@@ -196,12 +225,15 @@ public class HouseholdController {
    * @param request the request
    * @return the household details
    */
-  @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
   @PostMapping("/details")
-  public ResponseEntity<Map<String, Object>> getHouseholdDetails(
-      @RequestBody GetUserInfoRequestDto request) {
+  public ResponseEntity<?> getHouseholdDetails(@RequestBody GetUserInfoRequestDto request) {
     try {
       Map<String, Object> details = householdService.getHouseholdDetails(request.getUserId());
+
+      if (details == null || details.get("household") == null) {
+        LOGGER.info("User with ID {} has no household", request.getUserId());
+        return ResponseEntity.status(404).body(Map.of("error", "Brukeren tilhører ingen husstand"));
+      }
       LOGGER.info("Household members retrieved successfully: {}", details);
       return ResponseEntity.ok(details);
     } catch (IllegalArgumentException e) {
@@ -212,6 +244,7 @@ public class HouseholdController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
+
 
   /**
    * Edit unregistered member in household response entity.

@@ -258,6 +258,11 @@ public class HouseholdService {
     User user = userRepository.findById(userId).orElseThrow(
         () -> new IllegalArgumentException("User not found"));
     Household household = user.getHousehold();
+
+    if (household == null) {
+      throw new IllegalArgumentException("User does not belong to a household");
+    }
+
     resultMap.put("household", new HouseholdResponseDto(
         household.getId(),
         household.getName(),
@@ -347,6 +352,37 @@ public class HouseholdService {
       household.setAddress(request.getAddress());
     }
     householdRepository.save(household);
+  }
+
+  /**
+   * Deletes a household and removes all associated users and unregistered members.
+   *
+   * @param householdId the household id
+   * @param ownerId     the owner id
+   * @throws IllegalArgumentException if the household is not found or if the user is not the owner.
+   */
+  public void deleteHousehold(Long householdId, Long ownerId) {
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+
+    if (!household.getOwner().getId().equals(ownerId)) {
+      throw new IllegalArgumentException("Only the owner can delete the household");
+    }
+
+    // Remove household from all users
+    List<User> users = userRepository.getUsersByHousehold(household);
+    for (User user : users) {
+      user.setHousehold(null);
+      userRepository.save(user);
+    }
+    // Delete unregistered members
+    List<UnregisteredHouseholdMember> unregistered = unregisteredHouseholdMemberRepository
+        .findUnregisteredHouseholdMembersByHousehold(household);
+    for (UnregisteredHouseholdMember member : unregistered) {
+      unregisteredHouseholdMemberRepository.delete(member);
+    }
+
+    householdRepository.delete(household);
   }
 
   /**
