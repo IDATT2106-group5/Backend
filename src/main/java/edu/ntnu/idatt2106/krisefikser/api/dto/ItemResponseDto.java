@@ -1,8 +1,10 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
 
 public class ItemResponseDto {
+
   private Long id;
   private String name;
   private int caloricAmount;
@@ -13,6 +15,15 @@ public class ItemResponseDto {
     this.name = name;
     this.caloricAmount = caloricAmount;
     this.itemType = itemType;
+  }
+
+  public static ItemResponseDto fromEntity(Item item) {
+    return new ItemResponseDto(
+        item.getId(),
+        item.getName(),
+        item.getCaloricAmount(),
+        item.getItemType()
+    );
   }
 
   public Long getId() {

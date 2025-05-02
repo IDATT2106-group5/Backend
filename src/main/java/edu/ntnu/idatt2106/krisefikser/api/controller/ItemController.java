@@ -18,16 +18,22 @@ public class ItemController {
     public ItemController(ItemService itemService) {
         this.itemService = itemService;
     }
-
+    
     @GetMapping
     public ResponseEntity<List<ItemResponseDto>> getAllItems() {
-        List<ItemResponseDto> items = itemService.getAllItems(); // must return DTOs here
+        List<ItemResponseDto> items = itemService.getAllItems();
         return ResponseEntity.ok(items);
     }
 
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long itemId) {
-        ItemResponseDto item = itemService.getItemById(itemId); // must return DTO here
+        ItemResponseDto item = itemService.getItemById(itemId);
         return ResponseEntity.ok(item);
+    }
+    
+    @GetMapping("/type/{itemType}")
+    public ResponseEntity<List<ItemResponseDto>> getItemsByType(@PathVariable String itemType) {
+        List<ItemResponseDto> items = itemService.getItemsByType(itemType);
+        return ResponseEntity.ok(items);
     }
 }
