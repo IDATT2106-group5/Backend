@@ -46,7 +46,7 @@ public class MembershipRequest {
   private RequestStatus status;
 
   @Column
-  private Timestamp created_at;
+  private Timestamp createdAt;
 
   public Long getId() {
     return id;
@@ -96,11 +96,11 @@ public class MembershipRequest {
     this.status = status;
   }
 
-  public Timestamp getCreated_at() {
-    return created_at;
+  public Timestamp getCreatedAt() {
+    return createdAt;
   }
 
-  public void setCreated_at(Timestamp created_at) {
-    this.created_at = created_at;
+  public void setCreatedAt(Timestamp createdAt) {
+    this.createdAt = createdAt;
   }
 }

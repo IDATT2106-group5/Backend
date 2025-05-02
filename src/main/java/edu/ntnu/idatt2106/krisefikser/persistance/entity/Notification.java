@@ -44,6 +44,12 @@ public class Notification {
 
   @Column(name = "is_read") // This provides a custom column name
   private Boolean isRead; // Renamed from 'read'
+  /**
+   * The timestamp of the notification.
+   */
+  @Column(name = "timestamp", nullable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private LocalDateTime timestamp;
 
   // Update getters and setters
   public Boolean getIsRead() {
@@ -53,12 +59,6 @@ public class Notification {
   public void setIsRead(Boolean isRead) {
     this.isRead = isRead;
   }
-
-  /**
-   * The timestamp of the notification.
-   */
-  @Column(name = "timestamp", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-  private LocalDateTime timestamp;
 
   /**
    * Gets timestamp.

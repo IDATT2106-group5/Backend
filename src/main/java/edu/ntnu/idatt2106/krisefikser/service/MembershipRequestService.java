@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MembershipRequestService {
+
   private final MembershipRequestRepository membershipRequestRepository;
   private final HouseholdRepository householdRepository;
   private final UserRepository userRepository;
@@ -33,8 +34,8 @@ public class MembershipRequestService {
    * @param userRepository              the user repository
    */
   public MembershipRequestService(MembershipRequestRepository membershipRequestRepository,
-                                  HouseholdRepository householdRepository,
-                                  UserRepository userRepository) {
+      HouseholdRepository householdRepository,
+      UserRepository userRepository) {
     this.membershipRequestRepository = membershipRequestRepository;
     this.householdRepository = householdRepository;
     this.userRepository = userRepository;
@@ -58,7 +59,7 @@ public class MembershipRequestService {
     membershipRequest.setReceiver(receiver);
     membershipRequest.setType(RequestType.INVITATION);
     membershipRequest.setStatus(RequestStatus.PENDING);
-    membershipRequest.setCreated_at(new Timestamp(System.currentTimeMillis()));
+    membershipRequest.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
     membershipRequestRepository.save(membershipRequest);
   }
@@ -81,7 +82,7 @@ public class MembershipRequestService {
     membershipRequest.setReceiver(household.getOwner());
     membershipRequest.setType(RequestType.JOIN_REQUEST);
     membershipRequest.setStatus(RequestStatus.PENDING);
-    membershipRequest.setCreated_at(new Timestamp(System.currentTimeMillis()));
+    membershipRequest.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
     membershipRequestRepository.save(membershipRequest);
   }
@@ -160,7 +161,7 @@ public class MembershipRequestService {
                 invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
             invitation.getType(),
             invitation.getStatus(),
-            invitation.getCreated_at()
+            invitation.getCreatedAt()
         )
     ).toList();
   }
@@ -194,7 +195,7 @@ public class MembershipRequestService {
                 invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
             invitation.getType(),
             invitation.getStatus(),
-            invitation.getCreated_at()
+            invitation.getCreatedAt()
         )
     ).toList();
   }
@@ -223,7 +224,7 @@ public class MembershipRequestService {
                 request.getReceiver().getTlf(), request.getReceiver().getRole()),
             request.getType(),
             request.getStatus(),
-            request.getCreated_at()
+            request.getCreatedAt()
         )
     ).toList();
   }
@@ -247,7 +248,7 @@ public class MembershipRequestService {
                 request.getReceiver().getTlf(), request.getReceiver().getRole()),
             request.getType(),
             request.getStatus(),
-            request.getCreated_at()
+            request.getCreatedAt()
         )
     ).toList();
   }
