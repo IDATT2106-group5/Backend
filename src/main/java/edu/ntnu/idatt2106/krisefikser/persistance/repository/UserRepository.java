@@ -1,6 +1,8 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.repository;
 
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -43,4 +45,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
   @Transactional
   @Query("UPDATE User u SET u.household.id = :householdId WHERE u.id = :userId")
   void updateHouseholdId(@Param("userId") Long userId, @Param("householdId") Long householdId);
+
+  List<User> getUsersByHousehold(Household household);
+
+  Object findUsersByHousehold(Household household);
+
+  Optional<User> getUserByEmail(String email);
+
+  Optional<User> getUsersById(Long userId);
 }

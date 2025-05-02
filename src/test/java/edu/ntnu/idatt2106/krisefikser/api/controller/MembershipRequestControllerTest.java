@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
 import java.util.Collections;
 import java.util.Map;

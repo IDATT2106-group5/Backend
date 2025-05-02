@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.user.admin;
 
 /**
  * Data Transfer Object for admin invitation requests. Contains the required information to invite a
