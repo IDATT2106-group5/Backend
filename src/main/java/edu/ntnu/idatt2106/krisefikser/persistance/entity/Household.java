@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,6 +38,9 @@ public class Household {
   @JoinColumn(nullable = false)
   private User owner;
 
+  @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
+  private List<StorageItem> storageItems = new ArrayList<>();
+
   /**
    * Gets storage items.
    *
@@ -55,9 +59,6 @@ public class Household {
       List<StorageItem> storageItems) {
     this.storageItems = storageItems;
   }
-
-  @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
-  private List<StorageItem> storageItems = new ArrayList<>();
 
   /**
    * Gets id.

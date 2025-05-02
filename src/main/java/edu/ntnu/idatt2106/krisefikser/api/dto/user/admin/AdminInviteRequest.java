@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.user.admin;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

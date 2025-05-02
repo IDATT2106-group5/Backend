@@ -4,9 +4,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.ntnu.idatt2106.krisefikser.api.dto.AdminInviteRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.AdminSetupRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminSetupRequest;
 import edu.ntnu.idatt2106.krisefikser.service.AdminInvitationService;
 import edu.ntnu.idatt2106.krisefikser.service.IncidentService;
 import java.time.LocalDateTime;
