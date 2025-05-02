@@ -451,11 +451,7 @@ class AuthServiceTest {
       verifyNoInteractions(twoFactorService);
       verifyNoInteractions(tokenProvider);
     }
-  }
-
-  @Nested
-  class Verify2FATests {
-
+    
     @Test
     void verify2Fa_shouldThrowException_whenUserNotAdmin() {
       // Arrange
