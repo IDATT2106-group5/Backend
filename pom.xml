@@ -89,7 +89,7 @@
     <dependency>
       <artifactId>h2</artifactId>
       <groupId>com.h2database</groupId>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <artifactId>mysql-connector-j</artifactId>
@@ -124,6 +124,16 @@
     <dependency>
       <artifactId>spring-boot-starter-mail</artifactId>
       <groupId>org.springframework.boot</groupId>
+    </dependency>
+    <dependency>
+    <groupId>org.hibernate.validator</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>8.0.0.Final</version>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>jakarta.el</artifactId>
+        <version>4.0.2</version>
     </dependency>
 
   </dependencies>

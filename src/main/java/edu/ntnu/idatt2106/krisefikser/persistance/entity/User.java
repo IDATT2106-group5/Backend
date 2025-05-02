@@ -17,7 +17,7 @@ import java.util.Date;
  * The type User.
  */
 @Entity
-@Table(name = "user")
+@Table(name = "\"user\"")
 public class User {
 
   @Id
