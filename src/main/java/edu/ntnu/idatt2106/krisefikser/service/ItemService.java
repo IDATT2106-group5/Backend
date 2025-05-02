@@ -55,7 +55,7 @@ public class ItemService {
 
       // Convert to DTOs and return
       return items.stream()
-          .map(item -> ItemResponseDto.fromEntity(item))
+          .map(this::mapToDto) // Use the existing mapToDto method
           .collect(Collectors.toList());
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Invalid item type: " + itemType);
