@@ -454,7 +454,7 @@ class AuthServiceTest {
   }
 
   @Nested
-  class RegisterUserTests {
+  class Verify2FATests {
 
     @Test
     void verify2Fa_shouldThrowException_whenUserNotAdmin() {
