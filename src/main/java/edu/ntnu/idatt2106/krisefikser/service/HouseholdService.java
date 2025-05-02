@@ -21,6 +21,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 /**
@@ -150,6 +153,44 @@ public class HouseholdService {
   }
 
   /**
+   * Removes the current authenticated user from their household.
+   *
+   * @throws IllegalArgumentException if the user is not found or is not a member of any household.
+   */
+  public void leaveCurrentUserFromHousehold() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserDetails userDetails = (UserDetails) auth.getPrincipal();
+    String email = userDetails.getUsername();
+
+    logger.info("User attempting to leave household: {}", email);
+
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("Authenticated user not found in database: {}", email);
+          return new IllegalArgumentException("Authenticated user not found");
+        });
+
+    if (user.getHousehold() == null) {
+      logger.warn("User {} is not a member of any household", user.getFullName());
+      throw new IllegalArgumentException("You are not a member of any household.");
+    }
+
+    if (user.getHousehold().getOwner().getId().equals(user.getId())) {
+      logger.warn("User {} is the owner and cannot leave the household without transferring ownership", user.getFullName());
+      throw new IllegalArgumentException("Owner cannot leave the household. Transfer ownership first.");
+    }
+
+    logger.info("User {} is leaving household with ID {}", user.getFullName(), user.getHousehold().getId());
+
+    householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
+        user.getHousehold().getNumberOfMembers() - 1);
+
+    userRepository.updateHouseholdId(user.getId(), null);
+
+    logger.info("User {} has been removed from the household", user.getFullName());
+  }
+
+  /**
    * Adds a new unregistered member to a household.
    *
    * <p>This method checks if an unregistered member with the given full name already exists in the
@@ -217,6 +258,11 @@ public class HouseholdService {
     User user = userRepository.findById(userId).orElseThrow(
         () -> new IllegalArgumentException("User not found"));
     Household household = user.getHousehold();
+
+    if (household == null) {
+      throw new IllegalArgumentException("User does not belong to a household");
+    }
+
     resultMap.put("household", new HouseholdResponseDto(
         household.getId(),
         household.getName(),
@@ -227,6 +273,7 @@ public class HouseholdService {
             household.getOwner().getFullName(),
             household.getOwner().getTlf(),
             household.getOwner().getRole()
+
         )
     ));
 
@@ -305,6 +352,37 @@ public class HouseholdService {
       household.setAddress(request.getAddress());
     }
     householdRepository.save(household);
+  }
+
+  /**
+   * Deletes a household and removes all associated users and unregistered members.
+   *
+   * @param householdId the household id
+   * @param ownerId     the owner id
+   * @throws IllegalArgumentException if the household is not found or if the user is not the owner.
+   */
+  public void deleteHousehold(Long householdId, Long ownerId) {
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+
+    if (!household.getOwner().getId().equals(ownerId)) {
+      throw new IllegalArgumentException("Only the owner can delete the household");
+    }
+
+    // Remove household from all users
+    List<User> users = userRepository.getUsersByHousehold(household);
+    for (User user : users) {
+      user.setHousehold(null);
+      userRepository.save(user);
+    }
+    // Delete unregistered members
+    List<UnregisteredHouseholdMember> unregistered = unregisteredHouseholdMemberRepository
+        .findUnregisteredHouseholdMembersByHousehold(household);
+    for (UnregisteredHouseholdMember member : unregistered) {
+      unregisteredHouseholdMemberRepository.delete(member);
+    }
+
+    householdRepository.delete(household);
   }
 
   /**
