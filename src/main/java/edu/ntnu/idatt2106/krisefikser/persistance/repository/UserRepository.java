@@ -41,6 +41,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
    */
   Optional<User> findByConfirmationToken(String token);
 
+  /**
+   * Update household id.
+   *
+   * @param userId      the user id
+   * @param householdId the household id
+   */
   @Modifying
   @Transactional
   @Query("UPDATE User u SET u.household.id = :householdId WHERE u.id = :userId")
@@ -49,6 +55,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
   List<User> getUsersByHousehold(Household household);
 
   Object findUsersByHousehold(Household household);
+
+  List<User> getUsersByHouseholdId(Long householdId);
 
   Optional<User> getUserByEmail(String email);
 

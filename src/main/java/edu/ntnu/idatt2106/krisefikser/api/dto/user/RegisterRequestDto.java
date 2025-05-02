@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

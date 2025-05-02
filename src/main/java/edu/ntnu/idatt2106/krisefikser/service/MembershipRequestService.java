@@ -1,6 +1,8 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.MembershipRequest;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
@@ -44,15 +46,10 @@ public class MembershipRequestService {
    * @param request the request
    */
   public void sendInvitation(MembershipRequestDto request) {
-    // Check if the user and household exist
-    if (!userRepository.existsByEmail(request.getUserEmail())) {
-      throw new IllegalArgumentException("User not found");
-    }
-    if (!householdRepository.existsByName(request.getHouseholdName())) {
-      throw new IllegalArgumentException("Household not found");
-    }
-    User receiver = userRepository.findByEmail(request.getUserEmail()).orElse(null);
-    Household household = householdRepository.findByName(request.getHouseholdName()).orElse(null);
+    User receiver = userRepository.findById(request.getUserId()).orElseThrow(
+        () -> new IllegalArgumentException("User not found"));
+    Household household = householdRepository.findById(request.getHouseholdId()).orElseThrow(
+        () -> new IllegalArgumentException("Household not found"));
 
     // Create and save the membership request
     MembershipRequest membershipRequest = new MembershipRequest();
@@ -72,15 +69,10 @@ public class MembershipRequestService {
    * @param request the request
    */
   public void sendJoinRequest(MembershipRequestDto request) {
-    // Check if the user and household exist
-    if (!userRepository.existsByEmail(request.getUserEmail())) {
-      throw new IllegalArgumentException("User not found");
-    }
-    if (!householdRepository.existsByName(request.getHouseholdName())) {
-      throw new IllegalArgumentException("Household not found");
-    }
-    User sender = userRepository.findByEmail(request.getUserEmail()).orElse(null);
-    Household household = householdRepository.findByName(request.getHouseholdName()).orElse(null);
+    User sender = userRepository.findById(request.getUserId())
+        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    Household household = householdRepository.findById(request.getHouseholdId())
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
 
     // Create and save the membership request
     MembershipRequest membershipRequest = new MembershipRequest();
@@ -110,6 +102,21 @@ public class MembershipRequestService {
   }
 
   /**
+   * Cancel a membership request.
+   *
+   * @param requestId the request id
+   */
+  public void cancelRequest(Long requestId) {
+    // Check if the request exists
+    if (!membershipRequestRepository.existsById(requestId)) {
+      throw new IllegalArgumentException("Request not found");
+    }
+
+    // Update the request status to "accepted"
+    membershipRequestRepository.updateStatusById(requestId, RequestStatus.CANCELLED);
+  }
+
+  /**
    * Reject a membership request.
    *
    * @param requestId the request id
@@ -125,20 +132,124 @@ public class MembershipRequestService {
   }
 
   /**
-   * Get active requests by user.
+   * Get sent invitations by user.
    *
-   * @param email the users email
+   * @param userId the user id
+   * @return the active invitations by user
    */
-  public List<MembershipRequest> getActiveRequestsByUser(String email) {
+  public List<MembershipRequestResponseDto> getSentInvitationsByUser(Long userId) {
     // Check if the user exists
-    if (!userRepository.existsByEmail(email)) {
+    if (!userRepository.existsById(userId)) {
       throw new IllegalArgumentException("User not found");
     }
 
     // Get the user
-    User user = userRepository.findByEmail(email).orElse(null);
+    User user = userRepository.findById(userId).orElse(null);
 
     // Get the active requests for the user
-    return membershipRequestRepository.findAllByReceiverAndStatus(user, RequestStatus.PENDING);
+    return membershipRequestRepository.findAllBySenderAndTypeAndStatus(user,
+        RequestType.INVITATION, RequestStatus.PENDING).stream().map(invitation ->
+        new MembershipRequestResponseDto(
+            invitation.getId(),
+            invitation.getHousehold().getId(),
+            new UserResponseDto(invitation.getSender().getId(), invitation.getSender().getEmail(),
+                invitation.getSender().getFullName(), invitation.getSender().getTlf(),
+                invitation.getSender().getRole()),
+            new UserResponseDto(invitation.getReceiver().getId(),
+                invitation.getReceiver().getEmail(), invitation.getReceiver().getFullName(),
+                invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
+            invitation.getType(),
+            invitation.getStatus(),
+            invitation.getCreated_at()
+        )
+    ).toList();
   }
+
+  /**
+   * Get received invitations by user.
+   *
+   * @param userId the user id
+   * @return the active invitations by user
+   */
+  public List<MembershipRequestResponseDto> getReceivedInvitationsByUser(Long userId) {
+    // Check if the user exists
+    if (!userRepository.existsById(userId)) {
+      throw new IllegalArgumentException("User not found");
+    }
+
+    // Get the user
+    User user = userRepository.findById(userId).orElse(null);
+
+    // Get the active requests for the user
+    return membershipRequestRepository.findAllByReceiverAndTypeAndStatus(user,
+        RequestType.INVITATION, RequestStatus.PENDING).stream().map(invitation ->
+        new MembershipRequestResponseDto(
+            invitation.getId(),
+            invitation.getHousehold().getId(),
+            new UserResponseDto(invitation.getSender().getId(), invitation.getSender().getEmail(),
+                invitation.getSender().getFullName(), invitation.getSender().getTlf(),
+                invitation.getSender().getRole()),
+            new UserResponseDto(invitation.getReceiver().getId(),
+                invitation.getReceiver().getEmail(), invitation.getReceiver().getFullName(),
+                invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
+            invitation.getType(),
+            invitation.getStatus(),
+            invitation.getCreated_at()
+        )
+    ).toList();
+  }
+
+  /**
+   * Get active join requests by householdID.
+   *
+   * @param householdId the household id
+   * @return the active join requests by user
+   */
+  public List<MembershipRequestResponseDto> getReceivedJoinRequestsByHousehold(Long householdId) {
+    List<MembershipRequest> requests =
+        membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId,
+            RequestType.JOIN_REQUEST,
+            RequestStatus.PENDING);
+
+    return requests.stream().map(request ->
+        new MembershipRequestResponseDto(
+            request.getId(),
+            request.getHousehold().getId(),
+            new UserResponseDto(request.getSender().getId(), request.getSender().getEmail(),
+                request.getSender().getFullName(), request.getSender().getTlf(),
+                request.getSender().getRole()),
+            new UserResponseDto(request.getReceiver().getId(),
+                request.getReceiver().getEmail(), request.getReceiver().getFullName(),
+                request.getReceiver().getTlf(), request.getReceiver().getRole()),
+            request.getType(),
+            request.getStatus(),
+            request.getCreated_at()
+        )
+    ).toList();
+  }
+
+  public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold(
+      Long householdId) {
+    List<MembershipRequest> requests =
+        membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId,
+            RequestType.JOIN_REQUEST,
+            RequestStatus.ACCEPTED);
+
+    return requests.stream().map(request ->
+        new MembershipRequestResponseDto(
+            request.getId(),
+            request.getHousehold().getId(),
+            new UserResponseDto(request.getSender().getId(), request.getSender().getEmail(),
+                request.getSender().getFullName(), request.getSender().getTlf(),
+                request.getSender().getRole()),
+            new UserResponseDto(request.getReceiver().getId(),
+                request.getReceiver().getEmail(), request.getReceiver().getFullName(),
+                request.getReceiver().getTlf(), request.getReceiver().getRole()),
+            request.getType(),
+            request.getStatus(),
+            request.getCreated_at()
+        )
+    ).toList();
+  }
+
 }

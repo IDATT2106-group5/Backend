@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.household;
 
 /**
  * Data Transfer Object for creating a household. Contains the name, address, and owner ID of the

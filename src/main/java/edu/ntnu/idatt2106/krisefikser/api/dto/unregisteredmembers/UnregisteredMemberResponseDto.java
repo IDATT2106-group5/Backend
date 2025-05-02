@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers;
 
 public class UnregisteredMemberResponseDto {
   private Long id;

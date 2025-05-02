@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers;
 
 /**
  * Data Transfer Object for the request to assign an unregistered member to a household. Contains

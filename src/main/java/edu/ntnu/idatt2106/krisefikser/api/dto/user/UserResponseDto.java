@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.user;
 
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 
