@@ -43,4 +43,11 @@ public class Item {
    */
   @Column
   private int caloricAmount;
+
+  /**
+   * Instantiates a new Item.
+   */
+  public void setId(Long id) {
+    this.id = id;
+  }
 }
