@@ -64,8 +64,10 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/items/**").permitAll()
+            .requestMatchers("/api/storage/**").permitAll()
             .requestMatchers("/api/admin/setup").permitAll()
             .requestMatchers("/api/admin/login/2fa/**").permitAll()
             .requestMatchers("/api/membership-requests/**").permitAll()

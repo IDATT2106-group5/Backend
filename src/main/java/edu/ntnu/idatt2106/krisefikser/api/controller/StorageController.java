@@ -7,6 +7,9 @@ import edu.ntnu.idatt2106.krisefikser.service.StorageService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class StorageController {
 
   private final StorageService storageService;
+  private static final Logger LOGGER = LoggerFactory.getLogger(StorageController.class);
 
   public StorageController(StorageService storageService) {
     this.storageService = storageService;
@@ -60,6 +64,9 @@ public class StorageController {
       @PathVariable Long householdId,
       @PathVariable Long itemId,
       @RequestBody Map<String, Object> request) {
+
+    LOGGER.info("Adding item to storage: householdId={}, itemId={}, request={}",
+        householdId, itemId, request);
 
     String unit = (String) request.get("unit");
     Integer amount = Integer.valueOf(request.get("amount").toString());
