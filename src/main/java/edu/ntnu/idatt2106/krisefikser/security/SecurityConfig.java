@@ -64,6 +64,8 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/ws/**").permitAll()
+            .requestMatchers("/api/notifications/**").permitAll()
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/admin/setup").permitAll()
             .requestMatchers("/api/admin/login/2fa/**").permitAll()

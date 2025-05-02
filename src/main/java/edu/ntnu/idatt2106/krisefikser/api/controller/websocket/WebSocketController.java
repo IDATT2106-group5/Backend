@@ -5,7 +5,9 @@ import edu.ntnu.idatt2106.krisefikser.service.NotificationService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @Controller
 public class WebSocketController {
 
