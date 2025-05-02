@@ -15,12 +15,14 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
-import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,7 +37,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
+/**
+ * Tests for the AuthService class.
+ */
 class AuthServiceTest {
 
   @Mock
@@ -454,7 +458,7 @@ class AuthServiceTest {
   }
 
   @Nested
-  class RegisterUserTests {
+  class Verify2FATests {
 
     @Test
     void verify2Fa_shouldThrowException_whenUserNotAdmin() {
@@ -498,6 +502,171 @@ class AuthServiceTest {
       verify(twoFactorService).verifyOtp(email, otpCode);
       verify(loginAttemptService).loginFailed(email);
       verifyNoInteractions(tokenProvider);
+    }
+  }
+
+  /**
+   * Tests for the initiate password reset functionality.
+   */
+  @Nested
+  class InitiatePasswordResetTests {
+
+    @Test
+    void initiatePasswordReset_shouldGenerateTokenAndSendEmail_whenUserExists() {
+      // Arrange
+      String email = "reset@example.com";
+      User user = new User();
+      user.setEmail(email);
+
+      when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+      // Act
+      authService.initiatePasswordReset(email);
+
+      // Assert
+      assertNotNull(user.getResetPasswordToken(), "Token should be set");
+      assertNotNull(user.getResetPasswordTokenExpiration(), "Expiration should be set");
+
+      verify(userRepository).save(user);
+      verify(emailService).sendPasswordResetEmail(email, user.getResetPasswordToken());
+    }
+
+    @Test
+    void initiatePasswordReset_shouldThrowException_whenUserNotFound() {
+      // Arrange
+      String email = "nonexistent@example.com";
+      when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.initiatePasswordReset(email));
+
+      assertEquals("No user registered with that email.", exception.getMessage());
+      verify(userRepository).findByEmail(email);
+      verifyNoInteractions(emailService);
+    }
+  }
+
+  /**
+   * Tests for the password reset token validation.
+   */
+  @Nested
+  class ValidateResetPasswordTokenTests {
+
+    @Test
+    void validateResetPasswordToken_shouldPass_whenTokenIsValid() {
+      // Arrange
+      String token = UUID.randomUUID().toString();
+      User user = new User();
+      user.setResetPasswordToken(token);
+      user.setResetPasswordTokenExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
+
+      when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.of(user));
+
+      // Act
+      authService.validateResetPasswordToken(token);
+
+      // Assert
+      verify(userRepository).findByResetPasswordToken(token);
+    }
+
+    @Test
+    void validateResetPasswordToken_shouldThrowException_whenTokenIsInvalid() {
+      // Arrange
+      String token = "invalid-token";
+      when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.empty());
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.validateResetPasswordToken(token));
+
+      assertEquals("Invalid token", exception.getMessage());
+      verify(userRepository).findByResetPasswordToken(token);
+    }
+
+    @Test
+    void validateResetPasswordToken_shouldThrowException_whenTokenIsExpired() {
+      // Arrange
+      String token = UUID.randomUUID().toString();
+      User user = new User();
+      user.setResetPasswordToken(token);
+      user.setResetPasswordTokenExpiration(Date.from(Instant.now().minus(1, ChronoUnit.HOURS)));
+
+      when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.of(user));
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.validateResetPasswordToken(token));
+
+      assertEquals("Token expired", exception.getMessage());
+      verify(userRepository).findByResetPasswordToken(token);
+    }
+  }
+
+  /**
+   * Tests for the password reset functionality.
+   */
+  @Nested
+  class ResetPasswordMethodTests {
+
+    @Test
+    void resetPassword_shouldUpdatePasswordAndClearToken_whenValidToken() {
+      // Arrange
+      String token = UUID.randomUUID().toString();
+      String newPassword = "newSecurePassword123!";
+      String encodedPassword = "encodedPassword123!";
+
+      User user = new User();
+      user.setEmail("test@example.com");
+      user.setResetPasswordToken(token);
+      user.setResetPasswordTokenExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
+
+      when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.of(user));
+      when(passwordEncoder.encode(newPassword)).thenReturn(encodedPassword);
+
+      // Act
+      authService.resetPassword(token, newPassword);
+
+      // Assert
+      assertEquals(encodedPassword, user.getPassword());
+      assertNull(user.getResetPasswordToken());
+      assertNull(user.getResetPasswordTokenExpiration());
+      verify(userRepository).save(user);
+    }
+
+    @Test
+    void resetPassword_shouldThrowException_whenTokenIsInvalid() {
+      // Arrange
+      String token = "invalid-token";
+      String newPassword = "newPassword!";
+      when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.empty());
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.resetPassword(token, newPassword));
+
+      assertEquals("Invalid token", exception.getMessage());
+      verify(userRepository).findByResetPasswordToken(token);
+    }
+
+    @Test
+    void resetPassword_shouldThrowException_whenTokenIsExpired() {
+      // Arrange
+      String token = UUID.randomUUID().toString();
+      String newPassword = "newPassword!";
+      User user = new User();
+      user.setEmail("expired@example.com");
+      user.setResetPasswordToken(token);
+      user.setResetPasswordTokenExpiration(Date.from(Instant.now().minus(1, ChronoUnit.HOURS)));
+
+      when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.of(user));
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.resetPassword(token, newPassword));
+
+      assertEquals("Token expired", exception.getMessage());
+      verify(userRepository).findByResetPasswordToken(token);
     }
   }
 }

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.api.dto.PasswordResetRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
 import edu.ntnu.idatt2106.krisefikser.service.AuthService;
@@ -21,6 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 
+/**
+ * Tests for the AuthController class.
+ */
 class AuthControllerTest {
 
   @Mock
@@ -117,6 +121,9 @@ class AuthControllerTest {
     }
   }
 
+  /**
+   * Tests for the user registration functionality.
+   */
   @Nested
   class RegisterUserTests {
 
@@ -175,6 +182,9 @@ class AuthControllerTest {
     }
   }
 
+  /**
+   * Tests for the email confirmation functionality.
+   */
   @Nested
   class ConfirmEmailTests {
 
@@ -210,4 +220,220 @@ class AuthControllerTest {
           response.getHeaders().getLocation().toString());
     }
   }
+
+  /**
+   * Tests for the password reset request functionality.
+   */
+  @Nested
+  class RequestPasswordResetTests {
+
+    @Test
+    void shouldSendPasswordResetLink_whenEmailIsValid() {
+      // Arrange
+      String email = "reset@example.com";
+      Map<String, String> request = Map.of("email", email);
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.requestPasswordReset(request);
+
+      // Assert
+      assertEquals(HttpStatus.OK, response.getStatusCode());
+      assertNotNull(response.getBody());
+      assertEquals("Password reset link sent to your email", response.getBody().get("message"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenEmailIsMissing() {
+      // Arrange
+      Map<String, String> request = Map.of();
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.requestPasswordReset(request);
+
+      // Assert
+      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+      assertEquals("Email is required", response.getBody().get("error"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenIllegalArgumentThrown() {
+      // Arrange
+      String email = "notfound@example.com";
+      Map<String, String> request = Map.of("email", email);
+      doThrow(new IllegalArgumentException("No user registered with that email."))
+          .when(authService).initiatePasswordReset(email);
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.requestPasswordReset(request);
+
+      // Assert
+      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+      assertEquals("No user registered with that email.", response.getBody().get("error"));
+    }
+
+    @Test
+    void shouldReturnInternalServerError_whenUnexpectedExceptionThrown() {
+      // Arrange
+      String email = "test@example.com";
+      Map<String, String> request = Map.of("email", email);
+      doThrow(new RuntimeException("Unexpected error"))
+          .when(authService).initiatePasswordReset(email);
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.requestPasswordReset(request);
+
+      // Assert
+      assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+      assertEquals("Internal server error", response.getBody().get("error"));
+    }
+  }
+
+  /**
+   * Tests for the password reset token validation functionality.
+   */
+  @Nested
+  class ValidateResetTokenTests {
+
+    @Test
+    void shouldReturnOk_whenTokenIsValid() {
+      // Arrange
+      String token = "valid-token";
+      Map<String, String> request = Map.of("token", token);
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.validateResetToken(request);
+
+      // Assert
+      assertEquals(HttpStatus.OK, response.getStatusCode());
+      assertNotNull(response.getBody());
+      assertEquals("Token is valid", response.getBody().get("message"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenTokenIsMissing() {
+      // Arrange
+      Map<String, String> request = Map.of();
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.validateResetToken(request);
+
+      // Assert
+      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+      assertEquals("Reset token is required", response.getBody().get("error"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenTokenIsInvalid() {
+      // Arrange
+      String token = "invalid-token";
+      Map<String, String> request = Map.of("token", token);
+
+      doThrow(new IllegalArgumentException("Invalid token"))
+          .when(authService).validateResetPasswordToken(token);
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.validateResetToken(request);
+
+      // Assert
+      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+      assertEquals("Invalid token", response.getBody().get("error"));
+    }
+
+    @Test
+    void shouldReturnInternalServerError_whenUnexpectedExceptionThrown() {
+      // Arrange
+      String token = "token";
+      Map<String, String> request = Map.of("token", token);
+
+      doThrow(new RuntimeException("Something went wrong"))
+          .when(authService).validateResetPasswordToken(token);
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.validateResetToken(request);
+
+      // Assert
+      assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+      assertEquals("Internal server error", response.getBody().get("error"));
+    }
+  }
+
+  /**
+   * Tests for the password reset functionality.
+   */
+  @Nested
+  class ResetPasswordEndpointTests {
+
+    @Test
+    void shouldResetPasswordSuccessfully_whenTokenAndPasswordAreValid() {
+      // Arrange
+      PasswordResetRequestDto requestDto = new PasswordResetRequestDto("valid-token",
+          "NewPass123!");
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.resetPassword(requestDto);
+
+      // Assert
+      assertEquals(HttpStatus.OK, response.getStatusCode());
+      assertNotNull(response.getBody());
+      assertEquals("Password reset successful", response.getBody().get("message"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenTokenIsMissing() {
+      // Arrange
+      PasswordResetRequestDto requestDto = new PasswordResetRequestDto(null, "NewPass123!");
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.resetPassword(requestDto);
+
+      // Assert
+      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+      assertEquals("Reset token is required", response.getBody().get("error"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenPasswordIsMissing() {
+      // Arrange
+      PasswordResetRequestDto requestDto = new PasswordResetRequestDto("valid-token", null);
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.resetPassword(requestDto);
+
+      // Assert
+      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+      assertEquals("New password is required", response.getBody().get("error"));
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenIllegalArgumentThrown() {
+      // Arrange
+      PasswordResetRequestDto requestDto = new PasswordResetRequestDto("invalid-token",
+          "NewPass123!");
+      doThrow(new IllegalArgumentException("Invalid token"))
+          .when(authService).resetPassword("invalid-token", "NewPass123!");
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.resetPassword(requestDto);
+
+      // Assert
+      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+      assertEquals("Invalid token", response.getBody().get("error"));
+    }
+
+    @Test
+    void shouldReturnInternalServerError_whenUnexpectedExceptionThrown() {
+      // Arrange
+      PasswordResetRequestDto requestDto = new PasswordResetRequestDto("token", "NewPass123!");
+      doThrow(new RuntimeException("Unexpected failure"))
+          .when(authService).resetPassword("token", "NewPass123!");
+
+      // Act
+      ResponseEntity<Map<String, String>> response = authController.resetPassword(requestDto);
+
+      // Assert
+      assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+      assertEquals("Internal server error", response.getBody().get("error"));
+    }
+  }
+
 }

@@ -7,7 +7,10 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -221,5 +224,70 @@ public class AuthService {
     loginAttemptService.loginSucceeded(email);
 
     return new LoginResponse(jwt);
+  }
+
+  /**
+   * Initiates the password reset process by generating a token and sending a reset email.
+   *
+   * @param email the user's email address
+   */
+  public void initiatePasswordReset(String email) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("No user registered with that email."));
+
+    String token = UUID.randomUUID().toString();
+    Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
+
+    user.setResetPasswordToken(token);
+    user.setResetPasswordTokenExpiration(expiration);
+    userRepository.save(user);
+
+    emailService.sendPasswordResetEmail(user.getEmail(), token);
+  }
+
+  /**
+   * Validates the reset password token.
+   *
+   * @param token the reset password token
+   */
+  public void validateResetPasswordToken(String token) {
+    User user = userRepository.findByResetPasswordToken(token)
+        .orElseThrow(() -> {
+          logger.warn("Invalid reset token received: {}", token);
+          return new IllegalArgumentException("Invalid token");
+        });
+
+    if (user.getResetPasswordTokenExpiration().before(new Date())) {
+      logger.warn("Reset token expired for user: {}", user.getEmail());
+      throw new IllegalArgumentException("Token expired");
+    }
+    logger.info("Reset token validated successfully for user: {}", user.getEmail());
+  }
+
+  /**
+   * Resets the user's password using the provided token and new password.
+   *
+   * @param token       the reset password token
+   * @param newPassword the new password
+   */
+  public void resetPassword(String token, String newPassword) {
+    User user = userRepository.findByResetPasswordToken(token)
+        .orElseThrow(() -> {
+          logger.warn("Invalid reset token received: {}", token);
+          return new IllegalArgumentException("Invalid token");
+        });
+
+    if (user.getResetPasswordTokenExpiration().before(new Date())) {
+      logger.warn("Reset token expired for user: {}", user.getEmail());
+      throw new IllegalArgumentException("Token expired");
+    }
+    logger.info("Reset token validated successfully for user: {}", user.getEmail());
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+    user.setResetPasswordToken(null);
+    user.setResetPasswordTokenExpiration(null);
+
+    userRepository.save(user);
+    logger.info("Password successfully reset for user: {}", user.getEmail());
   }
 }
