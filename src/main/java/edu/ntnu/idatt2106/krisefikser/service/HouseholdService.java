@@ -342,6 +342,18 @@ public class HouseholdService {
     logger.info("Household owner changed to {}", newOwner.getFullName());
   }
 
+  /**
+   * Searches for a household by its ID.
+   *
+   * @param householdId
+   * @return
+   */
+  public Long searchHouseholdById(Long householdId) {
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+    return household.getId();
+  }
+
   public void editHousehold(EditHouseholdRequestDto request) {
     Household household = householdRepository.findById(request.getHouseholdId())
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
