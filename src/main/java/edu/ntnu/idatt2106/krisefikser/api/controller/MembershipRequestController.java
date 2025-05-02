@@ -18,19 +18,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling membership requests. This includes sending invitations, joining requests,
+ * and accepting or declining requests.
+ */
+
 @Tag(name = "MembershipRequest", description = "Endpoints for managing membership requests")
 @RestController
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequestMapping("/api/membership-requests")
 public class MembershipRequestController {
-  private final MembershipRequestService membershipRequestService;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(MembershipRequestController.class);
+  private final MembershipRequestService membershipRequestService;
 
   public MembershipRequestController(MembershipRequestService membershipRequestService) {
     this.membershipRequestService = membershipRequestService;
   }
 
-  @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
+  /**
+   * Gets all active membership requests for a given user. This includes both sent and received
+   * requests.
+   *
+   * @param request The request containing the user ID.
+   * @return A response entity containing the list of active membership requests.
+   */
+  @Operation(summary = "Get active membership requests",
+      description = "Retrieves all active membership requests for a given user")
   @PostMapping("/invitations/received")
   public ResponseEntity<?> getActiveInvitations(
       @RequestBody GetUserInfoRequestDto request) {
@@ -48,7 +62,15 @@ public class MembershipRequestController {
     }
   }
 
-  @Operation(summary = "Gets all active join requests sent to a household", description = "Retrieves all active join requests sent to a household")
+  /**
+   * Gets all active join requests sent to a household. This includes both sent and received
+   * requests.
+   *
+   * @param request The request containing the household ID.
+   * @return A response entity containing the list of active join requests.
+   */
+  @Operation(summary = "Gets all active join requests sent to a household",
+      description = "Retrieves all active join requests sent to a household")
   @PostMapping("/join-requests/received")
   public ResponseEntity<?> getActiveJoinRequests(
       @RequestBody Map<String, Long> request) {
@@ -64,13 +86,23 @@ public class MembershipRequestController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
-  @Operation(summary = "Gets all accepted join requests sent to a household", description = "Retrieves all accepted join requests sent to a household")
+
+  /**
+   * Gets all accepted join requests sent to a household. This includes both sent and received
+   * requests.
+   *
+   * @param request The request containing the household ID.
+   * @return A response entity containing the list of accepted join requests.
+   */
+  @Operation(summary = "Gets all accepted join requests sent to a household",
+      description = "Retrieves all accepted join requests sent to a household")
   @PostMapping("/join-requests/received/accepted")
   public ResponseEntity<?> getActiveAcceptedJoinRequests(
       @RequestBody Map<String, Long> request) {
     try {
       List<MembershipRequestResponseDto> requests =
-          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold(request.get("householdId"));
+          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold(
+              request.get("householdId"));
       return ResponseEntity.ok(requests);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving join requests: {}", e.getMessage());
@@ -81,7 +113,15 @@ public class MembershipRequestController {
     }
   }
 
-  @Operation(summary = "Get active membership requests", description = "Retrieves all active membership requests for a given user")
+  /**
+   * Gets all active membership requests sent to a user. This includes both sent and received
+   * requests.
+   *
+   * @param request The request containing the user ID.
+   * @return A response entity containing the list of active membership requests.
+   */
+  @Operation(summary = "Get active membership requests",
+      description = "Retrieves all active membership requests for a given user")
   @PostMapping("/invitations/sent")
   public ResponseEntity<?> getActiveRequests(
       @RequestBody GetUserInfoRequestDto request) {
@@ -99,7 +139,15 @@ public class MembershipRequestController {
     }
   }
 
-  @Operation(summary = "Send a membership invitation", description = "Sends a membership invitation to a user for a given household")
+  /**
+   * Sends a membership invitation to a user for a given household. This includes both sent and
+   * received requests.
+   *
+   * @param request The request containing the user ID and household ID.
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Send a membership invitation",
+      description = "Sends a membership invitation to a user for a given household")
   @PostMapping("/send-invitation")
   public ResponseEntity<String> sendInvitation(@RequestBody MembershipRequestDto request) {
     try {
@@ -115,7 +163,15 @@ public class MembershipRequestController {
     }
   }
 
-  @Operation(summary = "Send a join request", description = "Sends a join request to a household for a given user")
+  /**
+   * Sends a join request to a household for a given user. This includes both sent and received
+   * requests.
+   *
+   * @param request The request containing the user ID and household ID.
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Send a join request",
+      description = "Sends a join request to a household for a given user")
   @PostMapping("/send-join-request")
   public ResponseEntity<String> sendJoinRequest(@RequestBody MembershipRequestDto request) {
     try {
@@ -131,7 +187,14 @@ public class MembershipRequestController {
     }
   }
 
-  @Operation(summary = "Decline a membership request", description = "Declines a membership request with the given ID")
+  /**
+   * Declines a membership request with the given ID.
+   *
+   * @param request The request containing the request ID.
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Decline a membership request",
+      description = "Declines a membership request with the given ID")
   @PostMapping("/decline")
   public ResponseEntity<String> declineRequest(@RequestBody RequestOperationDto request) {
     try {
@@ -147,7 +210,14 @@ public class MembershipRequestController {
     }
   }
 
-  @Operation(summary = "Accept a membership request", description = "Accepts a membership request with the given ID")
+  /**
+   * Accepts a membership request with the given ID.
+   *
+   * @param request The request containing the request ID.
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Accept a membership request",
+      description = "Accepts a membership request with the given ID")
   @PostMapping("/accept")
   public ResponseEntity<String> acceptRequest(@RequestBody RequestOperationDto request) {
     try {
@@ -162,7 +232,15 @@ public class MembershipRequestController {
       return ResponseEntity.status(500).body("Internal server error");
     }
   }
-  @Operation(summary = "Accept a membership request", description = "Accepts a membership request with the given ID")
+
+  /**
+   * Cancels a membership request with the given ID.
+   *
+   * @param request The request containing the request ID.
+   * @return A response entity indicating the result of the operation.
+   */
+  @Operation(summary = "Accept a membership request",
+      description = "Accepts a membership request with the given ID")
   @PostMapping("/cancel")
   public ResponseEntity<String> cancelRequest(@RequestBody RequestOperationDto request) {
     try {

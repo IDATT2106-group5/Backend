@@ -1,9 +1,9 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminSetupRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.TwoFactorVerifyRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminSetupRequest;
 import edu.ntnu.idatt2106.krisefikser.service.AdminInvitationService;
 import edu.ntnu.idatt2106.krisefikser.service.AuthService;
 import edu.ntnu.idatt2106.krisefikser.service.TwoFactorService;

@@ -17,16 +17,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for managing user-related operations.
- * Provides endpoints for retrieving user information.
+ * Controller for managing user-related operations. Provides endpoints for retrieving user
+ * information.
  */
 @Tag(name = "User", description = "Endpoints for managing a user")
 @RestController
 @RequestMapping("/api/user")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserController {
-  private final UserService userService;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+  private final UserService userService;
 
   /**
    * Constructs a new instance of the UserController.
@@ -40,9 +41,9 @@ public class UserController {
   /**
    * Retrieves the details of the currently authenticated user.
    *
-   * @return a ResponseEntity containing the user details as a UserResponseDto
-   * or an appropriate error response
+   * @return a ResponseEntity containing the user details as a UserResponseDto.
    */
+
   @GetMapping("/me")
   public ResponseEntity<?> getUser() {
     try {
@@ -58,6 +59,12 @@ public class UserController {
     }
   }
 
+  /**
+   * Retrieves the household information for a given user.
+   *
+   * @param userId The ID of the user whose household information is to be retrieved.
+   * @return a ResponseEntity containing the household information as a HouseholdResponseDto.
+   */
   @GetMapping("/me/household/{userId}")
   public ResponseEntity<?> getHousehold(@PathVariable Long userId) {
     try {
@@ -74,6 +81,12 @@ public class UserController {
     }
   }
 
+  /**
+   * Verifies if a given email address exists in the system.
+   *
+   * @param request A map containing the email address to check.
+   * @return A ResponseEntity indicating whether the email exists or not.
+   */
   @PostMapping("/check-mail")
   public ResponseEntity<?> verifyIfMailExists(@RequestBody Map<String, String> request) {
     try {

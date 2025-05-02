@@ -1,8 +1,8 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.CreateNotificationRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.service.NotificationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,16 +12,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * Controller for handling notification-related requests. This includes creating, updating,
+ * deleting, and retrieving notifications.
+ */
 
 @Tag(name = "Notification", description = "Endpoints for managing notifications")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
+
   private final NotificationService notificationService;
   private final Logger logger = LoggerFactory.getLogger(NotificationController.class);
 
@@ -60,8 +68,8 @@ public class NotificationController {
    */
 
   @PostMapping("/create/stock-control")
-  public ResponseEntity<?> createUserNotification(@RequestBody
-                                                  CreateNotificationRequestDto notification) {
+  public ResponseEntity<?> createUserNotification(
+      @RequestBody CreateNotificationRequestDto notification) {
     try {
       notificationService.saveNotification(notification, NotificationType.STOCK_CONTROL);
       logger.info("Created notification for user: {}", notification.getRecipientId());
@@ -75,6 +83,12 @@ public class NotificationController {
     }
   }
 
+  /**
+   * Marks a notification as read. This is used to update the notification status in the database.
+   *
+   * @param notificationId The ID of the notification to mark as read.
+   * @return A response entity with a message.
+   */
   @PutMapping("/{notificationId}/read")
   public ResponseEntity<?> markNotificationAsRead(@PathVariable Long notificationId) {
     try {

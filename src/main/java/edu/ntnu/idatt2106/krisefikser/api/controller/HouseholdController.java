@@ -182,7 +182,8 @@ public class HouseholdController {
    * @param request the request
    * @return the household details
    */
-  @Operation(summary = "Gets the details of a household", description = "Gets the members of a household with the given ID")
+  @Operation(summary = "Gets the details of a household",
+      description = "Gets the members of a household with the given ID")
   @PostMapping("/details")
   public ResponseEntity<Map<String, Object>> getHouseholdDetails(
       @RequestBody GetUserInfoRequestDto request) {

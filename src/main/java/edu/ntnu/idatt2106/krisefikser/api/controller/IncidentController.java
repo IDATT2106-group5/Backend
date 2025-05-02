@@ -20,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling incident-related requests. This includes creating, updating, deleting,
+ * and retrieving incidents.
+ */
+
 @RestController
 @RequestMapping("/api/incidents")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -31,6 +36,13 @@ public class IncidentController {
   public IncidentController(IncidentService incidentService) {
     this.incidentService = incidentService;
   }
+
+  /**
+   * Creates a new incident. This endpoint is only accessible to users with the ADMIN role.
+   *
+   * @param request The request containing the incident details.
+   * @return A response entity indicating the result of the operation.
+   */
 
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
@@ -49,6 +61,14 @@ public class IncidentController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
+
+  /**
+   * Updates an existing incident. This endpoint is only accessible to users with the ADMIN role.
+   *
+   * @param id      The ID of the incident to update.
+   * @param request The request containing the updated incident details.
+   * @return A response entity indicating the result of the operation.
+   */
 
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
@@ -69,6 +89,12 @@ public class IncidentController {
     }
   }
 
+  /**
+   * Deletes an existing incident. This endpoint is only accessible to users with the ADMIN role.
+   *
+   * @param id The ID of the incident to delete.
+   * @return A response entity indicating the result of the operation.
+   */
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> deleteIncident(@PathVariable Long id) {
@@ -85,6 +111,11 @@ public class IncidentController {
     }
   }
 
+  /**
+   * Retrieves all incidents. This endpoint is accessible to all users.
+   *
+   * @return A response entity containing a list of incidents.
+   */
   @GetMapping
   public ResponseEntity<List<IncidentResponseDto>> getAllIncidents() {
     try {

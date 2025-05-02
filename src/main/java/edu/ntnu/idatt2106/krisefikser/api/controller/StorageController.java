@@ -20,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling storage-related requests. This includes adding, updating, deleting, and
+ * retrieving storage items.
+ */
+
 @RestController
 @RequestMapping("/api/storage")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -31,13 +36,27 @@ public class StorageController {
     this.storageService = storageService;
   }
 
+  /**
+   * Retrieves all storage items for a specific household.
+   *
+   * @param householdId The ID of the household.
+   * @return A list of storage items for the specified household.
+   */
   @GetMapping("/household/{householdId}")
   public ResponseEntity<List<StorageItemResponseDto>> getStorageItemsByHousehold(
       @PathVariable Long householdId) {
-    List<StorageItemResponseDto> storageItems = storageService.getStorageItemsByHousehold(householdId);
+    List<StorageItemResponseDto> storageItems = storageService.getStorageItemsByHousehold(
+        householdId);
     return ResponseEntity.ok(storageItems);
   }
 
+  /**
+   * Retrieves all storage items for a specific household and item type.
+   *
+   * @param householdId The ID of the household.
+   * @param itemType    The type of item to filter by.
+   * @return A list of storage items for the specified household and item type.
+   */
   @GetMapping("/household/{householdId}/type/{itemType}")
   public ResponseEntity<List<StorageItem>> getStorageItemsByHouseholdAndType(
       @PathVariable Long householdId,
@@ -55,6 +74,14 @@ public class StorageController {
     return ResponseEntity.ok(expiringItems);
   }
 
+  /**
+   * Adds an item to the storage of a specific household.
+   *
+   * @param householdId The ID of the household.
+   * @param itemId      The ID of the item to add.
+   * @param request     The request body containing the unit, amount, and optional expiration date.
+   * @return The added storage item.
+   */
   @PostMapping("/household/{householdId}/item/{itemId}")
   public ResponseEntity<StorageItem> addItemToStorage(
       @PathVariable Long householdId,
@@ -75,11 +102,27 @@ public class StorageController {
     return ResponseEntity.ok(storageItem);
   }
 
+  /**
+   * Removes an item from the storage of a specific household.
+   *
+   * @param storageItemId The ID of the storage item to remove.
+   * @return A response entity indicating the result of the operation.
+   */
   @DeleteMapping("/{storageItemId}")
   public ResponseEntity<Void> removeItemFromStorage(@PathVariable Long storageItemId) {
     storageService.removeItemFromStorage(storageItemId);
     return ResponseEntity.ok().build();
   }
+
+  /**
+   * Updates an existing storage item. This endpoint is used to modify the unit, amount, and
+   * expiration date of a storage item.
+   *
+   * @param storageItemId The ID of the storage item to update.
+   * @param request       The request body containing the new unit, amount, and optional expiration
+   *                      date.
+   * @return The updated storage item.
+   */
 
   @PutMapping("/{storageItemId}")
   public ResponseEntity<?> updateStorageItem(
@@ -89,7 +132,8 @@ public class StorageController {
     try {
       // Extract values from request body
       String unit = (String) request.get("unit");
-      Integer amount = request.get("amount") != null ?
+      Integer amount = request.get("amount") != null
+          ?
           Integer.valueOf(request.get("amount").toString()) : null;
 
       // Handle expiration date (could be null)
