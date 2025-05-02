@@ -1,14 +1,20 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+
 /**
  * Data Transfer Object for admin invitation requests. Contains the required information to invite a
  * new admin.
  */
 public class AdminInviteRequest {
 
+  @NotBlank(message = "Email is required")
+  @Email(message = "Email must be valid")
   private String email;
+
+  @NotBlank(message = "Full name is required")
   private String fullName;
-  private String username; // Predefined admin username
 
   public AdminInviteRequest() {
   }
@@ -18,12 +24,10 @@ public class AdminInviteRequest {
    *
    * @param email    The email address of the new admin.
    * @param fullName The full name of the new admin.
-   * @param username The predefined username for the new admin.
    */
-  public AdminInviteRequest(String email, String fullName, String username) {
+  public AdminInviteRequest(String email, String fullName) {
     this.email = email;
     this.fullName = fullName;
-    this.username = username;
   }
 
   public String getEmail() {
@@ -40,13 +44,5 @@ public class AdminInviteRequest {
 
   public void setFullName(String fullName) {
     this.fullName = fullName;
-  }
-
-  public String getUsername() {
-    return username;
-  }
-
-  public void setUsername(String username) {
-    this.username = username;
   }
 }

@@ -56,6 +56,7 @@ public class AdminController {
    * @return A response entity indicating the result of the operation.
    */
   @PostMapping("/setup")
+  @PreAuthorize("isAnonymous()")  // This allows only unauthenticated users
   public ResponseEntity<?> setupAdmin(@RequestBody AdminSetupRequest request) {
     try {
       adminInvitationService.completeAdminSetup(request.getToken(), request.getPassword());
