@@ -1,12 +1,18 @@
 package edu.ntnu.idatt2106.krisefikser.security;
 
 import edu.ntnu.idatt2106.krisefikser.service.CustomUserDetailsService;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +28,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author Snake727
  */
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
   private final JwtAuthenticationEntryPoint jwtAuthEntryPoint;
@@ -99,5 +106,21 @@ public class SecurityConfig {
   public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
       throws Exception {
     return authConfig.getAuthenticationManager();
+  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    Map<String, Set<String>> roleHierarchyMap = new HashMap<>();
+
+    // Add ADMIN authorities to SUPERADMIN
+    String adminRole = "ROLE_ADMIN";
+    String superAdminRole = "ROLE_SUPERADMIN";
+
+    roleHierarchyMap.put(
+        superAdminRole,
+        Collections.singleton(adminRole)
+    );
+
+    return new MapBasedRoleHierarchy(roleHierarchyMap);
   }
 }
