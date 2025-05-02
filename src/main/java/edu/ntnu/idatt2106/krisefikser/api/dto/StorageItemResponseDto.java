@@ -1,17 +1,40 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto;
 
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
+
+/**
+ * A Data Transfer Object for StorageItem.
+ */
 
 public class StorageItemResponseDto {
+
   Long itemId;
   ItemResponseDto item;
   Long householdId;
   String unit;
   int amount;
   LocalDateTime expiration;
+
+  /**
+   * Constructor for StorageItemResponseDto.
+   *
+   * @param itemId      The ID of the storage item.
+   * @param item        The item associated with the storage item.
+   * @param householdId The ID of the household associated with the storage item.
+   * @param unit        The unit of measurement for the storage item.
+   * @param amount      The amount of the storage item.
+   * @param expiration  The expiration date and time of the storage item.
+   */
+  public StorageItemResponseDto(Long itemId, ItemResponseDto item, Long householdId, String unit,
+      int amount,
+      LocalDateTime expiration) {
+    this.itemId = itemId;
+    this.item = item;
+    this.householdId = householdId;
+    this.unit = unit;
+    this.amount = amount;
+    this.expiration = expiration;
+  }
 
   public Long getItemId() {
     return itemId;
@@ -21,50 +44,40 @@ public class StorageItemResponseDto {
     this.itemId = itemId;
   }
 
-  public StorageItemResponseDto(Long itemId, ItemResponseDto item, Long householdId, String unit, int amount,
-                                LocalDateTime expiration) {
-    this.itemId = itemId;
-    this.item = item;
-    this.householdId = householdId;
-    this.unit = unit;
-    this.amount = amount;
-    this.expiration = expiration;
-  }
-
   public ItemResponseDto getItem() {
     return item;
-  }
-
-  public Long getHouseholdId() {
-    return householdId;
-  }
-
-  public String getUnit() {
-    return unit;
-  }
-
-  public int getAmount() {
-    return amount;
-  }
-
-  public LocalDateTime getExpiration() {
-    return expiration;
   }
 
   public void setItem(ItemResponseDto item) {
     this.item = item;
   }
 
+  public Long getHouseholdId() {
+    return householdId;
+  }
+
   public void setHouseholdId(Long householdId) {
     this.householdId = householdId;
+  }
+
+  public String getUnit() {
+    return unit;
   }
 
   public void setUnit(String unit) {
     this.unit = unit;
   }
 
+  public int getAmount() {
+    return amount;
+  }
+
   public void setAmount(int amount) {
     this.amount = amount;
+  }
+
+  public LocalDateTime getExpiration() {
+    return expiration;
   }
 
   public void setExpiration(LocalDateTime expiration) {

@@ -78,7 +78,7 @@ public class AuthService {
    * @param request the user to register
    */
   public void registerUser(RegisterRequestDto request) {
-    if (!captchaService.verifyToken(request.getHCaptchaToken())) {
+    if (!captchaService.verifyToken(request.getHcaptchatoken())) {
       logger.warn("hCaptcha validation failed for email: {}", request.getEmail());
       throw new IllegalArgumentException("hCaptcha verification failed. Please try again.");
     }

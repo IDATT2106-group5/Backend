@@ -3,14 +3,28 @@ package edu.ntnu.idatt2106.krisefikser.api.dto.notification;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object for notifications. Contains the type of notification, recipient ID,
+ * timestamp, and read status of the notification.
+ */
 public class NotificationDto {
+
   private NotificationType type;
   private Long recipientId;
   private LocalDateTime timestamp;
   private boolean read;
 
+  /**
+   * Constructor for creating a notification DTO. Contains the type of notification, recipient ID,
+   * timestamp, and read status of the notification.
+   *
+   * @param type        The type of notification.
+   * @param recipientId The ID of the recipient.
+   * @param timestamp   The timestamp of the notification.
+   * @param read        The read status of the notification.
+   */
   public NotificationDto(NotificationType type, Long recipientId, LocalDateTime timestamp,
-                         boolean read) {
+      boolean read) {
     this.type = type;
     this.recipientId = recipientId;
     this.timestamp = timestamp;

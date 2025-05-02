@@ -5,7 +5,12 @@ import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestStatus;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
 import java.sql.Timestamp;
 
+/**
+ * The type Membership request dto.
+ */
+
 public class MembershipRequestResponseDto {
+
   Long id;
   Long householdId;
   UserResponseDto sender;
@@ -14,9 +19,20 @@ public class MembershipRequestResponseDto {
   RequestStatus status;
   Timestamp sentAt;
 
+  /**
+   * Constructor for MembershipRequestResponseDto.
+   *
+   * @param id          The ID of the membership request.
+   * @param householdId The ID of the household.
+   * @param sender      The sender of the request.
+   * @param recipient   The recipient of the request.
+   * @param requestType The type of the request.
+   * @param status      The status of the request.
+   * @param sentAt      The timestamp when the request was sent.
+   */
   public MembershipRequestResponseDto(Long id, Long householdId, UserResponseDto sender,
-                                      UserResponseDto recipient,
-                                      RequestType requestType, RequestStatus status, Timestamp sentAt) {
+      UserResponseDto recipient,
+      RequestType requestType, RequestStatus status, Timestamp sentAt) {
     this.id = id;
     this.householdId = householdId;
     this.sender = sender;

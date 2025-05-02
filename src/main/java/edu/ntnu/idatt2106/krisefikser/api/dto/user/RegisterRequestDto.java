@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * The type Register request dto.
  */
+
 public class RegisterRequestDto {
 
   private String fullName;
@@ -12,25 +13,7 @@ public class RegisterRequestDto {
   private String password;
   private String tlf;
   @JsonProperty("hCaptchaToken")
-  private String hCaptchaToken;
-
-  /**
-   * Gets a hCaptchaToken
-   *
-   * @return hCaptchaToken
-   */
-  public String getHCaptchaToken() {
-    return hCaptchaToken;
-  }
-
-  /**
-   * Sets a hCaptchaToken
-   *
-   * @param hCaptchaToken the hCaptchaToken
-   */
-  public void setHCaptchaToken(String hCaptchaToken) {
-    this.hCaptchaToken = hCaptchaToken;
-  }
+  private String hcaptchatoken;
 
   /**
    * Default constructor for RegisterRequestDto.
@@ -46,6 +29,24 @@ public class RegisterRequestDto {
     this.password = password;
     this.tlf = tlf;
 
+  }
+
+  /**
+   * Gets a hCaptchaToken.
+   *
+   * @return hCaptchaToken.
+   */
+  public String getHcaptchatoken() {
+    return hcaptchatoken;
+  }
+
+  /**
+   * Sets a hCaptchaToken.
+   *
+   * @param hcaptchatoken the hCaptchaToken.
+   */
+  public void setHcaptchatoken(String hcaptchatoken) {
+    this.hcaptchatoken = hcaptchatoken;
   }
 
   /**

@@ -13,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import edu.ntnu.idatt2106.krisefikser.api.dto.*;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
@@ -143,7 +142,7 @@ class AuthServiceTest {
       // Arrange
       RegisterRequestDto request = new RegisterRequestDto("Test User", "test@example.com",
           "Password123!", "12345678");
-      request.setHCaptchaToken("validToken");
+      request.setHcaptchatoken("validToken");
 
       when(userRepository.existsByEmail(anyString())).thenReturn(false);
       when(captchaService.verifyToken(anyString())).thenReturn(true);
@@ -171,7 +170,7 @@ class AuthServiceTest {
       // Arrange
       RegisterRequestDto request = new RegisterRequestDto("Test User", "test@example.com",
           "Password123!", "12345678");
-      request.setHCaptchaToken("invalidToken");
+      request.setHcaptchatoken("invalidToken");
 
       when(captchaService.verifyToken("invalidToken")).thenReturn(false);
 
@@ -190,7 +189,7 @@ class AuthServiceTest {
       // Arrange
       RegisterRequestDto request = new RegisterRequestDto("Test User", "existing@example.com",
           "Password123!", "12345678");
-      request.setHCaptchaToken("validToken");
+      request.setHcaptchatoken("validToken");
 
       when(captchaService.verifyToken(anyString())).thenReturn(true);
       when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
@@ -451,7 +450,7 @@ class AuthServiceTest {
       verifyNoInteractions(twoFactorService);
       verifyNoInteractions(tokenProvider);
     }
-    
+
     @Test
     void verify2Fa_shouldThrowException_whenUserNotAdmin() {
       // Arrange

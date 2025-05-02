@@ -26,6 +26,12 @@ public class IncidentRequestDto {
   @NotNull
   private Long scenarioId;
 
+  /**
+   * * Converts this DTO to an Incident entity.
+   *
+   * @param scenario The scenario to which the incident belongs.
+   * @return The Incident entity.
+   */
   public Incident toEntity(Scenario scenario) {
     Incident incident = new Incident();
     incident.setName(this.name);

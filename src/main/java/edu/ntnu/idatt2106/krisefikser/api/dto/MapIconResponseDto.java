@@ -16,6 +16,13 @@ public class MapIconResponseDto {
   private String description;
   private String openingHours;
   private String contactInfo;
+  
+  /**
+   * Converts a MapIcon entity to a MapIconResponseDto.
+   *
+   * @param mapIcon the MapIcon entity
+   * @return the MapIconResponseDto
+   */
 
   public static MapIconResponseDto fromEntity(MapIcon mapIcon) {
     MapIconResponseDto dto = new MapIconResponseDto();
