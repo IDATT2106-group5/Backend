@@ -66,6 +66,7 @@ public class HouseholdService {
    * Constructs a new HouseholdService with required repositories.
    *
    * @param householdRepository                   Repository for household operations.
+   * @param notificationService                   the notification service
    * @param userRepository                        Repository for user operations.
    * @param unregisteredHouseholdMemberRepository Repository for unregistered household member operations.
    */
@@ -107,7 +108,7 @@ public class HouseholdService {
     logger.info("Household created successfully: {}", householdRepository.findByName(
         request.getName()));
 
-    // Send notification to the users in the household.
+    // Send notification to the owner of the household.
     NotificationDto notification = new NotificationDto();
     notification.setMessage("Household created successfully");
     notification.setType(NotificationType.HOUSEHOLD);
@@ -147,6 +148,13 @@ public class HouseholdService {
     userRepository.updateHouseholdId(user.getId(), household.getId());
     householdRepository.updateNumberOfMembers(household.getId(),
         household.getNumberOfMembers() + 1);
+
+    // Create a notification for the household
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        household.getOwner().getId(), LocalDateTime.now(), false,
+        user.getFullName() + " has joined your household.");
+
+    notificationService.saveHouseholdNotification(notification, household.getId());
   }
 
   /**
@@ -154,7 +162,7 @@ public class HouseholdService {
    *
    * @param userId      the user id
    * @param householdId the household id
-   * @throws IllegalArgumentException if the user with specified id is not found.
+   * @throws IllegalArgumentException if the user with a specified id is not found.
    * @throws IllegalArgumentException if the user is not a member of any household.
    */
   public void removeUserFromHousehold(Long userId, Long householdId) {
@@ -171,6 +179,14 @@ public class HouseholdService {
     householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
         user.getHousehold().getNumberOfMembers() - 1);
     userRepository.updateHouseholdId(user.getId(), null);
+
+    // Create a notification for the household
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        householdId, LocalDateTime.now(), false,
+        user.getFullName() + " has been removed from household.");
+
+    notificationService.saveHouseholdNotification(notification, householdId);
+
   }
 
   /**
@@ -184,7 +200,6 @@ public class HouseholdService {
     String email = userDetails.getUsername();
 
     logger.info("User attempting to leave household: {}", email);
-
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
           logger.warn("Authenticated user not found in database: {}", email);
@@ -209,10 +224,14 @@ public class HouseholdService {
 
     householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
         user.getHousehold().getNumberOfMembers() - 1);
-
     userRepository.updateHouseholdId(user.getId(), null);
-
     logger.info("User {} has been removed from the household", user.getFullName());
+
+    // Create a notification for the household
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        user.getHousehold().getOwner().getId(), LocalDateTime.now(), false,
+        user.getFullName() + " has left the household.");
+    notificationService.saveHouseholdNotification(notification, user.getHousehold().getId());
   }
 
   /**
@@ -365,8 +384,20 @@ public class HouseholdService {
     household.setOwner(newOwner);
     householdRepository.save(household);
     logger.info("Household owner changed to {}", newOwner.getFullName());
+
+    // Create a notification for the new owner
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        newOwner.getId(), LocalDateTime.now(), false,
+        "You are now the owner of household " + household.getName());
+    notificationService.saveNotification(notification);
+    notificationService.sendPrivateNotification(newOwner.getId(), notification);
   }
 
+  /**
+   * Edit household.
+   *
+   * @param request the request
+   */
   public void editHousehold(EditHouseholdRequestDto request) {
     Household household = householdRepository.findById(request.getHouseholdId())
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
@@ -377,6 +408,13 @@ public class HouseholdService {
       household.setAddress(request.getAddress());
     }
     householdRepository.save(household);
+
+    // Create a notification for the household owner
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        household.getOwner().getId(), LocalDateTime.now(), false,
+        "Household " + household.getName() + " has been updated.");
+    notificationService.saveNotification(notification);
+    notificationService.sendPrivateNotification(household.getOwner().getId(), notification);
   }
 
   /**
@@ -407,7 +445,16 @@ public class HouseholdService {
       unregisteredHouseholdMemberRepository.delete(member);
     }
 
+    // Create notification for the household members
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        household.getOwner().getId(), LocalDateTime.now(), false,
+        "Household " + household.getName() + " has been deleted.");
+
+    // Delete the household
     householdRepository.delete(household);
+
+    // Send notification to all users
+    notificationService.saveHouseholdNotification(notification, household.getId());
   }
 
   /**
@@ -416,7 +463,6 @@ public class HouseholdService {
    * @param householdId the id of the household
    * @return HouseholdResponseDto containing household details.
    */
-
   public HouseholdResponseDto getHousehold(Long householdId) {
     Household household = householdRepository.findById(householdId)
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));

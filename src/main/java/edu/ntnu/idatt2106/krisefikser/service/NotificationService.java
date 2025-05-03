@@ -1,6 +1,5 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.CreateNotificationRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Notification;
@@ -50,22 +49,22 @@ public class NotificationService {
    * @param userId       the user id
    * @param notification the notification
    */
-public void sendPrivateNotification(Long userId, NotificationDto notification) {
+  public void sendPrivateNotification(Long userId, NotificationDto notification) {
     logger.info("Sending private notification to user {}: type={}, message={}, timestamp={}",
-                userId, notification.getType(), notification.getMessage(),
-                notification.getTimestamp());
+        userId, notification.getType(), notification.getMessage(),
+        notification.getTimestamp());
 
     try {
-        messagingTemplate.convertAndSendToUser(
-            String.valueOf(userId),
-            "/queue/notifications",
-            notification
-        );
-        logger.info("Successfully sent notification to user {}", userId);
+      messagingTemplate.convertAndSendToUser(
+          String.valueOf(userId),
+          "/queue/notifications",
+          notification
+      );
+      logger.info("Successfully sent notification to user {}", userId);
     } catch (Exception e) {
-        logger.error("Failed to send notification to user {}: {}", userId, e.getMessage(), e);
+      logger.error("Failed to send notification to user {}: {}", userId, e.getMessage(), e);
     }
-}
+  }
 
   /**
    * Broadcast notification.
@@ -74,29 +73,6 @@ public void sendPrivateNotification(Long userId, NotificationDto notification) {
    */
   public void broadcastNotification(NotificationDto notification) {
     messagingTemplate.convertAndSend("/topic/notifications", notification);
-  }
-
-  /**
-   * Send household notification.
-   *
-   * @param householdId  the household id
-   * @param notification the notification
-   */
-  public void sendHouseholdNotification(Long householdId, NotificationDto notification) {
-
-    messagingTemplate.convertAndSend(
-        "/topic/household/"
-            + householdId,
-        notification);
-  }
-
-  /**
-   * Save user notification.
-   *
-   * @param notification the notification
-   */
-  public void saveUserNotification(NotificationDto notification) {
-
   }
 
   /**
@@ -126,11 +102,22 @@ public void sendPrivateNotification(Long userId, NotificationDto notification) {
     List<User> users = userRepository.getUsersByHouseholdId(householdId);
 
     users.forEach(user -> {
+      logger.info("Sending household notification to user {}: type={}, message={}, timestamp={}",
+          user.getId(), notification.getType(), notification.getMessage(),
+          notification.getTimestamp());
+
       notificationEntity.setUser(user);
       notificationRepository.save(notificationEntity);
+      sendPrivateNotification(user.getId(), notification);
     });
   }
 
+  /**
+   * Gets user notifications.
+   *
+   * @param userId the user id
+   * @return the user notifications
+   */
   public List<NotificationResponseDto> getUserNotifications(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
@@ -147,6 +134,11 @@ public void sendPrivateNotification(Long userId, NotificationDto notification) {
         .toList();
   }
 
+  /**
+   * Save notification.
+   *
+   * @param notificationRequest the notification request
+   */
   public void saveNotification(NotificationDto notificationRequest) {
     Notification notification = new Notification();
     notification.setType(notificationRequest.getType());
@@ -159,10 +151,14 @@ public void sendPrivateNotification(Long userId, NotificationDto notification) {
     notificationRepository.save(notification);
   }
 
-  public void saveUserNotification(NotificationDto notificationRequest,
-                               NotificationType type) {
+  /**
+   * Save user notification.
+   *
+   * @param notificationRequest the notification request
+   */
+  public void saveUserNotification(NotificationDto notificationRequest) {
     Notification notification = new Notification();
-    notification.setType(type);
+    notification.setType(notificationRequest.getType());
     notification.setIsRead(false);
     notification.setTimestamp(LocalDateTime.now());
     notification.setMessage(notificationRequest.getMessage());
