@@ -52,28 +52,6 @@ public class NotificationController {
     }
   }
 
-  /**
-   * Creates a new notification for a user.
-   *
-   * @param notification the notification metadata.
-   * @return a response entity with a message
-   */
-
-  @PostMapping("/create/stock-control")
-  public ResponseEntity<?> createUserNotification(@RequestBody
-                                                  CreateNotificationRequestDto notification) {
-    try {
-      notificationService.saveNotification(notification, NotificationType.STOCK_CONTROL);
-      logger.info("Created notification for user: {}", notification.getRecipientId());
-      return ResponseEntity.ok(Map.of("message", "Notification created successfully"));
-    } catch (IllegalArgumentException e) {
-      logger.warn("Validation error creating notification: {}", e.getMessage());
-      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-    } catch (Exception e) {
-      logger.error("Unexpected error creating notification: {}", e.getMessage(), e);
-      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
-    }
-  }
 
   @PutMapping("/{notificationId}/read")
   public ResponseEntity<?> markNotificationAsRead(@PathVariable Long notificationId) {

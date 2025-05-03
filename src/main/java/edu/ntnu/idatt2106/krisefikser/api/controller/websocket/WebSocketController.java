@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @Controller
 public class WebSocketController {
+  private static final org.slf4j.Logger logger =
+      org.slf4j.LoggerFactory.getLogger(WebSocketController.class);
 
     private final NotificationService notificationService;
 

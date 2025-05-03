@@ -16,6 +16,7 @@ import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,9 +111,11 @@ public class HouseholdService {
     NotificationDto notification = new NotificationDto();
     notification.setMessage("Household created successfully");
     notification.setType(NotificationType.HOUSEHOLD);
+    notification.setRecipientId(household.getOwner().getId());
+    notification.setTimestamp(LocalDateTime.now());
     notification.setRead(false);
 
-    notificationService.saveHouseholdNotification(notification, household.getId());
+    notificationService.saveNotification(notification);
     notificationService.sendPrivateNotification(household.getOwner().getId(), notification);
   }
 
@@ -194,11 +197,15 @@ public class HouseholdService {
     }
 
     if (user.getHousehold().getOwner().getId().equals(user.getId())) {
-      logger.warn("User {} is the owner and cannot leave the household without transferring ownership", user.getFullName());
-      throw new IllegalArgumentException("Owner cannot leave the household. Transfer ownership first.");
+      logger.warn(
+          "User {} is the owner and cannot leave the household without transferring ownership",
+          user.getFullName());
+      throw new IllegalArgumentException(
+          "Owner cannot leave the household. Transfer ownership first.");
     }
 
-    logger.info("User {} is leaving household with ID {}", user.getFullName(), user.getHousehold().getId());
+    logger.info("User {} is leaving household with ID {}", user.getFullName(),
+        user.getHousehold().getId());
 
     householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
         user.getHousehold().getNumberOfMembers() - 1);
