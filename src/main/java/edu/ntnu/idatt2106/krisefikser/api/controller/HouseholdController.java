@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.DeleteHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
@@ -14,11 +15,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -182,13 +185,15 @@ public class HouseholdController {
   public ResponseEntity<String> deleteHousehold(@RequestBody DeleteHouseholdRequestDto request) {
     try {
       householdService.deleteHousehold(request.getHouseholdId(), request.getOwnerId());
-      LOGGER.info("Household deleted successfully: householdId={}, ownerId={}", request.getHouseholdId(), request.getOwnerId());
+      LOGGER.info("Household deleted successfully: householdId={}, ownerId={}",
+          request.getHouseholdId(), request.getOwnerId());
       return ResponseEntity.ok("Household deleted successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during household deletion: {}", e.getMessage());
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
-      LOGGER.error("Unexpected error during household deletion: householdId={}, ownerId={}, message={}",
+      LOGGER.error(
+          "Unexpected error during household deletion: householdId={}, ownerId={}, message={}",
           request.getHouseholdId(), request.getOwnerId(), e.getMessage(), e);
       return ResponseEntity.status(500).body("Internal server error");
     }
@@ -340,6 +345,26 @@ public class HouseholdController {
     } catch (Exception e) {
       LOGGER.error("Unexpected error during household search: {}", e.getMessage(), e);
       return ResponseEntity.status(500).body("Internal server error");
+    }
+  }
+
+  /**
+   * Gets the position of all the users in the household.
+   *
+   * @return the household positions
+   */
+  @GetMapping("/positions")
+  public ResponseEntity<?> getHouseholdPositions() {
+    try {
+      List<PositionDto> positions = householdService.getHouseholdPositions();
+      LOGGER.info("Household positions retrieved successfully: {}", positions);
+      return ResponseEntity.ok(positions);
+    } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during household position retrieval: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      LOGGER.error("Unexpected error during household position retrieval: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
 
