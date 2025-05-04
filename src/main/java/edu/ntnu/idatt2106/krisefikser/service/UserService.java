@@ -6,6 +6,7 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -100,6 +101,9 @@ public class UserService {
   public void updatePosition(PositionDto position) {
     User user = userRepository.getUsersById(position.getUserId())
         .orElseThrow(() -> new IllegalArgumentException("No user found"));
+
+    user.setLongitude(position.getLongitude());
+    user.setLatitude(position.getLatitude());
 
     userRepository.save(user);
     notificationService.sendHouseholdPositionUpdate(user.getHousehold().getId(), position);
