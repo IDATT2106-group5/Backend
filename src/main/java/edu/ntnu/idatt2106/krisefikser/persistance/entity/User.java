@@ -53,6 +53,15 @@ public class User {
   @Column(name = "token_expiry")
   private Date tokenExpiry;
 
+  @Column(name = "address")
+  private String address;
+
+  @Column(name = "longitude")
+  private String longitude;
+
+  @Column(name = "latitude")
+  private String latitude;
+
 
   /**
    * Instantiates a new User.
@@ -63,15 +72,17 @@ public class User {
   /**
    * Instantiates a new User.
    *
-   * @param email     the email
-   * @param password  the password
-   * @param fullName  the full name
-   * @param role      the role
-   * @param household the household
-   * @param tlf       the tlf
+   * @param email       the email
+   * @param password    the password
+   * @param fullName    the full name
+   * @param role        the role
+   * @param household   the household
+   * @param tlf         the tlf
+   * @param confirmed   the confirmed
+   * @param tokenExpiry the token expiry
    */
   public User(String email, String password, String fullName, Role role, Household household,
-      String tlf, boolean confirmed, Date tokenExpiry) {
+              String tlf, boolean confirmed, Date tokenExpiry) {
     this.email = email;
     this.password = password;
     this.fullName = fullName;
@@ -98,6 +109,60 @@ public class User {
    */
   public void setId(Long id) {
     this.id = id;
+  }
+
+  /**
+   * Gets latitude.
+   *
+   * @return the latitude
+   */
+  public String getLatitude() {
+    return latitude;
+  }
+
+  /**
+   * Sets latitude.
+   *
+   * @param latitude the latitude
+   */
+  public void setLatitude(String latitude) {
+    this.latitude = latitude;
+  }
+
+  /**
+   * Gets longitude.
+   *
+   * @return the longitude
+   */
+  public String getLongitude() {
+    return longitude;
+  }
+
+  /**
+   * Sets longitude.
+   *
+   * @param longitude the longitude
+   */
+  public void setLongitude(String longitude) {
+    this.longitude = longitude;
+  }
+
+  /**
+   * Gets address.
+   *
+   * @return the address
+   */
+  public String getAddress() {
+    return address;
+  }
+
+  /**
+   * Sets address.
+   *
+   * @param address the address
+   */
+  public void setAddress(String address) {
+    this.address = address;
   }
 
   /**
