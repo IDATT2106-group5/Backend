@@ -51,10 +51,15 @@ public class AdminInvitationService {
     // Generate unique token
     String token = UUID.randomUUID().toString();
 
+    // Generate a random placeholder password
+    String randomPlaceholder = UUID.randomUUID().toString() + UUID.randomUUID().toString();
+    String encodedPlaceholder = passwordEncoder.encode(randomPlaceholder);
+
     // Create admin user with token
     User adminUser = new User();
     adminUser.setEmail(email);
     adminUser.setFullName(fullName);
+    adminUser.setPassword(encodedPlaceholder);
     adminUser.setRole(Role.ADMIN);
     adminUser.setConfirmationToken(token);
     adminUser.setConfirmed(false);
@@ -70,7 +75,7 @@ public class AdminInvitationService {
     // Send invitation email
     // At the moment, this is hardcoded, and should be switched out with the frontend URL
     // when the frontend is ready.
-    String invitationLink = "http://yourapp.com/admin/setup?token=" + token;
+    String invitationLink = "http://localhost:5173/admin-registration?email=" + email + "&token=" + token;
     emailService.sendAdminInvitation(email, invitationLink);
   }
 
