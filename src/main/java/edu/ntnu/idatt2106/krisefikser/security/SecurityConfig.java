@@ -12,7 +12,6 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -70,19 +69,20 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers("/ws/**").permitAll()
-            .requestMatchers("/api/notifications/**").permitAll()
-            .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/admin/setup").permitAll()
-            .requestMatchers("/api/admin/login/2fa/**").permitAll()
-            .requestMatchers("/api/membership-requests/**").permitAll()
-            .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
-            .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
-            .requestMatchers("/api/user/**").permitAll()
-            .requestMatchers("/api/household/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/ws/**").permitAll()
+                .requestMatchers("/api/notifications/**").permitAll()
+                .requestMatchers("/api/scenarios/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/admin/setup").permitAll()
+                .requestMatchers("/api/admin/login/2fa/**").permitAll()
+                .requestMatchers("/api/membership-requests/**").permitAll()
+                .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
+                .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
+                .requestMatchers("/api/user/**").permitAll()
+                .requestMatchers("/api/household/**").permitAll()
 //            .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
-            .anyRequest().authenticated()
+                .anyRequest().authenticated()
         )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
