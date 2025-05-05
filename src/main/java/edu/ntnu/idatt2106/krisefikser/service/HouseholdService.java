@@ -504,7 +504,7 @@ public class HouseholdService {
     List<User> users = userRepository.getUsersByHouseholdId(user.getHousehold().getId());
 
     return users.stream()
-        .map(u -> new PositionDto(u.getId(), u.getLatitude(), u.getLongitude()))
+        .map(u -> new PositionDto(u.getId(), u.getLongitude(), u.getLatitude()))
         .toList();
 
   }
