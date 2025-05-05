@@ -7,6 +7,9 @@ import edu.ntnu.idatt2106.krisefikser.persistance.repository.ItemRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ItemService {
@@ -60,5 +63,17 @@ public class ItemService {
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException("Invalid item type: " + itemType);
     }
+  }
+  public Page<ItemResponseDto> getPaginatedItems(int page, int size, String search) {
+    Pageable pageable = PageRequest.of(page, size);
+
+    Page<Item> items;
+    if (search != null && !search.isEmpty()) {
+      items = itemRepository.findByNameContainingIgnoreCase(search, pageable);
+    } else {
+      items = itemRepository.findAll(pageable);
+    }
+
+    return items.map(this::mapToDto);
   }
 }
