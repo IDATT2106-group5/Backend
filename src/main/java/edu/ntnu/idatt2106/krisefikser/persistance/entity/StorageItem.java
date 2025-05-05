@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
  */
 
 @Entity
-@Table(name = "storage_item")
+@Table(name = "storage")
 public class StorageItem {
 
   @Id
@@ -36,7 +36,7 @@ public class StorageItem {
   @Column(nullable = false)
   private Integer amount;
 
-  @Column(name = "expiration_date")
+//  @Column(name = "expiration_date")
   private LocalDateTime expirationDate;
 
   @Column(name = "date_added", nullable = false)
