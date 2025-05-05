@@ -53,6 +53,12 @@ public class User {
   @Column(name = "token_expiry")
   private Date tokenExpiry;
 
+  @Column(name = "reset_password_token")
+  private String resetPasswordToken;
+
+  @Column(name = "reset_password_token_expiration")
+  private Date resetPasswordTokenExpiration;
+
 
   /**
    * Instantiates a new User.
@@ -260,5 +266,41 @@ public class User {
    */
   public void setTokenExpiry(Date tokenExpiry) {
     this.tokenExpiry = tokenExpiry;
+  }
+
+  /**
+   * Gets reset password token.
+   *
+   * @return the reset password token
+   */
+  public String getResetPasswordToken() {
+    return resetPasswordToken;
+  }
+
+  /**
+   * Sets reset password token.
+   *
+   * @param resetPasswordToken the reset password token
+   */
+  public void setResetPasswordToken(String resetPasswordToken) {
+    this.resetPasswordToken = resetPasswordToken;
+  }
+
+  /**
+   * Gets reset password token expiration.
+   *
+   * @return the reset password token expiration
+   */
+  public Date getResetPasswordTokenExpiration() {
+    return resetPasswordTokenExpiration;
+  }
+
+  /**
+   * Sets reset password token expiration.
+   *
+   * @param resetPasswordTokenExpiration the reset password token expiration
+   */
+  public void setResetPasswordTokenExpiration(Date resetPasswordTokenExpiration) {
+    this.resetPasswordTokenExpiration = resetPasswordTokenExpiration;
   }
 }
