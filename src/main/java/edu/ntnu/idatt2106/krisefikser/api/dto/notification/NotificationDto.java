@@ -8,16 +8,26 @@ public class NotificationDto {
   private Long recipientId;
   private LocalDateTime timestamp;
   private boolean read;
+  private String message;
 
   public NotificationDto(NotificationType type, Long recipientId, LocalDateTime timestamp,
-                         boolean read) {
+                         boolean read, String message) {
     this.type = type;
     this.recipientId = recipientId;
     this.timestamp = timestamp;
     this.read = read;
+    this.message = message;
   }
 
   public NotificationDto() {
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
   }
 
   public NotificationType getType() {
