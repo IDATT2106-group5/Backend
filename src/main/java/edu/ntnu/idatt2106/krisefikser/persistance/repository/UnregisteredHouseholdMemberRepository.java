@@ -2,8 +2,8 @@ package edu.ntnu.idatt2106.krisefikser.persistance.repository;
 
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.UnregisteredHouseholdMember;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,8 +21,10 @@ public interface UnregisteredHouseholdMemberRepository
    * @return an Optional containing the UnregisteredMember if found
    */
   Optional<UnregisteredHouseholdMember> findByFullNameAndHouseholdId(String fullName,
-                                                                     Long householdId);
+      Long householdId);
+
   Optional<UnregisteredHouseholdMember> findById(Long id);
 
-  List<UnregisteredHouseholdMember> findUnregisteredHouseholdMembersByHousehold(Household household);
+  List<UnregisteredHouseholdMember>
+  findUnregisteredHouseholdMembersByHousehold(Household household);
 }

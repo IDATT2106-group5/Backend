@@ -20,7 +20,12 @@ public interface MembershipRequestRepository extends JpaRepository<MembershipReq
   @Query("UPDATE MembershipRequest m SET m.status = :status WHERE m.id = :id")
   void updateStatusById(Long id, RequestStatus status);
 
-  List<MembershipRequest> findAllByReceiverAndTypeAndStatus(User receiver, RequestType type, RequestStatus status);
-  List<MembershipRequest> findAllBySenderAndTypeAndStatus(User receiver, RequestType type, RequestStatus status);
-  List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatus(Long householdId, RequestType type, RequestStatus status);
+  List<MembershipRequest> findAllByReceiverAndTypeAndStatus(User receiver,
+      RequestType type, RequestStatus status);
+
+  List<MembershipRequest> findAllBySenderAndTypeAndStatus(User receiver,
+      RequestType type, RequestStatus status);
+
+  List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatus(Long householdId,
+      RequestType type, RequestStatus status);
 }
