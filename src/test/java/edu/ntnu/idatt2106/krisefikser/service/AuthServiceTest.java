@@ -13,9 +13,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+<<<<<<< HEAD
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.RegisterRequestDto;
+=======
+import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.*;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
+>>>>>>> c40adcbabf90915b7f51b244998fd1efd2fe69c2
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;

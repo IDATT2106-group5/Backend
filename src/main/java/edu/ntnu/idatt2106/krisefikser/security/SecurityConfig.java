@@ -1,12 +1,20 @@
 package edu.ntnu.idatt2106.krisefikser.security;
 
 import edu.ntnu.idatt2106.krisefikser.service.CustomUserDetailsService;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +30,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author Snake727
  */
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
   private final JwtAuthenticationEntryPoint jwtAuthEntryPoint;
@@ -61,12 +70,16 @@ public class SecurityConfig {
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/ws/**").permitAll()
+            .requestMatchers("/api/notifications/**").permitAll()
             .requestMatchers("/api/auth/**").permitAll()
             .requestMatchers("/api/admin/setup").permitAll()
             .requestMatchers("/api/admin/login/2fa/**").permitAll()
             .requestMatchers("/api/membership-requests/**").permitAll()
             .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
             .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
+            .requestMatchers("/api/user/**").permitAll()
             .requestMatchers("/api/household/**")
             .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
             .anyRequest().authenticated()
@@ -99,5 +112,21 @@ public class SecurityConfig {
   public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
       throws Exception {
     return authConfig.getAuthenticationManager();
+  }
+
+  @Bean
+  public RoleHierarchy roleHierarchy() {
+    Map<String, Set<String>> roleHierarchyMap = new HashMap<>();
+
+    // Add ADMIN authorities to SUPERADMIN
+    String adminRole = "ROLE_ADMIN";
+    String superAdminRole = "ROLE_SUPERADMIN";
+
+    roleHierarchyMap.put(
+        superAdminRole,
+        Collections.singleton(adminRole)
+    );
+
+    return new MapBasedRoleHierarchy(roleHierarchyMap);
   }
 }
