@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -132,5 +133,25 @@ public class AdminInvitationService {
         && password.matches(".*[a-z].*")
         && password.matches(".*[0-9].*")
         && password.matches(".*[@#$%^&+=!].*");
+  }
+
+  /**
+   * Deletes an admin user by their ID. Only users with ADMIN role can be deleted with this method.
+   *
+   * @param adminId The ID of the admin user to delete
+   * @throws IllegalArgumentException if the user doesn't exist or isn't an admin
+   */
+  @Transactional
+  public void deleteAdmin(Long adminId) {
+    User admin = userRepository.findById(adminId)
+        .orElseThrow(() -> new IllegalArgumentException("Admin user not found"));
+
+    // Check if user is actually an admin
+    if (admin.getRole() != Role.ADMIN) {
+      throw new IllegalArgumentException("User is not an admin");
+    }
+
+    // Delete the admin user
+    userRepository.delete(admin);
   }
 }
