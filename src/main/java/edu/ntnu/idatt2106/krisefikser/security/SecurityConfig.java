@@ -12,7 +12,6 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -114,6 +113,12 @@ public class SecurityConfig {
     return authConfig.getAuthenticationManager();
   }
 
+  /**
+   * Configures the role hierarchy for the application. This allows for defining roles that inherit
+   * permissions from other roles.
+   *
+   * @return The configured RoleHierarchy.
+   */
   @Bean
   public RoleHierarchy roleHierarchy() {
     Map<String, Set<String>> roleHierarchyMap = new HashMap<>();
