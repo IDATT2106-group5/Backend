@@ -2,6 +2,7 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.MapIconType;
 import edu.ntnu.idatt2106.krisefikser.service.MapIconService;
 import java.util.List;
 import java.util.Map;
@@ -115,6 +116,32 @@ public class MapIconController {
     } catch (Exception e) {
       logger.error("Error retrieving map icons: {}", e.getMessage(), e);
       return ResponseEntity.status(500).build();
+    }
+  }
+
+  /**
+   * Finds the closest map icon of a specified type from a given location.
+   *
+   * @param latitude  the user's current latitude
+   * @param longitude the user's current longitude
+   * @param type      the type of map icon to find (optional - if not provided, finds closest of any
+   *                  type)
+   * @return ResponseEntity containing the closest map icon or an appropriate error response
+   */
+  @GetMapping("/closest")
+  public ResponseEntity<?> findClosestMapIcon(
+      @RequestParam double latitude,
+      @RequestParam double longitude,
+      @RequestParam(required = false) MapIconType type) {
+    try {
+      MapIconResponseDto closest = mapIconService.findClosestMapIcon(latitude, longitude, type);
+      if (closest == null) {
+        return ResponseEntity.notFound().build();
+      }
+      return ResponseEntity.ok(closest);
+    } catch (Exception e) {
+      logger.error("Error finding closest map icon: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
 }
