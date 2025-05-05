@@ -229,6 +229,12 @@ public class MembershipRequestService {
     ).toList();
   }
 
+  /**
+   * Get accepted join requests by householdID.
+   *
+   * @param householdId The household id.
+   * @return The accepted join requests by household.
+   */
   public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold(
       Long householdId) {
     List<MembershipRequest> requests =

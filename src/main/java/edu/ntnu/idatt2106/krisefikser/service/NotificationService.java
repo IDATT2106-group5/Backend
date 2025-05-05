@@ -2,7 +2,8 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.CreateNotificationRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;import edu.ntnu.idatt2106.krisefikser.persistance.entity.Notification;
+import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Notification;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.NotificationRepository;
@@ -15,8 +16,10 @@ import org.springframework.stereotype.Service;
 /**
  * The type Notification service.
  */
+
 @Service
 public class NotificationService {
+
   private final SimpMessagingTemplate messagingTemplate;
 
   private final NotificationRepository notificationRepository;
@@ -32,8 +35,8 @@ public class NotificationService {
    * @param userRepository         the user repository
    */
   public NotificationService(SimpMessagingTemplate messagingTemplate,
-                             NotificationRepository notificationRepository,
-                             UserRepository userRepository) {
+      NotificationRepository notificationRepository,
+      UserRepository userRepository) {
     this.messagingTemplate = messagingTemplate;
     this.notificationRepository = notificationRepository;
     this.userRepository = userRepository;
@@ -60,16 +63,6 @@ public class NotificationService {
    */
   public void broadcastNotification(NotificationDto notification) {
     messagingTemplate.convertAndSend("/topic/notifications", notification);
-  }
-
-  /**
-   * Send household notification.
-   *
-   * @param householdId  the household id
-   * @param notification the notification
-   */
-  public void sendHouseholdNotification(String householdId, NotificationDto notification) {
-    messagingTemplate.convertAndSend("/topic/household/" + householdId, notification);
   }
 
   /**
@@ -112,10 +105,28 @@ public class NotificationService {
     });
   }
 
+  /**
+   * Send household notification.
+   *
+   * @param householdId  the household id
+   * @param notification the notification
+   */
+  public void sendHouseholdNotification(String householdId, NotificationDto notification) {
+    messagingTemplate.convertAndSend("/topic/household/" + householdId, notification);
+  }
+
+  /**
+   * Get user notifications.
+   *
+   * @param userId The user id.
+   * @return The list of notifications.
+   */
+
   public List<NotificationResponseDto> getUserNotifications(Long userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    List<Notification> notifications = notificationRepository.findAllByUserIdOrderByTimestampDesc(userId);
+    List<Notification> notifications = notificationRepository.findAllByUserIdOrderByTimestampDesc(
+        userId);
     return notifications.stream()
         .map(notification -> new NotificationResponseDto(
             notification.getId(),
@@ -126,7 +137,14 @@ public class NotificationService {
         .toList();
   }
 
-  public void saveNotification(CreateNotificationRequestDto notificationRequest, NotificationType type) {
+  /**
+   * Save notification.
+   *
+   * @param notificationRequest The notification request.
+   * @param type                The notification type.
+   */
+  public void saveNotification(CreateNotificationRequestDto notificationRequest,
+      NotificationType type) {
     Notification notification = new Notification();
     notification.setType(type);
     notification.setIsRead(false);

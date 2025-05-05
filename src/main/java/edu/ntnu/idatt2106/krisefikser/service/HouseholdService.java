@@ -24,9 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Service class for managing household-related operations.
- * This service handles the creation, management, and modification of households,
- * including validation and persistence operations.
+ * Service class for managing household-related operations. This service handles the creation,
+ * management, and modification of households, including validation and persistence operations.
  */
 @Service
 public class HouseholdService {
@@ -56,19 +55,20 @@ public class HouseholdService {
    *
    * @param householdRepository                   Repository for household operations.
    * @param userRepository                        Repository for user operations.
-   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member operations.
+   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member
+   *                                              operations.
    */
   public HouseholdService(HouseholdRepository householdRepository,
-                          UserRepository userRepository,
-                          UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
+      UserRepository userRepository,
+      UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
     this.householdRepository = householdRepository;
     this.userRepository = userRepository;
     this.unregisteredHouseholdMemberRepository = unregisteredHouseholdMemberRepository;
   }
 
   /**
-   * Creates a new household with the given name, address, and creator's user ID.
-   * The creator automatically becomes the owner of the household.
+   * Creates a new household with the given name, address, and creator's user ID. The creator
+   * automatically becomes the owner of the household.
    *
    * @param request DTO containing household name, address, and owner ID.
    * @throws IllegalArgumentException if a household with the same name already exists.
@@ -157,8 +157,10 @@ public class HouseholdService {
    * `UnregisteredHouseholdMember` entity, associates it with the household, and updates the
    * household's number of members.
    *
-   * @param request The DTO containing the full name of the unregistered member and the ID of the household to which the member should be added.
-   * @throws IllegalArgumentException if the unregistered member already exists in the specified household or if the household is not found.
+   * @param request The DTO containing the full name of the unregistered member and the ID of the
+   *                household to which the member should be added.
+   * @throws IllegalArgumentException if the unregistered member already exists in the specified
+   *                                  household or if the household is not found.
    */
   public void addUnregisteredMemberToHousehold(
       UnregisteredMemberHouseholdAssignmentRequestDto request) {
@@ -257,7 +259,8 @@ public class HouseholdService {
   /**
    * Edits an unregistered member in a household.
    *
-   * @param request The request containing the full name of the unregistered member and the new full name.
+   * @param request The request containing the full name of the unregistered member and the new full
+   *                name.
    */
   public void editUnregisteredMemberInHousehold(EditMemberDto request) {
     UnregisteredHouseholdMember member = unregisteredHouseholdMemberRepository
@@ -295,6 +298,11 @@ public class HouseholdService {
     logger.info("Household owner changed to {}", newOwner.getFullName());
   }
 
+  /**
+   * Edits a household's details.
+   *
+   * @param request The request containing the household ID and new details.
+   */
   public void editHousehold(EditHouseholdRequestDto request) {
     Household household = householdRepository.findById(request.getHouseholdId())
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
@@ -310,7 +318,7 @@ public class HouseholdService {
   /**
    * Gets a household by its ID.
    *
-   * @param householdId
+   * @param householdId The ID of the household to retrieve.
    * @return HouseholdResponseDto containing household details.
    */
 

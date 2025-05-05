@@ -10,6 +10,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class for managing map icons. This includes creating, updating, deleting, and retrieving
+ * map icons.
+ */
+
 @Service
 public class MapIconService {
 
@@ -117,14 +122,14 @@ public class MapIconService {
    */
   private boolean isWithinRadius(double lat1, double lon1, double lat2, double lon2,
       double radiusKm) {
-    final int EARTH_RADIUS_KM = 6371;
-    double dLat = Math.toRadians(lat2 - lat1);
-    double dLon = Math.toRadians(lon2 - lon1);
-    double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+    final int earthRadiusKm = 6371;
+    double dlat = Math.toRadians(lat2 - lat1);
+    double dlon = Math.toRadians(lon2 - lon1);
+    double a = Math.sin(dlat / 2) * Math.sin(dlat / 2)
         + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-        * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        * Math.sin(dlon / 2) * Math.sin(dlon / 2);
     double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return (EARTH_RADIUS_KM * c) <= radiusKm;
+    return (earthRadiusKm * c) <= radiusKm;
   }
 
   /**

@@ -58,6 +58,12 @@ public class IncidentService {
     logger.info("Incident created successfully: {}", incident.getName());
   }
 
+  /**
+   * Updates an existing incident.
+   *
+   * @param id      The ID of the incident to update.
+   * @param request The request containing the updated details for the incident.
+   */
   public void updateIncident(Long id, IncidentRequestDto request) {
     Incident incident = incidentRepository.findById(id)
         .orElseThrow(() -> {
@@ -91,6 +97,11 @@ public class IncidentService {
     logger.info("Incident with ID {} updated successfully", id);
   }
 
+  /**
+   * Deletes an incident by its ID.
+   *
+   * @param id The ID of the incident to delete.
+   */
   public void deleteIncident(Long id) {
     if (!incidentRepository.existsById(id)) {
       logger.error("Incident not found with ID: {}", id);
@@ -101,6 +112,11 @@ public class IncidentService {
     logger.info("Incident with ID {} deleted successfully", id);
   }
 
+  /**
+   * Fetches all incidents.
+   *
+   * @return A list of all incidents.
+   */
   public List<IncidentResponseDto> getAllIncidents() {
     logger.info("Fetching all incidents");
     return incidentRepository.findAll()

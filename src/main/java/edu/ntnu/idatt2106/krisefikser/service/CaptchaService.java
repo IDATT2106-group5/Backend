@@ -10,26 +10,36 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Service class for verifying hCaptcha tokens.
+ */
+
 @Service
 public class CaptchaService {
 
   private static final String VERIFY_URL = "https://hcaptcha.com/siteverify";
   private final RestTemplate restTemplate;
   @Value("${hcaptcha.secret}")
-  private String hCaptchaSecret;
+  private String hcaptchasecret;
 
   @Autowired
   public CaptchaService(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
   }
 
+  /**
+   * Verifies the hCaptcha token by sending a request to the hCaptcha verification endpoint.
+   *
+   * @param token The hCaptcha token to verify.
+   * @return true if the token is valid, false otherwise.
+   */
   public boolean verifyToken(String token) {
     if (token == null || token.isEmpty()) {
       return false;
     }
 
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-    params.add("secret", hCaptchaSecret);
+    params.add("secret", hcaptchasecret);
     params.add("response", token);
 
     try {
