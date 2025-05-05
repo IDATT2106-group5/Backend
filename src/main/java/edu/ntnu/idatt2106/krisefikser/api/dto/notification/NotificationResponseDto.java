@@ -9,14 +9,16 @@ public class NotificationResponseDto {
   private Long recipientId;
   private LocalDateTime timestamp;
   private boolean read;
+  private String message;
 
-  public NotificationResponseDto(Long id, NotificationType type, Long recipientId, LocalDateTime timestamp,
-                         boolean read) {
+  public NotificationResponseDto(Long id, NotificationType type, Long recipientId,
+                                 LocalDateTime timestamp, String message, boolean read) {
     this.type = type;
     this.recipientId = recipientId;
     this.timestamp = timestamp;
     this.read = read;
     this.id = id;
+    this.message = message;
   }
 
   public NotificationResponseDto() {
@@ -25,11 +27,24 @@ public class NotificationResponseDto {
   public NotificationType getType() {
     return type;
   }
-public Long getId() {
-  return id;
-}public void setId(Long id) {
-  this.id = id;
-}public void setType(NotificationType type) {
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setType(NotificationType type) {
     this.type = type;
   }
 

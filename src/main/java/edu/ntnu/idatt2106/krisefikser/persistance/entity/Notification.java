@@ -42,8 +42,20 @@ public class Notification {
   private NotificationType type;
 
 
-  @Column(name = "is_read") // This provides a custom column name
-  private Boolean isRead; // Renamed from 'read'
+  @Column(name = "is_read")
+  private Boolean isRead;
+
+  @Column(name = "message")
+  private String message;
+
+
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
 
   // Update getters and setters
   public Boolean getIsRead() {
