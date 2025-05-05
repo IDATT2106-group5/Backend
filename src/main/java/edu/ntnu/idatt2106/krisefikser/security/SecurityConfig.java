@@ -77,6 +77,7 @@ public class SecurityConfig {
             .requestMatchers("/api/admin/setup").permitAll()
             .requestMatchers("/api/admin/login/2fa/**").permitAll()
             .requestMatchers("/api/membership-requests/**").permitAll()
+            .requestMatchers("/api/incidents/**").permitAll()
             .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
             .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
             .requestMatchers("/api/user/**").permitAll()
