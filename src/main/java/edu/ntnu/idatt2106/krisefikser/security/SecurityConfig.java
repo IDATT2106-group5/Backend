@@ -12,6 +12,7 @@ import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -64,6 +65,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
+        .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
         .sessionManagement(
@@ -77,6 +79,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/setup").permitAll()
                 .requestMatchers("/api/admin/login/2fa/**").permitAll()
                 .requestMatchers("/api/membership-requests/**").permitAll()
+                .requestMatchers("/api/incidents/**").permitAll()
+                .requestMatchers("/api/map-icons/**").permitAll()
                 .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
                 .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
                 .requestMatchers("/api/user/**").permitAll()
