@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.MapIcon;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.MapIconType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.MapIconRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -145,5 +146,69 @@ public class MapIconService {
             || (icon.getAddress() != null && icon.getAddress().toLowerCase().contains(lowerQuery))
             || (icon.getContactInfo() != null && icon.getContactInfo().toLowerCase()
             .contains(lowerQuery));
+  }
+
+  /**
+   * Finds the closest map icon of a specific type from a given location.
+   *
+   * @param latitude  the latitude of the user's location
+   * @param longitude the longitude of the user's location
+   * @param type      the type of map icon to find (null for any type)
+   * @return the closest map icon or null if none found
+   */
+  public MapIconResponseDto findClosestMapIcon(double latitude, double longitude,
+      MapIconType type) {
+    List<MapIcon> allIcons;
+
+    // If type is provided, filter by type, otherwise get all icons
+    if (type != null) {
+      allIcons = mapIconRepository.findByType(type);
+    } else {
+      allIcons = mapIconRepository.findAll();
+    }
+
+    if (allIcons.isEmpty()) {
+      return null;
+    }
+
+    // Find the closest icon
+    MapIcon closest = null;
+    double minDistance = Double.MAX_VALUE;
+
+    for (MapIcon icon : allIcons) {
+      if (icon.getLatitude() != null && icon.getLongitude() != null) {
+        double distance = calculateDistance(
+            latitude, longitude,
+            icon.getLatitude(), icon.getLongitude()
+        );
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closest = icon;
+        }
+      }
+    }
+
+    return closest != null ? MapIconResponseDto.fromEntity(closest) : null;
+  }
+
+  /**
+   * Calculates the distance between two geographical points using the Haversine formula.
+   *
+   * @param lat1 the latitude of the first point
+   * @param lon1 the longitude of the first point
+   * @param lat2 the latitude of the second point
+   * @param lon2 the longitude of the second point
+   * @return the distance in kilometers
+   */
+  public double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    final int EARTH_RADIUS_KM = 6371;
+    double dLat = Math.toRadians(lat2 - lat1);
+    double dLon = Math.toRadians(lon2 - lon1);
+    double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+        + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+        * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return EARTH_RADIUS_KM * c;
   }
 }
