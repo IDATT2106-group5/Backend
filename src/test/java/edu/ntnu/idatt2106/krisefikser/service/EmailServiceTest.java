@@ -138,4 +138,19 @@ class EmailServiceTest {
     EmailService service = new EmailService(mailSender);
     assertNotNull(service);
   }
+
+  @Test
+  void sendPasswordResetEmail_shouldCreateAndSendEmail() {
+    // Arrange
+    String email = "test@example.com";
+    String token = "reset-token-123";
+
+    // Act
+    emailService.sendPasswordResetEmail(email, token);
+
+    // Assert
+    verify(mailSender).createMimeMessage();
+    verify(mailSender).send(mimeMessageCaptor.capture());
+    assertEquals(mimeMessage, mimeMessageCaptor.getValue());
+  }
 }
