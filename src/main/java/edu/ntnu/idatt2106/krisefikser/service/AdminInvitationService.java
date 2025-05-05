@@ -1,11 +1,14 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -132,5 +135,26 @@ public class AdminInvitationService {
         && password.matches(".*[a-z].*")
         && password.matches(".*[0-9].*")
         && password.matches(".*[@#$%^&+=!].*");
+  }
+
+  /**
+   * Gets all users with ADMIN role.
+   *
+   * @return List of admin users as DTOs
+   */
+  public List<UserResponseDto> getAllAdmins() {
+    List<User> adminUsers = userRepository.findAll().stream()
+        .filter(user -> user.getRole() == Role.ADMIN)
+        .toList();
+
+    return adminUsers.stream()
+        .map(admin -> new UserResponseDto(
+            admin.getId(),
+            admin.getEmail(),
+            admin.getFullName(),
+            admin.getTlf(),
+            admin.getRole()
+        ))
+        .collect(Collectors.toList());
   }
 }
