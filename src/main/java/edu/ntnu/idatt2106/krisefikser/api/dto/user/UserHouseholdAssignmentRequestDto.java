@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.user;
 
 /**
  * Data Transfer Object for the request to assign a user to a household. Contains the email of the
@@ -6,11 +6,11 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
  */
 public class UserHouseholdAssignmentRequestDto {
 
-  private String email;
+  private Long userId;
   private Long householdId;
 
-  public String getEmail() {
-    return email;
+  public Long getUserId() {
+    return userId;
   }
 
   public Long getHouseholdId() {

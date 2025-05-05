@@ -27,6 +27,8 @@ public interface HouseholdRepository extends JpaRepository<Household, Long> {
 
   Optional<Household> findByName(String name);
 
+  Optional<Household> getHouseholdById(Long id);
+
 
   boolean existsByName(String householdName);
 }
