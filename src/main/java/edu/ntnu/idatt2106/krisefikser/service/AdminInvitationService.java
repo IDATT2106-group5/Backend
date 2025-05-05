@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -50,10 +51,15 @@ public class AdminInvitationService {
     // Generate unique token
     String token = UUID.randomUUID().toString();
 
+    // Generate a random placeholder password
+    String randomPlaceholder = UUID.randomUUID().toString() + UUID.randomUUID().toString();
+    String encodedPlaceholder = passwordEncoder.encode(randomPlaceholder);
+
     // Create admin user with token
     User adminUser = new User();
     adminUser.setEmail(email);
     adminUser.setFullName(fullName);
+    adminUser.setPassword(encodedPlaceholder);
     adminUser.setRole(Role.ADMIN);
     adminUser.setConfirmationToken(token);
     adminUser.setConfirmed(false);
@@ -69,7 +75,7 @@ public class AdminInvitationService {
     // Send invitation email
     // At the moment, this is hardcoded, and should be switched out with the frontend URL
     // when the frontend is ready.
-    String invitationLink = "http://yourapp.com/admin/setup?token=" + token;
+    String invitationLink = "http://localhost:5173/admin-registration?email=" + email + "&token=" + token;
     emailService.sendAdminInvitation(email, invitationLink);
   }
 
@@ -132,5 +138,25 @@ public class AdminInvitationService {
         && password.matches(".*[a-z].*")
         && password.matches(".*[0-9].*")
         && password.matches(".*[@#$%^&+=!].*");
+  }
+
+  /**
+   * Deletes an admin user by their ID. Only users with ADMIN role can be deleted with this method.
+   *
+   * @param adminId The ID of the admin user to delete
+   * @throws IllegalArgumentException if the user doesn't exist or isn't an admin
+   */
+  @Transactional
+  public void deleteAdmin(Long adminId) {
+    User admin = userRepository.findById(adminId)
+        .orElseThrow(() -> new IllegalArgumentException("Admin user not found"));
+
+    // Check if user is actually an admin
+    if (admin.getRole() != Role.ADMIN) {
+      throw new IllegalArgumentException("User is not an admin");
+    }
+
+    // Delete the admin user
+    userRepository.delete(admin);
   }
 }

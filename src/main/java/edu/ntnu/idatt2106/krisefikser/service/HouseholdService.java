@@ -390,10 +390,24 @@ public class HouseholdService {
   }
 
   /**
+   * Searches for a household by its ID.
+   *
+   * @param householdId
+   * @return
+   */
+  public Long searchHouseholdById(Long householdId) {
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+    return household.getId();
+  }
+
+  /**
    * Edit household.
    *
    * @param request the request
    */
+
+
   public void editHousehold(EditHouseholdRequestDto request) {
     Household household = householdRepository.findById(request.getHouseholdId())
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));

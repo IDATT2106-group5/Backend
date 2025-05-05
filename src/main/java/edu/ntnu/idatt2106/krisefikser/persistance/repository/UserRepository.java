@@ -52,6 +52,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
   @Query("UPDATE User u SET u.household.id = :householdId WHERE u.id = :userId")
   void updateHouseholdId(@Param("userId") Long userId, @Param("householdId") Long householdId);
 
+  /**
+   * Find a user by their reset password token.
+   *
+   * @param token the reset password token to search for
+   * @return an Optional containing the User if found
+   */
+  Optional<User> findByResetPasswordToken(String token);
+
   List<User> getUsersByHousehold(Household household);
 
   Object findUsersByHousehold(Household household);

@@ -185,15 +185,13 @@ public class HouseholdController {
   public ResponseEntity<String> deleteHousehold(@RequestBody DeleteHouseholdRequestDto request) {
     try {
       householdService.deleteHousehold(request.getHouseholdId(), request.getOwnerId());
-      LOGGER.info("Household deleted successfully: householdId={}, ownerId={}",
-          request.getHouseholdId(), request.getOwnerId());
+      LOGGER.info("Household deleted successfully: householdId={}, ownerId={}", request.getHouseholdId(), request.getOwnerId());
       return ResponseEntity.ok("Household deleted successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during household deletion: {}", e.getMessage());
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
-      LOGGER.error(
-          "Unexpected error during household deletion: householdId={}, ownerId={}, message={}",
+      LOGGER.error("Unexpected error during household deletion: householdId={}, ownerId={}, message={}",
           request.getHouseholdId(), request.getOwnerId(), e.getMessage(), e);
       return ResponseEntity.status(500).body("Internal server error");
     }
@@ -330,21 +328,20 @@ public class HouseholdController {
    * @param request the request
    * @return the response entity
    */
-  @Operation(summary = "Search for a household by household id",
-      description = "Search for a household by household id")
+  @Operation(summary = "Search for a household by household id", description = "Search for a household by household id")
   @PostMapping("/search")
   public ResponseEntity<?> searchHouseholdById(
       @RequestBody Map<String, Long> request) {
     try {
-      HouseholdResponseDto household = householdService.getHousehold(request.get("householdId"));
-      LOGGER.info("Household found successfully: {}", household);
-      return ResponseEntity.ok(household);
+      Long foundId = householdService.searchHouseholdById(request.get("householdId"));
+      LOGGER.info("Household found with ID: {}", foundId);
+      return ResponseEntity.ok(Map.of("id", foundId));
     } catch (IllegalArgumentException e) {
-      LOGGER.warn("Validation error during household search: {}", e.getMessage());
-      return ResponseEntity.badRequest().body(e.getMessage());
+      LOGGER.warn("Household search failed: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      LOGGER.error("Unexpected error during household search: {}", e.getMessage(), e);
-      return ResponseEntity.status(500).body("Internal server error");
+      LOGGER.error("Unexpected error during household search", e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
 
