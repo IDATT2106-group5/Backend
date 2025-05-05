@@ -11,6 +11,9 @@ import edu.ntnu.idatt2106.krisefikser.service.TwoFactorService;
 import edu.ntnu.idatt2106.krisefikser.service.UserService;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,6 +38,7 @@ public class AdminController {
   private final TwoFactorService twoFactorService;
   private final AuthService authService;
   private final UserService userService;
+  private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
   /**
    * Constructor for AdminController.
@@ -69,6 +73,7 @@ public class AdminController {
   @PreAuthorize("isAnonymous()")  // This allows only unauthenticated users
   public ResponseEntity<?> setupAdmin(@RequestBody AdminSetupRequest request) {
     try {
+      logger.info("Setup admin request from frontend: {}", request.getToken());
       adminInvitationService.completeAdminSetup(request.getToken(), request.getPassword());
       return ResponseEntity.ok(Map.of("message", "Admin account setup completed"));
     } catch (IllegalArgumentException e) {
