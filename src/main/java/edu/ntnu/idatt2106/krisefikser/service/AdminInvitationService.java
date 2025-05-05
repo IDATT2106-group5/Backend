@@ -1,14 +1,12 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -138,23 +136,22 @@ public class AdminInvitationService {
   }
 
   /**
-   * Gets all users with ADMIN role.
+   * Deletes an admin user by their ID. Only users with ADMIN role can be deleted with this method.
    *
-   * @return List of admin users as DTOs
+   * @param adminId The ID of the admin user to delete
+   * @throws IllegalArgumentException if the user doesn't exist or isn't an admin
    */
-  public List<UserResponseDto> getAllAdmins() {
-    List<User> adminUsers = userRepository.findAll().stream()
-        .filter(user -> user.getRole() == Role.ADMIN)
-        .toList();
+  @Transactional
+  public void deleteAdmin(Long adminId) {
+    User admin = userRepository.findById(adminId)
+        .orElseThrow(() -> new IllegalArgumentException("Admin user not found"));
 
-    return adminUsers.stream()
-        .map(admin -> new UserResponseDto(
-            admin.getId(),
-            admin.getEmail(),
-            admin.getFullName(),
-            admin.getTlf(),
-            admin.getRole()
-        ))
-        .collect(Collectors.toList());
+    // Check if user is actually an admin
+    if (admin.getRole() != Role.ADMIN) {
+      throw new IllegalArgumentException("User is not an admin");
+    }
+
+    // Delete the admin user
+    userRepository.delete(admin);
   }
 }
