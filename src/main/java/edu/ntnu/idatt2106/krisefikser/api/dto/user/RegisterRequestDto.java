@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/edu/ntnu/idatt2106/krisefikser/api/dto/auth/RegisterRequestDto.java
-package edu.ntnu.idatt2106.krisefikser.api.dto.auth;
-========
 package edu.ntnu.idatt2106.krisefikser.api.dto.user;
->>>>>>>> c40adcbabf90915b7f51b244998fd1efd2fe69c2:src/main/java/edu/ntnu/idatt2106/krisefikser/api/dto/user/RegisterRequestDto.java
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -17,6 +13,22 @@ public class RegisterRequestDto {
   private String tlf;
   @JsonProperty("hCaptchaToken")
   private String hCaptchaToken;
+
+  /**
+   * Default constructor for RegisterRequestDto.
+   *
+   * @param fullName The full name of the user.
+   * @param email    The email address of the user.
+   * @param password The password for the user.
+   * @param tlf      The telephone number of the user.
+   */
+  public RegisterRequestDto(String fullName, String email, String password, String tlf) {
+    this.fullName = fullName;
+    this.email = email;
+    this.password = password;
+    this.tlf = tlf;
+
+  }
 
   /**
    * Gets a hCaptchaToken
@@ -34,22 +46,6 @@ public class RegisterRequestDto {
    */
   public void setHCaptchaToken(String hCaptchaToken) {
     this.hCaptchaToken = hCaptchaToken;
-  }
-
-  /**
-   * Default constructor for RegisterRequestDto.
-   *
-   * @param fullName The full name of the user.
-   * @param email    The email address of the user.
-   * @param password The password for the user.
-   * @param tlf      The telephone number of the user.
-   */
-  public RegisterRequestDto(String fullName, String email, String password, String tlf) {
-    this.fullName = fullName;
-    this.email = email;
-    this.password = password;
-    this.tlf = tlf;
-
   }
 
   /**

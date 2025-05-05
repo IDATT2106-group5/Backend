@@ -1,16 +1,9 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.PasswordResetRequestDto;
-<<<<<<< HEAD
-import edu.ntnu.idatt2106.krisefikser.api.dto.auth.RegisterRequestDto;
-=======
-import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
->>>>>>> c40adcbabf90915b7f51b244998fd1efd2fe69c2
 import edu.ntnu.idatt2106.krisefikser.service.AuthService;
 import java.util.Map;
 import org.slf4j.Logger;

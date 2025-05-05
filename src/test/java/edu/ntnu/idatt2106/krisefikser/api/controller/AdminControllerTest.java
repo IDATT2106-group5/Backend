@@ -9,17 +9,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import com.fasterxml.jackson.databind.ObjectMapper;
-<<<<<<< HEAD
-import edu.ntnu.idatt2106.krisefikser.api.dto.AdminInviteRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.AdminSetupRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
-import edu.ntnu.idatt2106.krisefikser.api.dto.TwoFactorVerifyRequest;
-=======
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.TwoFactorVerifyRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminSetupRequest;
->>>>>>> c40adcbabf90915b7f51b244998fd1efd2fe69c2
 import edu.ntnu.idatt2106.krisefikser.service.AdminInvitationService;
 import edu.ntnu.idatt2106.krisefikser.service.AuthService;
 import edu.ntnu.idatt2106.krisefikser.service.TwoFactorService;
