@@ -4,7 +4,10 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
+
   private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
   private final UserRepository userRepository;
@@ -63,5 +67,26 @@ public class UserService {
             household.getOwner().getFullName(),
             household.getOwner().getTlf(),
             household.getOwner().getRole()));
+  }
+
+  /**
+   * Gets all users with ADMIN role.
+   *
+   * @return List of admin users as DTOs
+   */
+  public List<UserResponseDto> getAllAdmins() {
+    List<User> adminUsers = userRepository.findAll().stream()
+        .filter(user -> user.getRole() == Role.ADMIN)
+        .toList();
+
+    return adminUsers.stream()
+        .map(admin -> new UserResponseDto(
+            admin.getId(),
+            admin.getEmail(),
+            admin.getFullName(),
+            admin.getTlf(),
+            admin.getRole()
+        ))
+        .collect(Collectors.toList());
   }
 }
