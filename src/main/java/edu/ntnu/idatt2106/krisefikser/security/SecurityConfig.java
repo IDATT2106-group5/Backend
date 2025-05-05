@@ -65,6 +65,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
+        .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
         .sessionManagement(
@@ -80,6 +81,7 @@ public class SecurityConfig {
             .requestMatchers("/api/admin/login/2fa/**").permitAll()
             .requestMatchers("/api/membership-requests/**").permitAll()
             .requestMatchers("/api/incidents/**").permitAll()
+            .requestMatchers("/api/map-icons/**").permitAll()
             .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
             .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
             .requestMatchers("/api/user/**").permitAll()
