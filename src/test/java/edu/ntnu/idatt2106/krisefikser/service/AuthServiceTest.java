@@ -13,10 +13,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
-import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
-import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.*;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
@@ -451,11 +451,7 @@ class AuthServiceTest {
       verifyNoInteractions(twoFactorService);
       verifyNoInteractions(tokenProvider);
     }
-  }
-
-  @Nested
-  class RegisterUserTests {
-
+    
     @Test
     void verify2Fa_shouldThrowException_whenUserNotAdmin() {
       // Arrange

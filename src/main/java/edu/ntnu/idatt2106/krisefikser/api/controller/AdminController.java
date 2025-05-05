@@ -10,6 +10,7 @@ import edu.ntnu.idatt2106.krisefikser.service.TwoFactorService;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/admin")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AdminController {
 
   private final AdminInvitationService adminInvitationService;
@@ -56,6 +58,7 @@ public class AdminController {
    * @return A response entity indicating the result of the operation.
    */
   @PostMapping("/setup")
+  @PreAuthorize("isAnonymous()")  // This allows only unauthenticated users
   public ResponseEntity<?> setupAdmin(@RequestBody AdminSetupRequest request) {
     try {
       adminInvitationService.completeAdminSetup(request.getToken(), request.getPassword());
