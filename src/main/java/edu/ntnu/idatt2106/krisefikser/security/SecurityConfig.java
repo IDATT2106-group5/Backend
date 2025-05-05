@@ -64,23 +64,27 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
+        .cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthEntryPoint))
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/api/notifications/**").permitAll()
-                .requestMatchers("/api/scenarios/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/admin/setup").permitAll()
-                .requestMatchers("/api/admin/login/2fa/**").permitAll()
-                .requestMatchers("/api/membership-requests/**").permitAll()
-                .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
-                .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
-                .requestMatchers("/api/user/**").permitAll()
-                .requestMatchers("/api/household/**").permitAll()
+        .authorizeHttpRequests(auth -> auth  
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers("/ws/**").permitAll()
+            .requestMatchers("/api/notifications/**").permitAll()
+            .requestMatchers("/api/scenarios/**").permitAll()
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/admin/setup").permitAll()
+            .requestMatchers("/api/admin/login/2fa/**").permitAll()
+            .requestMatchers("/api/membership-requests/**").permitAll()
+            .requestMatchers("/api/incidents/**").permitAll()
+            .requestMatchers("/api/map-icons/**").permitAll()
+            .requestMatchers("/api/admin/invite").hasAuthority("ROLE_SUPERADMIN")
+            .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
+            .requestMatchers("/api/user/**").permitAll()
+            .requestMatchers("/api/household/**").permitAll()
+
 //            .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
                 .anyRequest().authenticated()
         )
