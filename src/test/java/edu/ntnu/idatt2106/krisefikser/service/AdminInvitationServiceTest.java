@@ -267,4 +267,71 @@ class AdminInvitationServiceTest {
 
     assertTrue(exception.getMessage().contains("Password must be at least 8 characters"));
   }
+
+  @Test
+  void deleteAdmin_shouldDeleteAdminUser_whenUserIsAdmin() {
+    // Arrange
+    Long adminId = 1L;
+    User adminUser = new User();
+    adminUser.setId(adminId);
+    adminUser.setEmail("admin@example.com");
+    adminUser.setRole(Role.ADMIN);
+
+    when(userRepository.findById(adminId)).thenReturn(Optional.of(adminUser));
+
+    // Act
+    adminInvitationService.deleteAdmin(adminId);
+
+    // Assert
+    verify(userRepository).delete(adminUser);
+  }
+
+  @Test
+  void deleteAdmin_shouldThrowException_whenUserNotFound() {
+    // Arrange
+    Long adminId = 1L;
+    when(userRepository.findById(adminId)).thenReturn(Optional.empty());
+
+    // Act & Assert
+    Exception exception = assertThrows(IllegalArgumentException.class, () ->
+        adminInvitationService.deleteAdmin(adminId));
+
+    assertEquals("Admin user not found", exception.getMessage());
+  }
+
+  @Test
+  void deleteAdmin_shouldThrowException_whenUserIsNotAdmin() {
+    // Arrange
+    Long userId = 1L;
+    User normalUser = new User();
+    normalUser.setId(userId);
+    normalUser.setEmail("user@example.com");
+    normalUser.setRole(Role.USER);
+
+    when(userRepository.findById(userId)).thenReturn(Optional.of(normalUser));
+
+    // Act & Assert
+    Exception exception = assertThrows(IllegalArgumentException.class, () ->
+        adminInvitationService.deleteAdmin(userId));
+
+    assertEquals("User is not an admin", exception.getMessage());
+  }
+
+  @Test
+  void deleteAdmin_shouldThrowException_whenUserIsSuperAdmin() {
+    // Arrange
+    Long superAdminId = 1L;
+    User superAdmin = new User();
+    superAdmin.setId(superAdminId);
+    superAdmin.setEmail("superadmin@example.com");
+    superAdmin.setRole(Role.SUPERADMIN);
+
+    when(userRepository.findById(superAdminId)).thenReturn(Optional.of(superAdmin));
+
+    // Act & Assert
+    Exception exception = assertThrows(IllegalArgumentException.class, () ->
+        adminInvitationService.deleteAdmin(superAdminId));
+
+    assertEquals("User is not an admin", exception.getMessage());
+  }
 }

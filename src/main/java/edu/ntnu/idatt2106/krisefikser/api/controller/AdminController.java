@@ -1,16 +1,22 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminSetupRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.TwoFactorVerifyRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminSetupRequest;
 import edu.ntnu.idatt2106.krisefikser.service.AdminInvitationService;
 import edu.ntnu.idatt2106.krisefikser.service.AuthService;
 import edu.ntnu.idatt2106.krisefikser.service.TwoFactorService;
+import edu.ntnu.idatt2106.krisefikser.service.UserService;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +34,7 @@ public class AdminController {
   private final AdminInvitationService adminInvitationService;
   private final TwoFactorService twoFactorService;
   private final AuthService authService;
+  private final UserService userService;
 
   /**
    * Constructor for AdminController.
@@ -37,10 +44,11 @@ public class AdminController {
    * @param authService            The service for handling authentication.
    */
   public AdminController(AdminInvitationService adminInvitationService,
-      TwoFactorService twoFactorService, AuthService authService) {
+      TwoFactorService twoFactorService, AuthService authService, UserService userService) {
     this.adminInvitationService = adminInvitationService;
     this.twoFactorService = twoFactorService;
     this.authService = authService;
+    this.userService = userService;
   }
 
   @PostMapping("/invite")
@@ -95,6 +103,58 @@ public class AdminController {
           "token", response.getToken(),
           "message", "2FA verification successful"
       ));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
+  }
+
+  /**
+   * Initiates a password reset for an admin user. Only accessible by SUPERADMIN users.
+   *
+   * @param request The request containing the admin's email
+   * @return ResponseEntity indicating the result of the operation
+   */
+  @PostMapping("/reset-password/initiate")
+  @PreAuthorize("hasRole('SUPERADMIN')")
+  public ResponseEntity<?> initiateAdminPasswordReset(@RequestBody Map<String, String> request) {
+    try {
+      String email = request.get("email");
+      authService.initiatePasswordReset(email);
+      return ResponseEntity.ok(Map.of("message", "Password reset email sent successfully"));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
+  }
+
+  /**
+   * Gets a list of all admin users. Only accessible by SUPERADMIN users.
+   *
+   * @return ResponseEntity containing the list of admin users
+   */
+  @GetMapping
+  @PreAuthorize("hasRole('SUPERADMIN')")
+  public ResponseEntity<?> getAllAdmins() {
+    try {
+      List<UserResponseDto> admins = userService.getAllAdmins();
+      return ResponseEntity.ok(admins);
+    } catch (Exception e) {
+      return ResponseEntity.status(500)
+          .body(Map.of("error", "Error retrieving admins: " + e.getMessage()));
+    }
+  }
+
+  /**
+   * Deletes an admin user by their ID. Only accessible by SUPERADMIN users.
+   *
+   * @param adminId The ID of the admin to delete
+   * @return ResponseEntity indicating the result of the operation
+   */
+  @DeleteMapping("/{adminId}")
+  @PreAuthorize("hasRole('SUPERADMIN')")
+  public ResponseEntity<?> deleteAdmin(@PathVariable Long adminId) {
+    try {
+      adminInvitationService.deleteAdmin(adminId);
+      return ResponseEntity.ok(Map.of("message", "Admin deleted successfully"));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }

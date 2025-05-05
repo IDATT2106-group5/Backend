@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberResponseDto;
@@ -11,9 +12,11 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.UnregisteredHouseholdMember;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +24,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,6 +48,11 @@ public class HouseholdService {
   private final HouseholdRepository householdRepository;
 
   /**
+   * Notification service for sending notifications.
+   */
+  private final NotificationService notificationService;
+
+  /**
    * Repository for user entity operations.
    */
   private final UserRepository userRepository;
@@ -55,13 +66,16 @@ public class HouseholdService {
    * Constructs a new HouseholdService with required repositories.
    *
    * @param householdRepository                   Repository for household operations.
+   * @param notificationService                   the notification service
    * @param userRepository                        Repository for user operations.
    * @param unregisteredHouseholdMemberRepository Repository for unregistered household member operations.
    */
   public HouseholdService(HouseholdRepository householdRepository,
+                          NotificationService notificationService,
                           UserRepository userRepository,
                           UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
     this.householdRepository = householdRepository;
+    this.notificationService = notificationService;
     this.userRepository = userRepository;
     this.unregisteredHouseholdMemberRepository = unregisteredHouseholdMemberRepository;
   }
@@ -93,6 +107,17 @@ public class HouseholdService {
     userRepository.updateHouseholdId(request.getOwnerId(), household.getId());
     logger.info("Household created successfully: {}", householdRepository.findByName(
         request.getName()));
+
+    // Send notification to the owner of the household.
+    NotificationDto notification = new NotificationDto();
+    notification.setMessage("Household created successfully");
+    notification.setType(NotificationType.HOUSEHOLD);
+    notification.setRecipientId(household.getOwner().getId());
+    notification.setTimestamp(LocalDateTime.now());
+    notification.setRead(false);
+
+    notificationService.saveNotification(notification);
+    notificationService.sendPrivateNotification(household.getOwner().getId(), notification);
   }
 
   /**
@@ -123,6 +148,13 @@ public class HouseholdService {
     userRepository.updateHouseholdId(user.getId(), household.getId());
     householdRepository.updateNumberOfMembers(household.getId(),
         household.getNumberOfMembers() + 1);
+
+    // Create a notification for the household
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        household.getOwner().getId(), LocalDateTime.now(), false,
+        user.getFullName() + " has joined your household.");
+
+    notificationService.saveHouseholdNotification(notification, household.getId());
   }
 
   /**
@@ -130,7 +162,7 @@ public class HouseholdService {
    *
    * @param userId      the user id
    * @param householdId the household id
-   * @throws IllegalArgumentException if the user with specified id is not found.
+   * @throws IllegalArgumentException if the user with a specified id is not found.
    * @throws IllegalArgumentException if the user is not a member of any household.
    */
   public void removeUserFromHousehold(Long userId, Long householdId) {
@@ -147,6 +179,59 @@ public class HouseholdService {
     householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
         user.getHousehold().getNumberOfMembers() - 1);
     userRepository.updateHouseholdId(user.getId(), null);
+
+    // Create a notification for the household
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        householdId, LocalDateTime.now(), false,
+        user.getFullName() + " has been removed from household.");
+
+    notificationService.saveHouseholdNotification(notification, householdId);
+
+  }
+
+  /**
+   * Removes the current authenticated user from their household.
+   *
+   * @throws IllegalArgumentException if the user is not found or is not a member of any household.
+   */
+  public void leaveCurrentUserFromHousehold() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    UserDetails userDetails = (UserDetails) auth.getPrincipal();
+    String email = userDetails.getUsername();
+
+    logger.info("User attempting to leave household: {}", email);
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("Authenticated user not found in database: {}", email);
+          return new IllegalArgumentException("Authenticated user not found");
+        });
+
+    if (user.getHousehold() == null) {
+      logger.warn("User {} is not a member of any household", user.getFullName());
+      throw new IllegalArgumentException("You are not a member of any household.");
+    }
+
+    if (user.getHousehold().getOwner().getId().equals(user.getId())) {
+      logger.warn(
+          "User {} is the owner and cannot leave the household without transferring ownership",
+          user.getFullName());
+      throw new IllegalArgumentException(
+          "Owner cannot leave the household. Transfer ownership first.");
+    }
+
+    logger.info("User {} is leaving household with ID {}", user.getFullName(),
+        user.getHousehold().getId());
+
+    householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
+        user.getHousehold().getNumberOfMembers() - 1);
+    userRepository.updateHouseholdId(user.getId(), null);
+    logger.info("User {} has been removed from the household", user.getFullName());
+
+    // Create a notification for the household
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        user.getHousehold().getOwner().getId(), LocalDateTime.now(), false,
+        user.getFullName() + " has left the household.");
+    notificationService.saveHouseholdNotification(notification, user.getHousehold().getId());
   }
 
   /**
@@ -217,6 +302,11 @@ public class HouseholdService {
     User user = userRepository.findById(userId).orElseThrow(
         () -> new IllegalArgumentException("User not found"));
     Household household = user.getHousehold();
+
+    if (household == null) {
+      throw new IllegalArgumentException("User does not belong to a household");
+    }
+
     resultMap.put("household", new HouseholdResponseDto(
         household.getId(),
         household.getName(),
@@ -227,6 +317,7 @@ public class HouseholdService {
             household.getOwner().getFullName(),
             household.getOwner().getTlf(),
             household.getOwner().getRole()
+
         )
     ));
 
@@ -293,8 +384,20 @@ public class HouseholdService {
     household.setOwner(newOwner);
     householdRepository.save(household);
     logger.info("Household owner changed to {}", newOwner.getFullName());
+
+    // Create a notification for the new owner
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        newOwner.getId(), LocalDateTime.now(), false,
+        "You are now the owner of household " + household.getName());
+    notificationService.saveNotification(notification);
+    notificationService.sendPrivateNotification(newOwner.getId(), notification);
   }
 
+  /**
+   * Edit household.
+   *
+   * @param request the request
+   */
   public void editHousehold(EditHouseholdRequestDto request) {
     Household household = householdRepository.findById(request.getHouseholdId())
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
@@ -305,15 +408,61 @@ public class HouseholdService {
       household.setAddress(request.getAddress());
     }
     householdRepository.save(household);
+
+    // Create a notification for the household owner
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        household.getOwner().getId(), LocalDateTime.now(), false,
+        "Household " + household.getName() + " has been updated.");
+    notificationService.saveNotification(notification);
+    notificationService.sendPrivateNotification(household.getOwner().getId(), notification);
+  }
+
+  /**
+   * Deletes a household and removes all associated users and unregistered members.
+   *
+   * @param householdId the household id
+   * @param ownerId     the owner id
+   * @throws IllegalArgumentException if the household is not found or if the user is not the owner.
+   */
+  public void deleteHousehold(Long householdId, Long ownerId) {
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+
+    if (!household.getOwner().getId().equals(ownerId)) {
+      throw new IllegalArgumentException("Only the owner can delete the household");
+    }
+
+    // Remove household from all users
+    List<User> users = userRepository.getUsersByHousehold(household);
+    for (User user : users) {
+      user.setHousehold(null);
+      userRepository.save(user);
+    }
+    // Delete unregistered members
+    List<UnregisteredHouseholdMember> unregistered = unregisteredHouseholdMemberRepository
+        .findUnregisteredHouseholdMembersByHousehold(household);
+    for (UnregisteredHouseholdMember member : unregistered) {
+      unregisteredHouseholdMemberRepository.delete(member);
+    }
+
+    // Create notification for the household members
+    NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
+        household.getOwner().getId(), LocalDateTime.now(), false,
+        "Household " + household.getName() + " has been deleted.");
+
+    // Delete the household
+    householdRepository.delete(household);
+
+    // Send notification to all users
+    notificationService.saveHouseholdNotification(notification, household.getId());
   }
 
   /**
    * Gets a household by its ID.
    *
-   * @param householdId
+   * @param householdId the id of the household
    * @return HouseholdResponseDto containing household details.
    */
-
   public HouseholdResponseDto getHousehold(Long householdId) {
     Household household = householdRepository.findById(householdId)
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));

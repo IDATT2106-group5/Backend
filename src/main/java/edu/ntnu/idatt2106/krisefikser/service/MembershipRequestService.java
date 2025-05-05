@@ -2,16 +2,19 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.MembershipRequest;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestStatus;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.MembershipRequestRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,7 @@ public class MembershipRequestService {
   private final MembershipRequestRepository membershipRequestRepository;
   private final HouseholdRepository householdRepository;
   private final UserRepository userRepository;
+  private final NotificationService notificationService;
 
 
   /**
@@ -34,24 +38,28 @@ public class MembershipRequestService {
    */
   public MembershipRequestService(MembershipRequestRepository membershipRequestRepository,
                                   HouseholdRepository householdRepository,
-                                  UserRepository userRepository) {
+                                  UserRepository userRepository,
+                                  NotificationService notificationService) {
     this.membershipRequestRepository = membershipRequestRepository;
     this.householdRepository = householdRepository;
     this.userRepository = userRepository;
+    this.notificationService = notificationService;
   }
 
   /**
    * Send an invitation to a user to join a household.
    *
-   * @param request the request
+   * @param email       the email
+   * @param householdId the household id
    */
-  public void sendInvitation(MembershipRequestDto request) {
-    User receiver = userRepository.findById(request.getUserId()).orElseThrow(
-        () -> new IllegalArgumentException("User not found"));
-    Household household = householdRepository.findById(request.getHouseholdId()).orElseThrow(
-        () -> new IllegalArgumentException("Household not found"));
+  public void sendInvitation(String email, Long householdId) {
+    User receiver = userRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("User with email not found: " + email));
 
-    // Create and save the membership request
+    Household household = householdRepository.findById(householdId)
+        .orElseThrow(
+            () -> new IllegalArgumentException("Household not found with ID: " + householdId));
+
     MembershipRequest membershipRequest = new MembershipRequest();
     membershipRequest.setHousehold(household);
     membershipRequest.setSender(household.getOwner());
@@ -61,7 +69,20 @@ public class MembershipRequestService {
     membershipRequest.setCreated_at(new Timestamp(System.currentTimeMillis()));
 
     membershipRequestRepository.save(membershipRequest);
+
+    // Send a notification to the receiver
+    NotificationDto notificationDto = new NotificationDto(
+        NotificationType.MEMBERSHIP_REQUEST,
+        receiver.getId(),
+        LocalDateTime.now(),
+        false,
+        "You have received an invitation to join the household: " + household.getName()
+    );
+
+    notificationService.saveNotification(notificationDto);
+    notificationService.sendPrivateNotification(receiver.getId(), notificationDto);
   }
+
 
   /**
    * Send a request to join a household.
@@ -84,6 +105,19 @@ public class MembershipRequestService {
     membershipRequest.setCreated_at(new Timestamp(System.currentTimeMillis()));
 
     membershipRequestRepository.save(membershipRequest);
+
+    // Send a notification to the receiver
+    NotificationDto notificationDto = new NotificationDto(
+        NotificationType.MEMBERSHIP_REQUEST,
+        household.getOwner().getId(),
+        LocalDateTime.now(),
+        false,
+        sender.getFullName() + " has requested to join the household: " + household.getName()
+    );
+
+    // Add these missing lines to save and send the notification
+    notificationService.saveNotification(notificationDto);
+    notificationService.broadcastNotification(notificationDto);
   }
 
   /**
@@ -112,8 +146,8 @@ public class MembershipRequestService {
       throw new IllegalArgumentException("Request not found");
     }
 
-    // Update the request status to "accepted"
-    membershipRequestRepository.updateStatusById(requestId, RequestStatus.CANCELLED);
+    // Update the request status to "canceled"
+    membershipRequestRepository.updateStatusById(requestId, RequestStatus.CANCELED);
   }
 
   /**
@@ -228,6 +262,12 @@ public class MembershipRequestService {
     ).toList();
   }
 
+  /**
+   * Gets accepted received join requests by a household.
+   *
+   * @param householdId the household id
+   * @return the accepted received join requests by household
+   */
   public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold(
       Long householdId) {
     List<MembershipRequest> requests =
@@ -248,6 +288,49 @@ public class MembershipRequestService {
             request.getType(),
             request.getStatus(),
             request.getCreated_at()
+        )
+    ).toList();
+  }
+
+  /**
+   * Get invitations sent by a household, regardless of status (e.g., PENDING, ACCEPTED).
+   *
+   * @param householdId the ID of the household
+   * @return list of membership invitations sent from the household
+   */
+  public List<MembershipRequestResponseDto> getInvitationsSentByHousehold(Long householdId) {
+    if (!householdRepository.existsById(householdId)) {
+      throw new IllegalArgumentException("Household not found");
+    }
+
+    List<RequestStatus> statuses = List.of(RequestStatus.PENDING, RequestStatus.ACCEPTED);
+
+    List<MembershipRequest> invitations =
+        membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatusIn(
+            householdId, RequestType.INVITATION, statuses
+        );
+
+    return invitations.stream().map(invitation ->
+        new MembershipRequestResponseDto(
+            invitation.getId(),
+            invitation.getHousehold().getId(),
+            new UserResponseDto(
+                invitation.getSender().getId(),
+                invitation.getSender().getEmail(),
+                invitation.getSender().getFullName(),
+                invitation.getSender().getTlf(),
+                invitation.getSender().getRole()
+            ),
+            new UserResponseDto(
+                invitation.getReceiver().getId(),
+                invitation.getReceiver().getEmail(),
+                invitation.getReceiver().getFullName(),
+                invitation.getReceiver().getTlf(),
+                invitation.getReceiver().getRole()
+            ),
+            invitation.getType(),
+            invitation.getStatus(),
+            invitation.getCreated_at()
         )
     ).toList();
   }
