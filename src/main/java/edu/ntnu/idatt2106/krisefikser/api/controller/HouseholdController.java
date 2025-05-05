@@ -325,22 +325,21 @@ public class HouseholdController {
    * @param request the request
    * @return the response entity
    */
-  @Operation(summary = "Search for a household by household id",
-      description = "Search for a household by household id")
+  @Operation(summary = "Search for a household by household id", description = "Search for a household by household id")
   @PostMapping("/search")
-  public ResponseEntity<?> searchHouseholdById(
-      @RequestBody Map<String, Long> request) {
+  public ResponseEntity<?> searchHouseholdById(@RequestBody Map<String, Long> request) {
+    Long householdId = request.get("householdId");
+    LOGGER.info("Received request to search for household with ID: {}", householdId);
     try {
-      HouseholdResponseDto household = householdService.getHousehold(request.get("householdId"));
-      LOGGER.info("Household found successfully: {}", household);
-      return ResponseEntity.ok(household);
+      Long foundId = householdService.searchHouseholdById(householdId);
+      LOGGER.info("Household found with ID: {}", foundId);
+      return ResponseEntity.ok(Map.of("id", foundId));
     } catch (IllegalArgumentException e) {
-      LOGGER.warn("Validation error during household search: {}", e.getMessage());
-      return ResponseEntity.badRequest().body(e.getMessage());
+      LOGGER.warn("Household search failed: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
-      LOGGER.error("Unexpected error during household search: {}", e.getMessage(), e);
-      return ResponseEntity.status(500).body("Internal server error");
+      LOGGER.error("Unexpected error during household search", e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
-
 }
