@@ -25,7 +25,10 @@ public interface HouseholdRepository extends JpaRepository<Household, Long> {
   @Query("UPDATE Household h SET h.numberOfMembers = :numberOfMembers WHERE h.id = :id")
   void updateNumberOfMembers(@Param("id") Long id, @Param("numberOfMembers") int numberOfMembers);
 
-  Optional<Object> findByName(String name);
+  Optional<Household> findByName(String name);
+
+  Optional<Household> getHouseholdById(Long id);
 
 
+  boolean existsByName(String householdName);
 }

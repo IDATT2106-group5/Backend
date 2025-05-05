@@ -1,8 +1,9 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.LoginRequest;
-import edu.ntnu.idatt2106.krisefikser.api.dto.LoginResponse;
-import edu.ntnu.idatt2106.krisefikser.api.dto.RegisterRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.PasswordResetRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.AuthService;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -111,6 +112,92 @@ public class AuthController {
       return ResponseEntity.status(302)
           .header("Location", "http://localhost:5173/register-failed")
           .build();
+    }
+  }
+
+  /**
+   * Initiates a password reset process by sending a reset link to the user's email.
+   *
+   * @param request the request containing the user's email
+   * @return a response entity with a message
+   */
+  @PostMapping("/request-password-reset")
+  public ResponseEntity<Map<String, String>> requestPasswordReset(
+      @RequestBody Map<String, String> request) {
+    try {
+      String email = request.get("email");
+      if (email == null || email.isBlank()) {
+        logger.warn("Email is required for password reset");
+        throw new IllegalArgumentException("Email is required");
+      }
+
+      authService.initiatePasswordReset(email);
+      logger.info("Password reset link sent to email: {}", email);
+      return ResponseEntity.ok(Map.of("message", "Password reset link sent to your email"));
+    } catch (IllegalArgumentException e) {
+      logger.warn("Validation error during password reset request: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      logger.error("Unexpected error during password reset request: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
+
+  /**
+   * Resets the user's password using a reset token.
+   *
+   * @param request the request containing the new password and token
+   * @return a response entity with a message
+   */
+  @PostMapping("/validate-reset-token")
+  public ResponseEntity<Map<String, String>> validateResetToken(
+      @RequestBody Map<String, String> request) {
+    try {
+      String token = request.get("token");
+      if (token == null || token.isBlank()) {
+        logger.warn("Missing token in request body");
+        throw new IllegalArgumentException("Reset token is required");
+      }
+
+      authService.validateResetPasswordToken(token);
+      return ResponseEntity.ok(Map.of("message", "Token is valid"));
+    } catch (IllegalArgumentException e) {
+      logger.warn("Invalid or expired reset token: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      logger.error("Unexpected error during token validation: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+    }
+  }
+
+  /**
+   * Resets the user's password using a reset token.
+   *
+   * @param request the request containing the new password and token
+   * @return a response entity with a message
+   */
+  @PostMapping("/reset-password")
+  public ResponseEntity<Map<String, String>> resetPassword(
+      @RequestBody PasswordResetRequestDto request) {
+    try {
+      String token = request.getToken();
+      String newPassword = request.getNewPassword();
+
+      if (token == null || token.isBlank()) {
+        throw new IllegalArgumentException("Reset token is required");
+      }
+      if (newPassword == null || newPassword.isBlank()) {
+        throw new IllegalArgumentException("New password is required");
+      }
+
+      authService.resetPassword(token, newPassword);
+      return ResponseEntity.ok(Map.of("message", "Password reset successful"));
+    } catch (IllegalArgumentException e) {
+      logger.warn("Password reset failed: {}", e.getMessage());
+      return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      logger.error("Unexpected error during password reset: {}", e.getMessage(), e);
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
 }

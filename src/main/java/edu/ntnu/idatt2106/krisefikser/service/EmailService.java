@@ -107,4 +107,31 @@ public class EmailService {
       throw new RuntimeException("Failed to send verification code", e);
     }
   }
+
+  /**
+   * Sends a password reset email to the user.
+   *
+   * @param toEmail the recipient's email address
+   * @param token   the reset token
+   */
+  public void sendPasswordResetEmail(String toEmail, String token) {
+    String subject = "Tilbakestill passordet ditt – Krisefikser";
+    String resetUrl = "http://localhost:5173/reset-password?token=" + token;
+    String body = "<html><body>"
+        + "<h1>Glemt passord?</h1>"
+        + "<p>Klikk på lenken under for å tilbakestille passordet ditt. Lenken er gyldig i 1 time:</p>"
+        + "<a href=\"" + resetUrl + "\">Tilbakestill passord</a>"
+        + "</body></html>";
+
+    MimeMessage message = mailSender.createMimeMessage();
+    try {
+      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+      helper.setTo(toEmail);
+      helper.setSubject(subject);
+      helper.setText(body, true);
+      mailSender.send(message);
+    } catch (MessagingException e) {
+      throw new RuntimeException("Failed to send password reset email", e);
+    }
+  }
 }

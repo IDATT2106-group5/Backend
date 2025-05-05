@@ -6,11 +6,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 /**
  * The type Membership request.
@@ -20,6 +22,7 @@ import java.security.Timestamp;
 public class MembershipRequest {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @JoinColumn(name = "household_id")
@@ -43,5 +46,61 @@ public class MembershipRequest {
   private RequestStatus status;
 
   @Column
-  private Timestamp createdAt;
+  private Timestamp created_at;
+
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public Household getHousehold() {
+    return household;
+  }
+
+  public void setHousehold(Household household) {
+    this.household = household;
+  }
+
+  public User getSender() {
+    return sender;
+  }
+
+  public void setSender(User sender) {
+    this.sender = sender;
+  }
+
+  public User getReceiver() {
+    return receiver;
+  }
+
+  public void setReceiver(User receiver) {
+    this.receiver = receiver;
+  }
+
+  public RequestType getType() {
+    return type;
+  }
+
+  public void setType(RequestType type) {
+    this.type = type;
+  }
+
+  public RequestStatus getStatus() {
+    return status;
+  }
+
+  public void setStatus(RequestStatus status) {
+    this.status = status;
+  }
+
+  public Timestamp getCreated_at() {
+    return created_at;
+  }
+
+  public void setCreated_at(Timestamp created_at) {
+    this.created_at = created_at;
+  }
 }

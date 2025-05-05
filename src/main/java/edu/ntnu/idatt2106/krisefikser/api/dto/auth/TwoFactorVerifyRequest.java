@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.dto;
+package edu.ntnu.idatt2106.krisefikser.api.dto.auth;
 
 /**
  * Data Transfer Object for two-factor authentication verification requests. Contains the email and
