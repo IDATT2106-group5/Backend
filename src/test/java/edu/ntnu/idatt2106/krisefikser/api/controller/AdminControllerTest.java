@@ -5,7 +5,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -214,28 +213,35 @@ public class AdminControllerTest {
 
   @Test
   void deleteAdmin_shouldDeleteAdmin_whenIdIsValid() throws Exception {
-    // Arrange
     Long adminId = 1L;
+    Map<String, Long> requestBody = Map.of("adminId", adminId);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String requestJson = objectMapper.writeValueAsString(requestBody);
 
     doNothing().when(adminInvitationService).deleteAdmin(adminId);
 
-    // Act & Assert
-    mockMvc.perform(delete("/api/admin/" + adminId))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.message").value("Admin deleted successfully"));
+    mockMvc.perform(post("/api/admin/delete")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestJson))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Admin deleted successfully"));
   }
 
   @Test
   void deleteAdmin_shouldReturnBadRequest_whenIdIsInvalid() throws Exception {
-    // Arrange
     Long invalidId = 999L;
+    Map<String, Long> requestBody = Map.of("adminId", invalidId);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String requestJson = objectMapper.writeValueAsString(requestBody);
 
     doThrow(new IllegalArgumentException("Admin user not found"))
-        .when(adminInvitationService).deleteAdmin(invalidId);
+            .when(adminInvitationService).deleteAdmin(invalidId);
 
-    // Act & Assert
-    mockMvc.perform(delete("/api/admin/" + invalidId))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error").value("Admin user not found"));
+    mockMvc.perform(post("/api/admin/delete") // Added the leading slash here
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestJson))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("Admin user not found"));
   }
 }
+
