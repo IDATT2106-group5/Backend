@@ -151,14 +151,14 @@ public class AdminController {
   /**
    * Deletes an admin user by their ID. Only accessible by SUPERADMIN users.
    *
-   * @param adminId The ID of the admin to delete
+   * @param  request The request containing the admin ID
    * @return ResponseEntity indicating the result of the operation
    */
-  @PostMapping("/{adminId}")
+  @PostMapping("/delete")
   @PreAuthorize("hasRole('SUPERADMIN')")
-  public ResponseEntity<?> deleteAdmin(@PathVariable Long adminId) {
+  public ResponseEntity<?> deleteAdmin(@RequestBody Map<String, Long> request) {
     try {
-      adminInvitationService.deleteAdmin(adminId);
+      adminInvitationService.deleteAdmin(request.get("adminId"));
       return ResponseEntity.ok(Map.of("message", "Admin deleted successfully"));
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
