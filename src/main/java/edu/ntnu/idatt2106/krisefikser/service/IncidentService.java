@@ -4,9 +4,11 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Scenario;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Severity;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.IncidentRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.ScenarioRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,17 +23,23 @@ public class IncidentService {
   private static final Logger logger = LoggerFactory.getLogger(IncidentService.class);
   private final IncidentRepository incidentRepository;
   private final ScenarioRepository scenarioRepository;
+  private final NotificationService notificationService;
+  private final UserRepository userRepository;
 
   /**
    * Constructor for IncidentService.
    *
-   * @param incidentRepository The repository for incident-related operations.
-   * @param scenarioRepository The repository for scenario-related operations.
+   * @param incidentRepository  The repository for incident-related operations.
+   * @param scenarioRepository  The repository for scenario-related operations.
+   * @param notificationService the notification service
    */
   public IncidentService(IncidentRepository incidentRepository,
-      ScenarioRepository scenarioRepository) {
+                         ScenarioRepository scenarioRepository,
+                         NotificationService notificationService, UserRepository userRepository) {
     this.incidentRepository = incidentRepository;
     this.scenarioRepository = scenarioRepository;
+    this.notificationService = notificationService;
+    this.userRepository = userRepository;
   }
 
   /**
@@ -55,9 +63,18 @@ public class IncidentService {
 
     Incident incident = request.toEntity(scenario);
     incidentRepository.save(incident);
+    notificationService.notifyIncident("[EMERGENCY ALERT]: " + scenario.getName() +
+        " is in progress near you. Specific instructions can be found in the app.",
+        incident);
     logger.info("Incident created successfully: {}", incident.getName());
   }
 
+  /**
+   * Update incident.
+   *
+   * @param id      the id
+   * @param request the request
+   */
   public void updateIncident(Long id, IncidentRequestDto request) {
     Incident incident = incidentRepository.findById(id)
         .orElseThrow(() -> {
@@ -91,6 +108,11 @@ public class IncidentService {
     logger.info("Incident with ID {} updated successfully", id);
   }
 
+  /**
+   * Delete incident.
+   *
+   * @param id the id
+   */
   public void deleteIncident(Long id) {
     if (!incidentRepository.existsById(id)) {
       logger.error("Incident not found with ID: {}", id);
@@ -101,6 +123,11 @@ public class IncidentService {
     logger.info("Incident with ID {} deleted successfully", id);
   }
 
+  /**
+   * Gets all incidents.
+   *
+   * @return the all incidents
+   */
   public List<IncidentResponseDto> getAllIncidents() {
     logger.info("Fetching all incidents");
     return incidentRepository.findAll()
