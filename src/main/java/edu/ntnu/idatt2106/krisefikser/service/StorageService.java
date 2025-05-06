@@ -52,6 +52,7 @@ public class StorageService {
         storageItem -> new StorageItemResponseDto(
             storageItem.getId(),
             new ItemResponseDto(
+                storageItem.getItem().getId(),
                 storageItem.getItem().getName(),
                 storageItem.getItem().getCaloricAmount(),
                 storageItem.getItem().getItemType()
