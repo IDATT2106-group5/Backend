@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MembershipRequestService {
+
   private final MembershipRequestRepository membershipRequestRepository;
   private final HouseholdRepository householdRepository;
   private final UserRepository userRepository;
@@ -37,9 +38,9 @@ public class MembershipRequestService {
    * @param userRepository              the user repository
    */
   public MembershipRequestService(MembershipRequestRepository membershipRequestRepository,
-                                  HouseholdRepository householdRepository,
-                                  UserRepository userRepository,
-                                  NotificationService notificationService) {
+      HouseholdRepository householdRepository,
+      UserRepository userRepository,
+      NotificationService notificationService) {
     this.membershipRequestRepository = membershipRequestRepository;
     this.householdRepository = householdRepository;
     this.userRepository = userRepository;
@@ -186,6 +187,7 @@ public class MembershipRequestService {
         new MembershipRequestResponseDto(
             invitation.getId(),
             invitation.getHousehold().getId(),
+            invitation.getHousehold().getName(),
             new UserResponseDto(invitation.getSender().getId(), invitation.getSender().getEmail(),
                 invitation.getSender().getFullName(), invitation.getSender().getTlf(),
                 invitation.getSender().getRole()),
@@ -220,6 +222,7 @@ public class MembershipRequestService {
         new MembershipRequestResponseDto(
             invitation.getId(),
             invitation.getHousehold().getId(),
+            invitation.getHousehold().getName(),
             new UserResponseDto(invitation.getSender().getId(), invitation.getSender().getEmail(),
                 invitation.getSender().getFullName(), invitation.getSender().getTlf(),
                 invitation.getSender().getRole()),
@@ -249,6 +252,7 @@ public class MembershipRequestService {
         new MembershipRequestResponseDto(
             request.getId(),
             request.getHousehold().getId(),
+            request.getHousehold().getName(),
             new UserResponseDto(request.getSender().getId(), request.getSender().getEmail(),
                 request.getSender().getFullName(), request.getSender().getTlf(),
                 request.getSender().getRole()),
@@ -279,6 +283,7 @@ public class MembershipRequestService {
         new MembershipRequestResponseDto(
             request.getId(),
             request.getHousehold().getId(),
+            request.getHousehold().getName(),
             new UserResponseDto(request.getSender().getId(), request.getSender().getEmail(),
                 request.getSender().getFullName(), request.getSender().getTlf(),
                 request.getSender().getRole()),
@@ -314,6 +319,7 @@ public class MembershipRequestService {
         new MembershipRequestResponseDto(
             invitation.getId(),
             invitation.getHousehold().getId(),
+            invitation.getHousehold().getName(),
             new UserResponseDto(
                 invitation.getSender().getId(),
                 invitation.getSender().getEmail(),
