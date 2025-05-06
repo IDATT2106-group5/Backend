@@ -25,7 +25,7 @@ public class StorageExpiryService {
    * Scheduled method to check for items expiring in the next 7 days and send notifications.
    * This method runs every day at 08:00 AM.
    */
-  @Scheduled(cron = "0 45 9 * * ?")
+  @Scheduled(cron = "0 0 8 * * ?")
   public void checkForExpiringItems() {
     logger.info("Checking for items expiring in the next 7 days...");
 
