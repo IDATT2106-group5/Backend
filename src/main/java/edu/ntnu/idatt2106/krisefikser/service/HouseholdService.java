@@ -31,9 +31,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 /**
- * Service class for managing household-related operations.
- * This service handles the creation, management, and modification of households,
- * including validation and persistence operations.
+ * Service class for managing household-related operations. This service handles the creation,
+ * management, and modification of households, including validation and persistence operations.
  */
 @Service
 public class HouseholdService {
@@ -69,12 +68,13 @@ public class HouseholdService {
    * @param householdRepository                   Repository for household operations.
    * @param notificationService                   the notification service
    * @param userRepository                        Repository for user operations.
-   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member operations.
+   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member
+   *                                              operations.
    */
   public HouseholdService(HouseholdRepository householdRepository,
-                          NotificationService notificationService,
-                          UserRepository userRepository,
-                          UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
+      NotificationService notificationService,
+      UserRepository userRepository,
+      UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
     this.householdRepository = householdRepository;
     this.notificationService = notificationService;
     this.userRepository = userRepository;
@@ -82,8 +82,8 @@ public class HouseholdService {
   }
 
   /**
-   * Creates a new household with the given name, address, and creator's user ID.
-   * The creator automatically becomes the owner of the household.
+   * Creates a new household with the given name, address, and creator's user ID. The creator
+   * automatically becomes the owner of the household.
    *
    * @param request DTO containing household name, address, and owner ID.
    * @throws IllegalArgumentException if a household with the same name already exists.
@@ -153,7 +153,12 @@ public class HouseholdService {
         household.getOwner().getId(), LocalDateTime.now(), false,
         user.getFullName() + " has joined your household.");
 
+    NotificationDto notification2 = new NotificationDto(NotificationType.INFO,
+        request.getUserId(), LocalDateTime.now(), false,
+        "You have been added to household " + household.getName() + ".");
+
     notificationService.saveHouseholdNotification(notification, household.getId());
+    notificationService.sendPrivateNotification(request.getUserId(), notification2);
   }
 
   /**
@@ -239,8 +244,10 @@ public class HouseholdService {
    * `UnregisteredHouseholdMember` entity, associates it with the household, and updates the
    * household's number of members.
    *
-   * @param request The DTO containing the full name of the unregistered member and the ID of the household to which the member should be added.
-   * @throws IllegalArgumentException if the unregistered member already exists in the specified household or if the household is not found.
+   * @param request The DTO containing the full name of the unregistered member and the ID of the
+   *                household to which the member should be added.
+   * @throws IllegalArgumentException if the unregistered member already exists in the specified
+   *                                  household or if the household is not found.
    */
   public void addUnregisteredMemberToHousehold(
       UnregisteredMemberHouseholdAssignmentRequestDto request) {
@@ -345,7 +352,8 @@ public class HouseholdService {
   /**
    * Edits an unregistered member in a household.
    *
-   * @param request The request containing the full name of the unregistered member and the new full name.
+   * @param request The request containing the full name of the unregistered member and the new full
+   *                name.
    */
   public void editUnregisteredMemberInHousehold(EditMemberDto request) {
     UnregisteredHouseholdMember member = unregisteredHouseholdMemberRepository
@@ -431,7 +439,8 @@ public class HouseholdService {
    *
    * @param householdId the household id
    * @param ownerId     the owner id
-   * @throws IllegalArgumentException if the household is not found or if the user is not the owner.
+   * @throws IllegalArgumentException if the household is not found or if the user is not the
+   *                                  owner.
    */
   public void deleteHousehold(Long householdId, Long ownerId) {
     Household household = householdRepository.findById(householdId)

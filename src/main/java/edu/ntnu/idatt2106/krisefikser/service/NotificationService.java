@@ -4,11 +4,13 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Notification;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.NotificationRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,4 +186,18 @@ public class NotificationService {
     notificationRepository.save(notification);
   }
 
+  /**
+   * Send expiry notification.
+   *
+   * @param item the item
+   */
+  public void sendExpiryNotification(StorageItem item) {
+    NotificationDto notification = new NotificationDto();
+    notification.setType(NotificationType.STOCK_CONTROL);
+    notification.setMessage("Your item '" + item.getItem().getName() + "' is expiring in " +
+        ChronoUnit.DAYS.between(LocalDateTime.now().toLocalDate(),
+            item.getExpirationDate().toLocalDate()) + " days.");
+
+    saveHouseholdNotification(notification, item.getHousehold().getId());
+  }
 }
