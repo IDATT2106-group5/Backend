@@ -1,6 +1,9 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -9,22 +12,25 @@ import jakarta.persistence.Table;
 public class Scenario {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private String name;
   private String description;
+  @Column(name = "to_do", columnDefinition = "TEXT")
   private String toDo;
-  private String packing_list;
+  @Column(name = "packing_list", columnDefinition = "TEXT")
+  private String packingList;
 
 
   public Scenario() {
   }
 
-  public Scenario(Long id, String name, String description, String toDo, String packing_list) {
+  public Scenario(Long id, String name, String description, String toDo, String packingList) {
     this.id = id;
     this.name = name;
     this.description = description;
     this.toDo = toDo;
-    this.packing_list = packing_list;
+    this.packingList = packingList;
   }
 
   public Long getId() {
@@ -51,12 +57,12 @@ public class Scenario {
     this.description = description;
   }
 
-  public String getPacking_list() {
-    return packing_list;
+  public String getPackingList() {
+    return packingList;
   }
 
-  public void setPacking_list(String packing_list) {
-    this.packing_list = packing_list;
+  public void setPackingList(String packingList) {
+    this.packingList = packingList;
   }
 
   public String getToDo() {
@@ -65,13 +71,5 @@ public class Scenario {
 
   public void setToDo(String toDo) {
     this.toDo = toDo;
-  }
-
-  public String getPackingList() {
-    return packing_list;
-  }
-
-  public void setPackingList(String packing_list) {
-    this.packing_list = packing_list;
   }
 }
