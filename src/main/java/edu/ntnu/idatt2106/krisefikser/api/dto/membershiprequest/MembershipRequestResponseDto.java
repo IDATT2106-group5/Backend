@@ -6,19 +6,23 @@ import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
 import java.sql.Timestamp;
 
 public class MembershipRequestResponseDto {
+
   Long id;
   Long householdId;
+  String householdName;
   UserResponseDto sender;
   UserResponseDto recipient;
   RequestType requestType;
   RequestStatus status;
   Timestamp sentAt;
 
-  public MembershipRequestResponseDto(Long id, Long householdId, UserResponseDto sender,
-                                      UserResponseDto recipient,
-                                      RequestType requestType, RequestStatus status, Timestamp sentAt) {
+  public MembershipRequestResponseDto(Long id, Long householdId, String householdName,
+      UserResponseDto sender,
+      UserResponseDto recipient,
+      RequestType requestType, RequestStatus status, Timestamp sentAt) {
     this.id = id;
     this.householdId = householdId;
+    this.householdName = householdName;
     this.sender = sender;
     this.recipient = recipient;
     this.requestType = requestType;
@@ -48,6 +52,14 @@ public class MembershipRequestResponseDto {
 
   public void setHouseholdId(Long householdId) {
     this.householdId = householdId;
+  }
+
+  public String getHouseholdName() {
+    return householdName;
+  }
+
+  public void setHouseholdName(String householdName) {
+    this.householdName = householdName;
   }
 
   public UserResponseDto getSender() {
