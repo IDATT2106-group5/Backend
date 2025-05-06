@@ -214,28 +214,29 @@ public class AdminControllerTest {
 
   @Test
   void deleteAdmin_shouldDeleteAdmin_whenIdIsValid() throws Exception {
-    // Arrange
     Long adminId = 1L;
 
     doNothing().when(adminInvitationService).deleteAdmin(adminId);
 
-    // Act & Assert
-    mockMvc.perform(delete("/api/admin/" + adminId))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.message").value("Admin deleted successfully"));
+    mockMvc.perform(post("api/admin/delete")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"adminId\": " + adminId + "}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.message").value("Admin deleted successfully"));
   }
 
   @Test
   void deleteAdmin_shouldReturnBadRequest_whenIdIsInvalid() throws Exception {
-    // Arrange
     Long invalidId = 999L;
 
     doThrow(new IllegalArgumentException("Admin user not found"))
-        .when(adminInvitationService).deleteAdmin(invalidId);
+            .when(adminInvitationService).deleteAdmin(invalidId);
 
-    // Act & Assert
-    mockMvc.perform(delete("/api/admin/" + invalidId))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error").value("Admin user not found"));
+    mockMvc.perform(post("api/admin/delete")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"adminId\": " + invalidId + "}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.error").value("Admin user not found"));
   }
 }
+
