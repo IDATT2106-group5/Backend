@@ -215,12 +215,15 @@ public class AdminControllerTest {
   @Test
   void deleteAdmin_shouldDeleteAdmin_whenIdIsValid() throws Exception {
     Long adminId = 1L;
+    Map<String, Long> requestBody = Map.of("adminId", adminId);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String requestJson = objectMapper.writeValueAsString(requestBody);
 
     doNothing().when(adminInvitationService).deleteAdmin(adminId);
 
-    mockMvc.perform(post("api/admin/delete")
+    mockMvc.perform(post("/api/admin/delete")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"adminId\": " + adminId + "}"))
+                    .content(requestJson))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.message").value("Admin deleted successfully"));
   }
@@ -228,13 +231,16 @@ public class AdminControllerTest {
   @Test
   void deleteAdmin_shouldReturnBadRequest_whenIdIsInvalid() throws Exception {
     Long invalidId = 999L;
+    Map<String, Long> requestBody = Map.of("adminId", invalidId);
+    ObjectMapper objectMapper = new ObjectMapper();
+    String requestJson = objectMapper.writeValueAsString(requestBody);
 
     doThrow(new IllegalArgumentException("Admin user not found"))
             .when(adminInvitationService).deleteAdmin(invalidId);
 
-    mockMvc.perform(post("api/admin/delete")
+    mockMvc.perform(post("/api/admin/delete") // Added the leading slash here
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"adminId\": " + invalidId + "}"))
+                    .content(requestJson))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.error").value("Admin user not found"));
   }
