@@ -154,7 +154,7 @@ public class AdminController {
    * @param adminId The ID of the admin to delete
    * @return ResponseEntity indicating the result of the operation
    */
-  @DeleteMapping("/{adminId}")
+  @PostMapping("/{adminId}")
   @PreAuthorize("hasRole('SUPERADMIN')")
   public ResponseEntity<?> deleteAdmin(@PathVariable Long adminId) {
     try {
