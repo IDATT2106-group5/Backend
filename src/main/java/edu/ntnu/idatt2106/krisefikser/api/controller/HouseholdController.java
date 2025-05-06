@@ -3,7 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.DeleteHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.RemoveUnregisteredMemberRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
@@ -182,13 +182,15 @@ public class HouseholdController {
   public ResponseEntity<String> deleteHousehold(@RequestBody DeleteHouseholdRequestDto request) {
     try {
       householdService.deleteHousehold(request.getHouseholdId(), request.getOwnerId());
-      LOGGER.info("Household deleted successfully: householdId={}, ownerId={}", request.getHouseholdId(), request.getOwnerId());
+      LOGGER.info("Household deleted successfully: householdId={}, ownerId={}",
+          request.getHouseholdId(), request.getOwnerId());
       return ResponseEntity.ok("Household deleted successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during household deletion: {}", e.getMessage());
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
-      LOGGER.error("Unexpected error during household deletion: householdId={}, ownerId={}, message={}",
+      LOGGER.error(
+          "Unexpected error during household deletion: householdId={}, ownerId={}, message={}",
           request.getHouseholdId(), request.getOwnerId(), e.getMessage(), e);
       return ResponseEntity.status(500).body("Internal server error");
     }
@@ -331,9 +333,9 @@ public class HouseholdController {
     Long householdId = request.get("householdId");
     LOGGER.info("Received request to search for household with ID: {}", householdId);
     try {
-      Long foundId = householdService.searchHouseholdById(householdId);
-      LOGGER.info("Household found with ID: {}", foundId);
-      return ResponseEntity.ok(Map.of("id", foundId));
+      HouseholdBasicResponseDto response = householdService.searchHouseholdById(householdId);
+      LOGGER.info("Household found with ID: {}", response.getId());
+      return ResponseEntity.ok(response);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Household search failed: {}", e.getMessage());
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

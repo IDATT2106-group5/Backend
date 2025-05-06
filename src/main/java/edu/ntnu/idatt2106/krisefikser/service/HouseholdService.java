@@ -2,6 +2,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
@@ -407,10 +408,10 @@ public class HouseholdService {
    * @param householdId
    * @return
    */
-  public Long searchHouseholdById(Long householdId) {
+  public HouseholdBasicResponseDto searchHouseholdById(Long householdId) {
     Household household = householdRepository.findById(householdId)
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
-    return household.getId();
+    return new HouseholdBasicResponseDto(household.getId(), household.getName());
   }
 
   /**
