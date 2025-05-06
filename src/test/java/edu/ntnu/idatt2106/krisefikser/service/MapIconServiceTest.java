@@ -2,7 +2,10 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -176,6 +179,93 @@ class MapIconServiceTest {
       List<MapIconResponseDto> result = mapIconService.getMapIcons(63.42, 10.39, 10, "nearby");
 
       assertEquals(1, result.size());
+    }
+  }
+
+  @Nested
+  class FindClosestMapIconTests {
+
+    @Test
+    void findClosestMapIcon_shouldReturnClosest_whenMultipleIconsExist() {
+      // Arrange
+      List<MapIcon> icons = new ArrayList<>();
+
+      // Create a closer icon
+      MapIcon closerIcon = new MapIcon();
+      closerIcon.setId(1L);
+      closerIcon.setType(MapIconType.SHELTER);
+      closerIcon.setLatitude(63.41); // Very close to search point
+      closerIcon.setLongitude(10.38);
+
+      // Create a farther icon
+      MapIcon fartherIcon = new MapIcon();
+      fartherIcon.setId(2L);
+      fartherIcon.setType(MapIconType.SHELTER);
+      fartherIcon.setLatitude(63.43); // Further from search point
+      fartherIcon.setLongitude(10.41);
+
+      icons.add(fartherIcon);
+      icons.add(closerIcon);
+
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      // Act
+      MapIconResponseDto result = mapIconService.findClosestMapIcon(63.42, 10.39, null);
+
+      // Assert
+      assertNotNull(result);
+      assertEquals(1L, result.getId());
+    }
+
+    @Test
+    void findClosestMapIcon_shouldFilterByType_whenTypeProvided() {
+      // Arrange
+      List<MapIcon> icons = new ArrayList<>();
+
+      MapIcon foodStation = new MapIcon();
+      foodStation.setId(1L);
+      foodStation.setType(MapIconType.FOODSTATION);
+      foodStation.setLatitude(63.42);
+      foodStation.setLongitude(10.39);
+
+      when(mapIconRepository.findByType(MapIconType.FOODSTATION)).thenReturn(List.of(foodStation));
+
+      // Act
+      MapIconResponseDto result = mapIconService.findClosestMapIcon(63.42, 10.39,
+          MapIconType.FOODSTATION);
+
+      // Assert
+      assertNotNull(result);
+      assertEquals(MapIconType.FOODSTATION, result.getType());
+    }
+
+    @Test
+    void findClosestMapIcon_shouldReturnNull_whenNoIconsFound() {
+      // Arrange
+      when(mapIconRepository.findAll()).thenReturn(new ArrayList<>());
+
+      // Act
+      MapIconResponseDto result = mapIconService.findClosestMapIcon(63.42, 10.39, null);
+
+      // Assert
+      assertNull(result);
+    }
+
+    @Test
+    void calculateDistance_shouldReturnCorrectDistance() {
+      // Arrange
+      double lat1 = 63.42;
+      double lon1 = 10.39;
+      double lat2 = 63.43;
+      double lon2 = 10.41;
+
+      // Act
+      double distance = mapIconService.calculateDistance(lat1, lon1, lat2, lon2);
+
+      // Assert
+      // Actual calculated distance is about 1.49 km
+      assertTrue(distance > 1.4 && distance < 1.6,
+          "Distance should be approximately 1.4-1.6 km, but was " + distance);
     }
   }
 }
