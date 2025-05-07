@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
@@ -74,14 +75,23 @@ public class NotificationService {
     logger.info("Sending position update to household {}: userId={}, latitude={}, longitude={}",
         householdId, position.getUserId(), position.getLatitude(), position.getLongitude());
 
+    PositionResponseDto response = new PositionResponseDto(
+        position.getUserId(),
+        userRepository.findById(position.getUserId())
+            .orElseThrow(() -> new IllegalArgumentException("User does not exist")).getFullName(),
+        position.getLatitude(),
+        position.getLongitude()
+    );
+
     try {
       messagingTemplate.convertAndSend(
           "/topic/position/" + householdId,
-          position
+          response
       );
       logger.info("Successfully sent position update to household {}", householdId);
     } catch (Exception e) {
-      logger.error("Failed to send position update to household {}: {}", householdId, e.getMessage(), e);
+      logger.error("Failed to send position update to household {}: {}", householdId,
+          e.getMessage(), e);
     }
   }
 

@@ -106,6 +106,16 @@ public class IncidentService {
 
     incidentRepository.save(incident);
     logger.info("Incident with ID {} updated successfully", id);
+
+    if(incident.getEndedAt() != null) {
+      notificationService.notifyIncident(incident.getName() +
+          " har avsluttet. Ta kontakt med dine nermeste.",
+          incident);
+    } else {
+      notificationService.notifyIncident(incident.getName() +
+          " har utviklet seg. Les mer på nyhetssiden.",
+          incident);
+    }
   }
 
   /**
