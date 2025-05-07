@@ -127,11 +127,11 @@ public class MembershipRequestService {
   }
 
   /**
-   * Accept a membership request.
+   * Accept a membership join request.
    *
    * @param requestId the request id
    */
-  public void acceptRequest(Long requestId) {
+  public void acceptJoinRequest(Long requestId) {
     MembershipRequest request = membershipRequestRepository.findById(requestId)
         .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
@@ -142,13 +142,36 @@ public class MembershipRequestService {
     request.setStatus(RequestStatus.ACCEPTED);
     membershipRequestRepository.save(request);
 
-    // 💡 Add user to the household using the service method
+    UserHouseholdAssignmentRequestDto assignment = new UserHouseholdAssignmentRequestDto();
+    assignment.setUserId(request.getSender().getId());
+    assignment.setHouseholdId(request.getHousehold().getId());
+
+    householdService.addUserToHousehold(assignment);
+  }
+
+  /**
+   * Accept an invitation request.
+   *
+   * @param requestId the request id
+   */
+  public void acceptInvitationRequest(Long requestId) {
+    MembershipRequest request = membershipRequestRepository.findById(requestId)
+        .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+
+    if (request.getStatus() != RequestStatus.PENDING) {
+      throw new IllegalArgumentException("Request is not pending");
+    }
+
+    request.setStatus(RequestStatus.ACCEPTED);
+    membershipRequestRepository.save(request);
+
     UserHouseholdAssignmentRequestDto assignment = new UserHouseholdAssignmentRequestDto();
     assignment.setUserId(request.getReceiver().getId());
     assignment.setHouseholdId(request.getHousehold().getId());
 
     householdService.addUserToHousehold(assignment);
   }
+
 
 
   /**
