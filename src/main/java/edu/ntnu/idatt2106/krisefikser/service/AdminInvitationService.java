@@ -48,6 +48,11 @@ public class AdminInvitationService {
    * @param fullName The full name of the new admin user.
    */
   public void createAdminInvitation(String email, String fullName) {
+    // Checks if an user by that email exists already
+    if (userRepository.existsByEmail(email)) {
+      throw new IllegalArgumentException("A user with that email already exists");
+    }
+
     // Generate unique token
     String token = UUID.randomUUID().toString();
 

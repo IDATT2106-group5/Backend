@@ -55,8 +55,12 @@ public class AdminController {
   @PostMapping("/invite")
   @PreAuthorize("hasRole('SUPERADMIN')")
   public ResponseEntity<?> inviteAdmin(@RequestBody AdminInviteRequest request) {
-    adminInvitationService.createAdminInvitation(request.getEmail(), request.getFullName());
-    return ResponseEntity.ok(Map.of("message", "Admin invitation sent successfully"));
+    try {
+      adminInvitationService.createAdminInvitation(request.getEmail(), request.getFullName());
+      return ResponseEntity.ok(Map.of("message", "Admin invitation sent successfully"));
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
   }
 
   /**
