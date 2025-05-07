@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.DeleteHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
@@ -353,7 +354,7 @@ public class HouseholdController {
   @GetMapping("/positions")
   public ResponseEntity<?> getHouseholdPositions() {
     try {
-      List<PositionDto> positions = householdService.getHouseholdPositions();
+      List<PositionResponseDto> positions = householdService.getHouseholdPositions();
       LOGGER.info("Household positions retrieved successfully: {}", positions);
       return ResponseEntity.ok(positions);
     } catch (IllegalArgumentException e) {
