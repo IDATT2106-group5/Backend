@@ -79,9 +79,9 @@ public class NotificationService {
         position.getUserId(),
         userRepository.findById(position.getUserId())
             .orElseThrow(() -> new IllegalArgumentException("User does not exist")).getFullName(),
-        position.getLatitude(),
-        position.getLongitude()
-    );
+        position.getLongitude(),
+        position.getLatitude()
+        );
 
     try {
       messagingTemplate.convertAndSend(
