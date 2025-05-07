@@ -142,13 +142,13 @@ public class MembershipRequestService {
     request.setStatus(RequestStatus.ACCEPTED);
     membershipRequestRepository.save(request);
 
-    // 💡 Add user to the household using the service method
     UserHouseholdAssignmentRequestDto assignment = new UserHouseholdAssignmentRequestDto();
-    assignment.setUserId(request.getReceiver().getId());
+    assignment.setUserId(request.getSender().getId());       // ← sender, not receiver
     assignment.setHouseholdId(request.getHousehold().getId());
 
     householdService.addUserToHousehold(assignment);
   }
+
 
 
   /**
