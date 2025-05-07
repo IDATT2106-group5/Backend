@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
  * The interface Household repository.
  */
 @Repository
-public interface HouseholdRepository extends JpaRepository<Household, Long> {
+public interface HouseholdRepository extends JpaRepository<Household, String> {
   /**
    * Update the number of members in a household.
    *
@@ -23,11 +23,11 @@ public interface HouseholdRepository extends JpaRepository<Household, Long> {
   @Modifying
   @Transactional
   @Query("UPDATE Household h SET h.numberOfMembers = :numberOfMembers WHERE h.id = :id")
-  void updateNumberOfMembers(@Param("id") Long id, @Param("numberOfMembers") int numberOfMembers);
+  void updateNumberOfMembers(@Param("id") String id, @Param("numberOfMembers") int numberOfMembers);
 
   Optional<Household> findByName(String name);
 
-  Optional<Household> getHouseholdById(Long id);
+  Optional<Household> getHouseholdById(String id);
 
 
   boolean existsByName(String householdName);

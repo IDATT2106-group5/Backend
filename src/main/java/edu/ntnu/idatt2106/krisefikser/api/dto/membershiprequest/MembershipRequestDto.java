@@ -5,7 +5,7 @@ package edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest;
  */
 public class MembershipRequestDto {
   private Long userId;
-  private Long householdId;
+  private String householdId;
 
   /**
    * Gets sender email.
@@ -30,7 +30,7 @@ public class MembershipRequestDto {
    *
    * @return the household name
    */
-  public Long getHouseholdId() {
+  public String getHouseholdId() {
     return householdId;
   }
 
@@ -39,7 +39,7 @@ public class MembershipRequestDto {
    *
    * @param householdId the household id
    */
-  public void setHouseholdId(Long householdId) {
+  public void setHouseholdId(String householdId) {
     this.householdId = householdId;
   }
 }

@@ -71,7 +71,7 @@ public class NotificationService {
     }
   }
 
-  public void sendHouseholdPositionUpdate(Long householdId, PositionDto position) {
+  public void sendHouseholdPositionUpdate(String householdId, PositionDto position) {
     logger.info("Sending position update to household {}: userId={}, latitude={}, longitude={}",
         householdId, position.getUserId(), position.getLatitude(), position.getLongitude());
 
@@ -122,7 +122,7 @@ public class NotificationService {
    * @param notification the notification
    * @param householdId  the household id
    */
-  public void saveHouseholdNotification(NotificationDto notification, Long householdId) {
+  public void saveHouseholdNotification(NotificationDto notification, String householdId) {
     Notification notificationEntity = new Notification();
     notificationEntity.setType(notification.getType());
     notificationEntity.setIsRead(notification.isRead());

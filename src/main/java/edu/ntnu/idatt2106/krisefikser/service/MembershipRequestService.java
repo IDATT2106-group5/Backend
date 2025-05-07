@@ -58,7 +58,7 @@ public class MembershipRequestService {
    * @param email       the email
    * @param householdId the household id
    */
-  public void sendInvitation(String email, Long householdId) {
+  public void sendInvitation(String email, String householdId) {
     User receiver = userRepository.findByEmail(email)
         .orElseThrow(() -> new IllegalArgumentException("User with email not found: " + email));
 
@@ -280,7 +280,7 @@ public class MembershipRequestService {
    * @param householdId the household id
    * @return the active join requests by user
    */
-  public List<MembershipRequestResponseDto> getReceivedJoinRequestsByHousehold(Long householdId) {
+  public List<MembershipRequestResponseDto> getReceivedJoinRequestsByHousehold(String householdId) {
     List<MembershipRequest> requests =
         membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId,
             RequestType.JOIN_REQUEST,
@@ -311,7 +311,7 @@ public class MembershipRequestService {
    * @return the accepted received join requests by household
    */
   public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold(
-      Long householdId) {
+      String householdId) {
     List<MembershipRequest> requests =
         membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(householdId,
             RequestType.JOIN_REQUEST,
@@ -341,7 +341,7 @@ public class MembershipRequestService {
    * @param householdId the ID of the household
    * @return list of membership invitations sent from the household
    */
-  public List<MembershipRequestResponseDto> getInvitationsSentByHousehold(Long householdId) {
+  public List<MembershipRequestResponseDto> getInvitationsSentByHousehold(String householdId) {
     if (!householdRepository.existsById(householdId)) {
       throw new IllegalArgumentException("Household not found");
     }

@@ -7,7 +7,7 @@ package edu.ntnu.idatt2106.krisefikser.api.dto.user;
 public class UserHouseholdAssignmentRequestDto {
 
   private Long userId;
-  private Long householdId;
+  private String householdId;
 
   public Long getUserId() {
     return userId;
@@ -17,11 +17,11 @@ public class UserHouseholdAssignmentRequestDto {
     this.userId = userId;
   }
 
-  public Long getHouseholdId() {
+  public String getHouseholdId() {
     return householdId;
   }
 
-  public void setHouseholdId(Long householdId) {
+  public void setHouseholdId(String householdId) {
     this.householdId = householdId;
   }
 

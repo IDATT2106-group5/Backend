@@ -8,7 +8,7 @@ import java.util.Date;
 public class StorageItemResponseDto {
   Long itemId;
   ItemResponseDto item;
-  Long householdId;
+  String householdId;
   String unit;
   int amount;
   LocalDateTime expiration;
@@ -21,7 +21,7 @@ public class StorageItemResponseDto {
     this.itemId = itemId;
   }
 
-  public StorageItemResponseDto(Long itemId, ItemResponseDto item, Long householdId, String unit, int amount,
+  public StorageItemResponseDto(Long itemId, ItemResponseDto item, String householdId, String unit, int amount,
                                 LocalDateTime expiration) {
     this.itemId = itemId;
     this.item = item;
@@ -35,7 +35,7 @@ public class StorageItemResponseDto {
     return item;
   }
 
-  public Long getHouseholdId() {
+  public String getHouseholdId() {
     return householdId;
   }
 
@@ -55,7 +55,7 @@ public class StorageItemResponseDto {
     this.item = item;
   }
 
-  public void setHouseholdId(Long householdId) {
+  public void setHouseholdId(String householdId) {
     this.householdId = householdId;
   }
 

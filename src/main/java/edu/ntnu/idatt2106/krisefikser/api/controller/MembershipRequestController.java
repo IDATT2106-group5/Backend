@@ -53,7 +53,7 @@ public class MembershipRequestController {
   @Operation(summary = "Gets all active join requests sent to a household", description = "Retrieves all active join requests sent to a household")
   @PostMapping("/join-requests/received")
   public ResponseEntity<?> getActiveJoinRequests(
-      @RequestBody Map<String, Long> request) {
+      @RequestBody Map<String, String> request) {
     try {
       List<MembershipRequestResponseDto> requests =
           membershipRequestService.getReceivedJoinRequestsByHousehold(request.get("householdId"));
@@ -66,13 +66,15 @@ public class MembershipRequestController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
+
   @Operation(summary = "Gets all accepted join requests sent to a household", description = "Retrieves all accepted join requests sent to a household")
   @PostMapping("/join-requests/received/accepted")
   public ResponseEntity<?> getActiveAcceptedJoinRequests(
-      @RequestBody Map<String, Long> request) {
+      @RequestBody Map<String, String> request) {
     try {
       List<MembershipRequestResponseDto> requests =
-          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold(request.get("householdId"));
+          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold(
+              request.get("householdId"));
       return ResponseEntity.ok(requests);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving join requests: {}", e.getMessage());
@@ -121,7 +123,7 @@ public class MembershipRequestController {
   @PostMapping("/invitations/sent/by-household")
   public ResponseEntity<?> getInvitationsSentByHousehold(@RequestBody MembershipInviteDto request) {
     try {
-      Long householdId = request.getHouseholdId();
+      String householdId = request.getHouseholdId();
       List<MembershipRequestResponseDto> invitations =
           membershipRequestService.getInvitationsSentByHousehold(householdId);
       LOGGER.info("Retrieved sent invitations for household: {}", householdId);

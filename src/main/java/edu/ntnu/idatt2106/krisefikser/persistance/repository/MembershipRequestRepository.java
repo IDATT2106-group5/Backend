@@ -22,8 +22,8 @@ public interface MembershipRequestRepository extends JpaRepository<MembershipReq
 
   List<MembershipRequest> findAllByReceiverAndTypeAndStatus(User receiver, RequestType type, RequestStatus status);
   List<MembershipRequest> findAllBySenderAndTypeAndStatus(User receiver, RequestType type, RequestStatus status);
-  List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatus(Long householdId, RequestType type, RequestStatus status);
+  List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatus(String householdId, RequestType type, RequestStatus status);
   List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatusIn(
-      Long householdId, RequestType type, List<RequestStatus> statuses
+      String householdId, RequestType type, List<RequestStatus> statuses
   );
 }

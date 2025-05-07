@@ -47,7 +47,7 @@ public class StorageService {
    * @param householdId The ID of the household.
    * @return A list of StorageItem entities.
    */
-  public List<StorageItemResponseDto> getStorageItemsByHousehold(Long householdId) {
+  public List<StorageItemResponseDto> getStorageItemsByHousehold(String householdId) {
     return storageItemRepository.findByHouseholdId(householdId).stream().map(
         storageItem -> new StorageItemResponseDto(
             storageItem.getId(),
@@ -72,7 +72,7 @@ public class StorageService {
    * @param itemType    The type of items to filter by.
    * @return A list of StorageItem entities.
    */
-  public List<StorageItem> getStorageItemsByHouseholdAndType(Long householdId, ItemType itemType) {
+  public List<StorageItem> getStorageItemsByHouseholdAndType(String householdId, ItemType itemType) {
     return storageItemRepository.findByHouseholdIdAndItemItemType(householdId, itemType);
   }
 
@@ -83,7 +83,7 @@ public class StorageService {
    * @param before      The date before which items will expire.
    * @return A list of StorageItem entities that will expire before the specified date.
    */
-  public List<StorageItem> getExpiringItems(Long householdId, LocalDateTime before) {
+  public List<StorageItem> getExpiringItems(String householdId, LocalDateTime before) {
     return storageItemRepository.findByHouseholdIdAndExpirationDateBefore(householdId, before);
   }
 
@@ -93,7 +93,7 @@ public class StorageService {
    * @param householdId The ID of the household.
    * @return A list of StorageItem entities that have already expired.
    */
-  public List<StorageItem> getExpiredItems(Long householdId) {
+  public List<StorageItem> getExpiredItems(String householdId) {
     return storageItemRepository.findByHouseholdIdAndExpirationDateBefore(
         householdId, LocalDateTime.now());
   }
@@ -111,7 +111,7 @@ public class StorageService {
    * @return The newly created StorageItem entity.
    */
   @Transactional
-  public StorageItem addItemToStorage(Long householdId, Long itemId,
+  public StorageItem addItemToStorage(String householdId, Long itemId,
       String unit, Integer amount,
       LocalDateTime expirationDate) {
     Household household = householdRepository.findById(householdId)

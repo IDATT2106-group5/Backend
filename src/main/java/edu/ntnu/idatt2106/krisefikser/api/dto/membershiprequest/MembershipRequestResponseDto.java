@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 public class MembershipRequestResponseDto {
 
   Long id;
-  Long householdId;
+  String householdId;
   String householdName;
   UserResponseDto sender;
   UserResponseDto recipient;
@@ -16,7 +16,7 @@ public class MembershipRequestResponseDto {
   RequestStatus status;
   Timestamp sentAt;
 
-  public MembershipRequestResponseDto(Long id, Long householdId, String householdName,
+  public MembershipRequestResponseDto(Long id, String householdId, String householdName,
       UserResponseDto sender,
       UserResponseDto recipient,
       RequestType requestType, RequestStatus status, Timestamp sentAt) {
@@ -46,11 +46,11 @@ public class MembershipRequestResponseDto {
     this.id = id;
   }
 
-  public Long getHouseholdId() {
+  public String getHouseholdId() {
     return householdId;
   }
 
-  public void setHouseholdId(Long householdId) {
+  public void setHouseholdId(String householdId) {
     this.householdId = householdId;
   }
 

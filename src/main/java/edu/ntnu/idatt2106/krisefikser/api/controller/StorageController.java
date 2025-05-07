@@ -37,14 +37,14 @@ public class StorageController {
 
   @GetMapping("/household/{householdId}")
   public ResponseEntity<List<StorageItemResponseDto>> getStorageItemsByHousehold(
-      @PathVariable Long householdId) {
+      @PathVariable String householdId) {
     List<StorageItemResponseDto> storageItems = storageService.getStorageItemsByHousehold(householdId);
     return ResponseEntity.ok(storageItems);
   }
 
   @GetMapping("/household/{householdId}/type/{itemType}")
   public ResponseEntity<List<StorageItem>> getStorageItemsByHouseholdAndType(
-      @PathVariable Long householdId,
+      @PathVariable String householdId,
       @PathVariable ItemType itemType) {
     List<StorageItem> storageItems = storageService.getStorageItemsByHouseholdAndType(householdId,
         itemType);
@@ -53,7 +53,7 @@ public class StorageController {
 
   @GetMapping("/household/{householdId}/expiring")
   public ResponseEntity<List<StorageItem>> getExpiringItems(
-      @PathVariable Long householdId,
+      @PathVariable String householdId,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime before) {
     List<StorageItem> expiringItems = storageService.getExpiringItems(householdId, before);
     return ResponseEntity.ok(expiringItems);
@@ -61,7 +61,7 @@ public class StorageController {
 
   @PostMapping("/household/{householdId}/item/{itemId}")
   public ResponseEntity<StorageItem> addItemToStorage(
-      @PathVariable Long householdId,
+      @PathVariable String householdId,
       @PathVariable Long itemId,
       @RequestBody Map<String, Object> request) {
 

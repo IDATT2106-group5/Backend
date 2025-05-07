@@ -1,14 +1,14 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto.household;
 
 public class DeleteHouseholdRequestDto {
-  private Long householdId;
+  private String  householdId;
   private Long ownerId;
 
-  public Long getHouseholdId() {
+  public String getHouseholdId() {
     return householdId;
   }
 
-  public void setHouseholdId(Long householdId) {
+  public void setHouseholdId(String householdId) {
     this.householdId = householdId;
   }
 
