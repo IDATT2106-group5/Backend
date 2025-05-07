@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
@@ -499,7 +500,7 @@ public class HouseholdService {
    *
    * @return the household positions
    */
-  public List<PositionDto> getHouseholdPositions() {
+  public List<PositionResponseDto> getHouseholdPositions() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
 
@@ -514,7 +515,7 @@ public class HouseholdService {
     List<User> users = userRepository.getUsersByHouseholdId(user.getHousehold().getId());
 
     return users.stream()
-        .map(u -> new PositionDto(u.getId(), u.getLongitude(), u.getLatitude()))
+        .map(u -> new PositionResponseDto(u.getId(), u.getFullName(), u.getLongitude(), u.getLatitude()))
         .toList();
 
   }

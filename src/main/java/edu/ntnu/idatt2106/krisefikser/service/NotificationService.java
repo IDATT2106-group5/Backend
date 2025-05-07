@@ -1,8 +1,10 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Notification;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
@@ -73,14 +75,23 @@ public class NotificationService {
     logger.info("Sending position update to household {}: userId={}, latitude={}, longitude={}",
         householdId, position.getUserId(), position.getLatitude(), position.getLongitude());
 
+    PositionResponseDto response = new PositionResponseDto(
+        position.getUserId(),
+        userRepository.findById(position.getUserId())
+            .orElseThrow(() -> new IllegalArgumentException("User does not exist")).getFullName(),
+        position.getLongitude(),
+        position.getLatitude()
+        );
+
     try {
       messagingTemplate.convertAndSend(
           "/topic/position/" + householdId,
-          position
+          response
       );
       logger.info("Successfully sent position update to household {}", householdId);
     } catch (Exception e) {
-      logger.error("Failed to send position update to household {}: {}", householdId, e.getMessage(), e);
+      logger.error("Failed to send position update to household {}: {}", householdId,
+          e.getMessage(), e);
     }
   }
 
@@ -170,23 +181,6 @@ public class NotificationService {
   }
 
   /**
-   * Save user notification.
-   *
-   * @param notificationRequest the notification request
-   */
-  public void saveUserNotification(NotificationDto notificationRequest) {
-    Notification notification = new Notification();
-    notification.setType(notificationRequest.getType());
-    notification.setIsRead(false);
-    notification.setTimestamp(LocalDateTime.now());
-    notification.setMessage(notificationRequest.getMessage());
-    notification.setUser(userRepository.findById(notificationRequest.getRecipientId())
-        .orElseThrow(() -> new IllegalArgumentException("User not found")));
-
-    notificationRepository.save(notification);
-  }
-
-  /**
    * Send expiry notification.
    *
    * @param item the item
@@ -199,5 +193,37 @@ public class NotificationService {
             item.getExpirationDate().toLocalDate()) + " days.");
 
     saveHouseholdNotification(notification, item.getHousehold().getId());
+  }
+
+  /**
+   * Send incident notification.
+   *
+   * @param message the message
+   */
+  public void notifyIncident(String message, Incident incident) {
+    NotificationDto notification = new NotificationDto();
+    notification.setType(NotificationType.INCIDENT);
+    notification.setMessage(message);
+    notification.setTimestamp(LocalDateTime.now());
+
+    findUsersWithinIncidentRadius(incident.getLatitude(), incident.getLongitude(),
+        incident.getImpactRadius()).forEach(user -> {
+      notification.setRecipientId(user.getId());
+      saveNotification(notification);
+      sendPrivateNotification(user.getId(), notification);
+    });
+  }
+
+  /**
+   * Finds all users in an incidents' radius to notify
+   *
+   * @param latitude  the latitude.
+   * @param longitude the longitude.
+   * @param radius    the radius.
+   */
+  public List<User> findUsersWithinIncidentRadius(double latitude, double longitude,
+                                                  double radius) {
+    logger.info("Finding users within {}km of coordinates [{}, {}]", radius, latitude, longitude);
+    return userRepository.findUsersWithinRadius(latitude, longitude, radius * 1.4);
   }
 }
