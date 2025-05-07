@@ -6,13 +6,13 @@ import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
  * A Data Transfer Object for User.
  */
 public class UserResponseDto {
-  private Long id;
+  private String id;
   private String email;
   private String fullName;
   private String tlf;
   private Role role;
 
-  public UserResponseDto(Long id, String email, String fullName, String tlf,
+  public UserResponseDto(String id, String email, String fullName, String tlf,
                          Role role) {
     this.id = id;
     this.email = email;
@@ -21,7 +21,7 @@ public class UserResponseDto {
     this.role = role;
   }
 
-  public Long getId() {
+  public String getId() {
     return id;
   }
 

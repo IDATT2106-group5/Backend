@@ -210,7 +210,7 @@ public class MembershipRequestService {
    * @param userId the user id
    * @return the active invitations by user
    */
-  public List<MembershipRequestResponseDto> getSentInvitationsByUser(Long userId) {
+  public List<MembershipRequestResponseDto> getSentInvitationsByUser(String userId) {
     // Check if the user exists
     if (!userRepository.existsById(userId)) {
       throw new IllegalArgumentException("User not found");
@@ -245,7 +245,7 @@ public class MembershipRequestService {
    * @param userId the user id
    * @return the active invitations by user
    */
-  public List<MembershipRequestResponseDto> getReceivedInvitationsByUser(Long userId) {
+  public List<MembershipRequestResponseDto> getReceivedInvitationsByUser(String userId) {
     // Check if the user exists
     if (!userRepository.existsById(userId)) {
       throw new IllegalArgumentException("User not found");

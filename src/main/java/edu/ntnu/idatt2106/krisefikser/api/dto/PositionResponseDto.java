@@ -7,7 +7,7 @@ public class PositionResponseDto {
   /**
    * The User id.
    */
-  Long userId;
+  String userId;
   /**
    * The Full name.
    */
@@ -29,7 +29,7 @@ public class PositionResponseDto {
    * @param longitude the longitude
    * @param latitude  the latitude
    */
-  public PositionResponseDto(Long userId, String fullName, String longitude, String latitude) {
+  public PositionResponseDto(String userId, String fullName, String longitude, String latitude) {
     this.userId = userId;
     this.fullName = fullName;
     this.longitude = longitude;
@@ -65,7 +65,7 @@ public class PositionResponseDto {
    *
    * @return the user id
    */
-  public Long getUserId() {
+  public String getUserId() {
     return userId;
   }
 
@@ -74,7 +74,7 @@ public class PositionResponseDto {
    *
    * @param userId the user id
    */
-  public void setUserId(Long userId) {
+  public void setUserId(String userId) {
     this.userId = userId;
   }
 

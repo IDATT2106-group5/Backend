@@ -5,12 +5,12 @@ import java.time.LocalDateTime;
 
 public class NotificationDto {
   private NotificationType type;
-  private Long recipientId;
+  private String recipientId;
   private LocalDateTime timestamp;
   private boolean read;
   private String message;
 
-  public NotificationDto(NotificationType type, Long recipientId, LocalDateTime timestamp,
+  public NotificationDto(NotificationType type, String recipientId, LocalDateTime timestamp,
                          boolean read, String message) {
     this.type = type;
     this.recipientId = recipientId;
@@ -39,11 +39,11 @@ public class NotificationDto {
   }
 
 
-  public Long getRecipientId() {
+  public String getRecipientId() {
     return recipientId;
   }
 
-  public void setRecipientId(Long recipientId) {
+  public void setRecipientId(String recipientId) {
     this.recipientId = recipientId;
   }
 

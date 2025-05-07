@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.spi.LocaleServiceProvider;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.config.annotation.web.oauth2.resourceserver.OpaqueTokenDsl;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -167,7 +169,7 @@ public class HouseholdService {
    * @throws IllegalArgumentException if the user with a specified id is not found.
    * @throws IllegalArgumentException if the user is not a member of any household.
    */
-  public void removeUserFromHousehold(Long userId, String householdId) {
+  public void removeUserFromHousehold(String userId, String householdId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
     if (user.getHousehold() == null) {
@@ -296,7 +298,7 @@ public class HouseholdService {
    * @param userId the user id.
    * @return A map containing household details, registered users, and unregistered members.
    */
-  public Map<String, Object> getHouseholdDetails(Long userId) {
+  public Map<String, Object> getHouseholdDetails(String userId) {
     Map<String, Object> resultMap = new HashMap<>();
 
     User user = userRepository.findById(userId)
@@ -423,7 +425,7 @@ public class HouseholdService {
    * @throws IllegalArgumentException if the household is not found or if the user is not the
    *                                  owner.
    */
-  public void deleteHousehold(String householdId, Long ownerId) {
+  public void deleteHousehold(String householdId, String ownerId) {
     Household household = householdRepository.findById(householdId)
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
 

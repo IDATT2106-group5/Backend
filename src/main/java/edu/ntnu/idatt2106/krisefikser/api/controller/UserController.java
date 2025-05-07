@@ -65,7 +65,7 @@ public class UserController {
   }
 
   @GetMapping("/me/household/{userId}")
-  public ResponseEntity<?> getHousehold(@PathVariable Long userId) {
+  public ResponseEntity<?> getHousehold(@PathVariable String userId) {
     try {
       HouseholdResponseDto household = userService.getHousehold(userId);
       LOGGER.info("Fetched household: {}", household.getName());

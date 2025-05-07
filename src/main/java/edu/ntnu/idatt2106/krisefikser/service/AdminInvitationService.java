@@ -152,7 +152,7 @@ public class AdminInvitationService {
    * @throws IllegalArgumentException if the user doesn't exist or isn't an admin
    */
   @Transactional
-  public void deleteAdmin(Long adminId) {
+  public void deleteAdmin(String adminId) {
     User admin = userRepository.findById(adminId)
         .orElseThrow(() -> new IllegalArgumentException("Admin user not found"));
 

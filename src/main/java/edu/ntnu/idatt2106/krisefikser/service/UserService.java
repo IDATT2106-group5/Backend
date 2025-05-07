@@ -68,7 +68,7 @@ public class UserService {
    * @param email the email
    * @return the userId
    */
-  public Long checkIfMailExists(String email) {
+  public String checkIfMailExists(String email) {
     User user = userRepository.getUserByEmail(email)
         .orElseThrow(() -> new IllegalArgumentException("No user with this email"));
     return user.getId();
@@ -80,7 +80,7 @@ public class UserService {
    * @param userId the user id
    * @return the household
    */
-  public HouseholdResponseDto getHousehold(Long userId) {
+  public HouseholdResponseDto getHousehold(String userId) {
     User user = userRepository.getUsersById(userId)
         .orElseThrow(() -> new IllegalArgumentException("No user found"));
 

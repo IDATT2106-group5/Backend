@@ -157,7 +157,7 @@ public class AdminController {
    */
   @PostMapping("/delete")
   @PreAuthorize("hasRole('SUPERADMIN')")
-  public ResponseEntity<?> deleteAdmin(@RequestBody Map<String, Long> request) {
+  public ResponseEntity<?> deleteAdmin(@RequestBody Map<String, String> request) {
     try {
       adminInvitationService.deleteAdmin(request.get("adminId"));
       return ResponseEntity.ok(Map.of("message", "Admin deleted successfully"));
