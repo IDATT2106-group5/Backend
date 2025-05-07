@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
@@ -35,6 +36,9 @@ class IncidentServiceTest {
 
   @Mock
   private ScenarioRepository scenarioRepository;
+
+  @Mock
+  private NotificationService notificationService;
 
   @InjectMocks
   private IncidentService incidentService;
