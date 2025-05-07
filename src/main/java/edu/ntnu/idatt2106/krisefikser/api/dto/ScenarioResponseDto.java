@@ -12,6 +12,7 @@ public class ScenarioResponseDto {
   private String description;
   private String toDo;
   private String packingList;
+  private String iconName;
 
   /**
    * Converts a Scenario entity to a ScenarioResponseDto.
@@ -26,6 +27,7 @@ public class ScenarioResponseDto {
     dto.setDescription(scenario.getDescription());
     dto.setToDo(scenario.getToDo());
     dto.setPackingList(scenario.getPackingList());
+    dto.setIconName(scenario.getIconName());
     return dto;
   }
 
@@ -68,5 +70,13 @@ public class ScenarioResponseDto {
 
   public void setPackingList(String packingList) {
     this.packingList = packingList;
+  }
+
+  public String getIconName() {
+    return iconName;
+  }
+
+  public void setIconName(String iconName) {
+    this.iconName = iconName;
   }
 }

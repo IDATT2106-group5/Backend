@@ -180,8 +180,10 @@ class ScenarioServiceTest {
     @Test
     void shouldReturnListOfScenarioResponseDtos() {
       // Arrange
-      Scenario scenario1 = new Scenario(1L, "Power Outage", "No power", "Stay warm", "Batteries");
-      Scenario scenario2 = new Scenario(2L, "Flood", "Water rising", "Evacuate", "Life jacket");
+      Scenario scenario1 = new Scenario(1L, "Power Outage", "No power", "Stay warm", "Batteries",
+          "icon1");
+      Scenario scenario2 = new Scenario(2L, "Flood", "Water rising", "Evacuate", "Life jacket",
+          "icon2");
 
       when(scenarioRepository.findAll()).thenReturn(List.of(scenario1, scenario2));
 
