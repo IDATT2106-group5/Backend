@@ -13,6 +13,7 @@ public class ScenarioRequestDto {
   private String description;
   private String toDo;
   private String packingList;
+  private String iconName;
 
   /**
    * Converts this DTO to a Scenario entity.
@@ -25,6 +26,7 @@ public class ScenarioRequestDto {
     scenario.setDescription(this.description);
     scenario.setToDo(this.toDo);
     scenario.setPackingList(this.packingList);
+    scenario.setIconName(this.iconName);
     return scenario;
   }
 
@@ -59,6 +61,14 @@ public class ScenarioRequestDto {
 
   public void setPackingList(String packingList) {
     this.packingList = packingList;
+  }
+
+  public String getIconName() {
+    return iconName;
+  }
+
+  public void setIconName(String iconName) {
+    this.iconName = iconName;
   }
 
 }

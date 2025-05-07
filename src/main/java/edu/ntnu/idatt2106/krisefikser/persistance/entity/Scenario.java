@@ -7,6 +7,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * The Scenario entity.
+ */
 @Entity
 @Table(name = "scenario")
 public class Scenario {
@@ -20,17 +23,33 @@ public class Scenario {
   private String toDo;
   @Column(name = "packing_list", columnDefinition = "TEXT")
   private String packingList;
+  @Column(name = "icon_name")
+  private String iconName;
 
-
+  /**
+   * Default constructor.
+   */
   public Scenario() {
   }
 
-  public Scenario(Long id, String name, String description, String toDo, String packingList) {
+  /**
+   * Constructor with parameters.
+   *
+   * @param id          The ID of the scenario
+   * @param name        The name of the scenario
+   * @param description The description of the scenario
+   * @param toDo        The information about what to do
+   * @param packingList The packing list for the scenario
+   * @param iconName    The icon name for the scenario
+   */
+  public Scenario(Long id, String name, String description, String toDo, String packingList,
+      String iconName) {
     this.id = id;
     this.name = name;
     this.description = description;
     this.toDo = toDo;
     this.packingList = packingList;
+    this.iconName = iconName;
   }
 
   public Long getId() {
@@ -71,5 +90,13 @@ public class Scenario {
 
   public void setToDo(String toDo) {
     this.toDo = toDo;
+  }
+
+  public String getIconName() {
+    return iconName;
+  }
+
+  public void setIconName(String iconName) {
+    this.iconName = iconName;
   }
 }

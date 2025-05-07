@@ -64,6 +64,7 @@ public class ScenarioService {
     scenario.setDescription(dto.getDescription());
     scenario.setToDo(dto.getToDo());
     scenario.setPackingList(dto.getPackingList());
+    scenario.setIconName(dto.getIconName());
 
     scenarioRepository.save(scenario);
     logger.info("Scenario with ID {} updated successfully", id);
@@ -78,5 +79,20 @@ public class ScenarioService {
     return scenarioRepository.findAll().stream()
         .map(ScenarioResponseDto::fromEntity)
         .toList();
+  }
+
+  /**
+   * Retrieves a scenario by ID.
+   *
+   * @param id The ID of the scenario to retrieve
+   * @return The scenario response DTO
+   */
+  public ScenarioResponseDto getScenarioById(Long id) {
+    Scenario scenario = scenarioRepository.findById(id)
+        .orElseThrow(() -> {
+          logger.warn("Scenario not found with ID: {}", id);
+          return new IllegalArgumentException("Scenario not found with ID: " + id);
+        });
+    return ScenarioResponseDto.fromEntity(scenario);
   }
 }
