@@ -13,7 +13,17 @@ public class UserHouseholdAssignmentRequestDto {
     return userId;
   }
 
+  public void setUserId(Long userId) {
+    this.userId = userId;
+  }
+
   public Long getHouseholdId() {
     return householdId;
   }
+
+  public void setHouseholdId(Long householdId) {
+    this.householdId = householdId;
+  }
+
 }
+
