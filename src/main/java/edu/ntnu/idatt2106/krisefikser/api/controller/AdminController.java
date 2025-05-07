@@ -11,15 +11,12 @@ import edu.ntnu.idatt2106.krisefikser.service.TwoFactorService;
 import edu.ntnu.idatt2106.krisefikser.service.UserService;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,11 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AdminController {
 
+  private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
   private final AdminInvitationService adminInvitationService;
   private final TwoFactorService twoFactorService;
   private final AuthService authService;
   private final UserService userService;
-  private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
   /**
    * Constructor for AdminController.
@@ -58,8 +55,12 @@ public class AdminController {
   @PostMapping("/invite")
   @PreAuthorize("hasRole('SUPERADMIN')")
   public ResponseEntity<?> inviteAdmin(@RequestBody AdminInviteRequest request) {
-    adminInvitationService.createAdminInvitation(request.getEmail(), request.getFullName());
-    return ResponseEntity.ok(Map.of("message", "Admin invitation sent successfully"));
+    try {
+      adminInvitationService.createAdminInvitation(request.getEmail(), request.getFullName());
+      return ResponseEntity.ok(Map.of("message", "Admin invitation sent successfully"));
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+    }
   }
 
   /**
@@ -132,9 +133,9 @@ public class AdminController {
   }
 
   /**
-   * Gets a list of all admin users. Only accessible by SUPERADMIN users.
+   * Gets a list of all admin and superadmin users. Only accessible by SUPERADMIN users.
    *
-   * @return ResponseEntity containing the list of admin users
+   * @return ResponseEntity containing the list of admin and superadmin users
    */
   @GetMapping
   @PreAuthorize("hasRole('SUPERADMIN')")
@@ -151,7 +152,7 @@ public class AdminController {
   /**
    * Deletes an admin user by their ID. Only accessible by SUPERADMIN users.
    *
-   * @param  request The request containing the admin ID
+   * @param request The request containing the admin ID
    * @return ResponseEntity indicating the result of the operation
    */
   @PostMapping("/delete")

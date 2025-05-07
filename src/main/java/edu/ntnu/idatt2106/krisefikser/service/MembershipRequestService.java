@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.MembershipRequest;
@@ -11,6 +12,7 @@ import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestStatus;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
+import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.MembershipRequestRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.sql.Timestamp;
@@ -26,6 +28,7 @@ public class MembershipRequestService {
 
   private final MembershipRequestRepository membershipRequestRepository;
   private final HouseholdRepository householdRepository;
+  private final HouseholdService householdService;
   private final UserRepository userRepository;
   private final NotificationService notificationService;
 
@@ -40,11 +43,13 @@ public class MembershipRequestService {
   public MembershipRequestService(MembershipRequestRepository membershipRequestRepository,
       HouseholdRepository householdRepository,
       UserRepository userRepository,
-      NotificationService notificationService) {
+      NotificationService notificationService,
+      HouseholdService householdService) {
     this.membershipRequestRepository = membershipRequestRepository;
     this.householdRepository = householdRepository;
     this.userRepository = userRepository;
     this.notificationService = notificationService;
+    this.householdService = householdService;
   }
 
   /**
@@ -122,19 +127,52 @@ public class MembershipRequestService {
   }
 
   /**
-   * Accept a membership request.
+   * Accept a membership join request.
    *
    * @param requestId the request id
    */
-  public void acceptRequest(Long requestId) {
-    // Check if the request exists
-    if (!membershipRequestRepository.existsById(requestId)) {
-      throw new IllegalArgumentException("Request not found");
+  public void acceptJoinRequest(Long requestId) {
+    MembershipRequest request = membershipRequestRepository.findById(requestId)
+        .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+
+    if (request.getStatus() != RequestStatus.PENDING) {
+      throw new IllegalArgumentException("Request is not pending");
     }
 
-    // Update the request status to "accepted"
-    membershipRequestRepository.updateStatusById(requestId, RequestStatus.ACCEPTED);
+    request.setStatus(RequestStatus.ACCEPTED);
+    membershipRequestRepository.save(request);
+
+    UserHouseholdAssignmentRequestDto assignment = new UserHouseholdAssignmentRequestDto();
+    assignment.setUserId(request.getSender().getId());
+    assignment.setHouseholdId(request.getHousehold().getId());
+
+    householdService.addUserToHousehold(assignment);
   }
+
+  /**
+   * Accept an invitation request.
+   *
+   * @param requestId the request id
+   */
+  public void acceptInvitationRequest(Long requestId) {
+    MembershipRequest request = membershipRequestRepository.findById(requestId)
+        .orElseThrow(() -> new IllegalArgumentException("Request not found"));
+
+    if (request.getStatus() != RequestStatus.PENDING) {
+      throw new IllegalArgumentException("Request is not pending");
+    }
+
+    request.setStatus(RequestStatus.ACCEPTED);
+    membershipRequestRepository.save(request);
+
+    UserHouseholdAssignmentRequestDto assignment = new UserHouseholdAssignmentRequestDto();
+    assignment.setUserId(request.getReceiver().getId());
+    assignment.setHouseholdId(request.getHousehold().getId());
+
+    householdService.addUserToHousehold(assignment);
+  }
+
+
 
   /**
    * Cancel a membership request.
