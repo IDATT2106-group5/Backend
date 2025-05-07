@@ -91,10 +91,6 @@ public class HouseholdService {
    * @throws IllegalArgumentException if the specified owner ID does not match any existing user.
    */
   public void createHousehold(CreateHouseholdRequestDto request) {
-    if (householdRepository.findByName(request.getName()).isPresent()) {
-      logger.warn("Household with name {} already exists", request.getName());
-      throw new IllegalArgumentException("Household with this name already exists");
-    }
     if (request.getOwnerId() == null) {
       throw new IllegalArgumentException("Owner id must not be null");
     }
