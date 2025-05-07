@@ -97,13 +97,13 @@ public class UserService {
   }
 
   /**
-   * Gets all users with ADMIN role.
+   * Gets all users with ADMIN and SUPERADMIN role.
    *
    * @return List of admin users as DTOs
    */
   public List<UserResponseDto> getAllAdmins() {
     List<User> adminUsers = userRepository.findAll().stream()
-        .filter(user -> user.getRole() == Role.ADMIN)
+        .filter(user -> user.getRole() == Role.ADMIN || user.getRole() == Role.SUPERADMIN)
         .toList();
 
     return adminUsers.stream()
