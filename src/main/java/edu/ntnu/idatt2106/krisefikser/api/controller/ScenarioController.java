@@ -104,4 +104,25 @@ public class ScenarioController {
       return ResponseEntity.status(500).build();
     }
   }
+
+  /**
+   * Get a scenario by ID.
+   *
+   * @param id the ID of the scenario to retrieve
+   * @return a response entity with the scenario data
+   */
+  @GetMapping("/{id}")
+  public ResponseEntity<ScenarioResponseDto> getScenarioById(@PathVariable Long id) {
+    try {
+      ScenarioResponseDto scenario = scenarioService.getScenarioById(id);
+      logger.info("Fetched scenario with ID {}", id);
+      return ResponseEntity.ok(scenario);
+    } catch (IllegalArgumentException e) {
+      logger.warn("Scenario not found with ID {}: {}", id, e.getMessage());
+      return ResponseEntity.notFound().build();
+    } catch (Exception e) {
+      logger.error("Failed to fetch scenario with ID {}: {}", id, e.getMessage(), e);
+      return ResponseEntity.status(500).build();
+    }
+  }
 }
