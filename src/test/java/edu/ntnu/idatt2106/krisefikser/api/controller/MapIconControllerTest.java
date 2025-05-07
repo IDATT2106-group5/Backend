@@ -161,4 +161,57 @@ class MapIconControllerTest {
       assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
   }
+
+  @Nested
+  class FindClosestMapIconTests {
+
+    @Test
+    void shouldReturnClosestMapIcon_whenFound() {
+      // Arrange
+      MapIconResponseDto icon = new MapIconResponseDto();
+      icon.setId(1L);
+      icon.setType(MapIconType.SHELTER);
+      icon.setLatitude(63.42);
+      icon.setLongitude(10.39);
+
+      when(mapIconService.findClosestMapIcon(63.42, 10.39, null)).thenReturn(icon);
+
+      // Act
+      ResponseEntity<?> response = mapIconController.findClosestMapIcon(63.42, 10.39, null);
+
+      // Assert
+      assertEquals(HttpStatus.OK, response.getStatusCode());
+      assertNotNull(response.getBody());
+      assertEquals(MapIconType.SHELTER, ((MapIconResponseDto) response.getBody()).getType());
+    }
+
+    @Test
+    void shouldReturnNotFound_whenNoIconFound() {
+      // Arrange
+      when(mapIconService.findClosestMapIcon(63.42, 10.39, null)).thenReturn(null);
+
+      // Act
+      ResponseEntity<?> response = mapIconController.findClosestMapIcon(63.42, 10.39, null);
+
+      // Assert
+      assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void shouldReturnInternalServerError_whenExceptionThrown() {
+      // Arrange
+      when(mapIconService.findClosestMapIcon(63.42, 10.39, MapIconType.HOSPITAL))
+          .thenThrow(new RuntimeException("Database error"));
+
+      // Act
+      ResponseEntity<?> response = mapIconController.findClosestMapIcon(63.42, 10.39,
+          MapIconType.HOSPITAL);
+
+      // Assert
+      assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+      assertNotNull(response.getBody());
+      assertEquals("Internal server error",
+          ((Map<String, String>) response.getBody()).get("error"));
+    }
+  }
 }

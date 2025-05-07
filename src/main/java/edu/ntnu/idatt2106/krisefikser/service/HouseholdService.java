@@ -1,5 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
@@ -109,7 +110,6 @@ public class HouseholdService {
     logger.info("Household created successfully: {}", householdRepository.findByName(
         request.getName()));
 
-    // Send notification to the owner of the household.
     NotificationDto notification = new NotificationDto();
     notification.setMessage("Household created successfully");
     notification.setType(NotificationType.HOUSEHOLD);
@@ -150,7 +150,6 @@ public class HouseholdService {
     householdRepository.updateNumberOfMembers(household.getId(),
         household.getNumberOfMembers() + 1);
 
-    // Create a notification for the household
     NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
         household.getOwner().getId(), LocalDateTime.now(), false,
         user.getFullName() + " has joined your household.");
@@ -186,7 +185,6 @@ public class HouseholdService {
         user.getHousehold().getNumberOfMembers() - 1);
     userRepository.updateHouseholdId(user.getId(), null);
 
-    // Create a notification for the household
     NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
         householdId, LocalDateTime.now(), false,
         user.getFullName() + " has been removed from household.");
@@ -233,7 +231,6 @@ public class HouseholdService {
     userRepository.updateHouseholdId(user.getId(), null);
     logger.info("User {} has been removed from the household", user.getFullName());
 
-    // Create a notification for the household
     NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
         user.getHousehold().getOwner().getId(), LocalDateTime.now(), false,
         user.getFullName() + " has left the household.");
@@ -394,7 +391,6 @@ public class HouseholdService {
     householdRepository.save(household);
     logger.info("Household owner changed to {}", newOwner.getFullName());
 
-    // Create a notification for the new owner
     NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
         newOwner.getId(), LocalDateTime.now(), false,
         "You are now the owner of household " + household.getName());
@@ -432,7 +428,6 @@ public class HouseholdService {
     }
     householdRepository.save(household);
 
-    // Create a notification for the household owner
     NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
         household.getOwner().getId(), LocalDateTime.now(), false,
         "Household " + household.getName() + " has been updated.");
@@ -456,28 +451,23 @@ public class HouseholdService {
       throw new IllegalArgumentException("Only the owner can delete the household");
     }
 
-    // Remove household from all users
     List<User> users = userRepository.getUsersByHousehold(household);
     for (User user : users) {
       user.setHousehold(null);
       userRepository.save(user);
     }
-    // Delete unregistered members
+
     List<UnregisteredHouseholdMember> unregistered = unregisteredHouseholdMemberRepository
         .findUnregisteredHouseholdMembersByHousehold(household);
     for (UnregisteredHouseholdMember member : unregistered) {
       unregisteredHouseholdMemberRepository.delete(member);
     }
 
-    // Create notification for the household members
     NotificationDto notification = new NotificationDto(NotificationType.HOUSEHOLD,
         household.getOwner().getId(), LocalDateTime.now(), false,
         "Household " + household.getName() + " has been deleted.");
 
-    // Delete the household
     householdRepository.delete(household);
-
-    // Send notification to all users
     notificationService.saveHouseholdNotification(notification, household.getId());
   }
 
@@ -502,5 +492,30 @@ public class HouseholdService {
             household.getOwner().getRole()
         )
     );
+  }
+
+  /**
+   * Gets positions of the users in the current users household.
+   *
+   * @return the household positions
+   */
+  public List<PositionDto> getHouseholdPositions() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+
+    logger.info("Fetching household positions for user: {}", email);
+
+    User user = userRepository.getUserByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("No user logged in"));
+    if (user.getHousehold() == null) {
+        throw new IllegalArgumentException("User does not belong to a household");
+    }
+
+    List<User> users = userRepository.getUsersByHouseholdId(user.getHousehold().getId());
+
+    return users.stream()
+        .map(u -> new PositionDto(u.getId(), u.getLongitude(), u.getLatitude()))
+        .toList();
+
   }
 }
