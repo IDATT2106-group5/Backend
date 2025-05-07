@@ -10,7 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 @SpringBootTest
 @ContextConfiguration(classes = {TestConfig.class})
 @ActiveProfiles("test")
-class KrisefikserApplicationTests {
+public class KrisefikserApplicationTests {
 
     @Test
     void contextLoads() {

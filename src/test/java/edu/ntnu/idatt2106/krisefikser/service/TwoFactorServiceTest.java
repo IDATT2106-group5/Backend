@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-class TwoFactorServiceTest {
+public class TwoFactorServiceTest {
 
   private final String testEmail = "test@example.com";
   private final String testOtp = "123456";

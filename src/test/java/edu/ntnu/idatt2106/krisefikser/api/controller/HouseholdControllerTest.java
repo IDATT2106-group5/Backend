@@ -30,7 +30,7 @@ import org.springframework.http.ResponseEntity;
  * Unit tests for the HouseholdController class.
  * This class contains nested test classes for testing various endpoints of the HouseholdController.
  */
-class HouseholdControllerTest {
+public class HouseholdControllerTest {
 
   @Mock
   private HouseholdService householdService;

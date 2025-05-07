@@ -29,7 +29,7 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit tests for the MapIconService class.
  */
-class MapIconServiceTest {
+public class MapIconServiceTest {
 
   @Mock
   private MapIconRepository mapIconRepository;

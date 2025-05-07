@@ -24,7 +24,7 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit tests for the ScenarioService class.
  */
-class ScenarioServiceTest {
+public class ScenarioServiceTest {
 
   @Mock
   private ScenarioRepository scenarioRepository;

@@ -15,7 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 
-class JwtAuthenticationEntryPointTest {
+public class JwtAuthenticationEntryPointTest {
 
   @InjectMocks
   private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;

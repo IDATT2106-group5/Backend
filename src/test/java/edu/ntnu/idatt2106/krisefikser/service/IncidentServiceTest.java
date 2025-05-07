@@ -29,7 +29,7 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit tests for the IncidentService class.
  */
-class IncidentServiceTest {
+public class IncidentServiceTest {
 
   @Mock
   private IncidentRepository incidentRepository;
