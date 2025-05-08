@@ -127,7 +127,7 @@ public class HouseholdController {
   /**
    * Removes a user from a household with the given ID. The user must be registered in the system.
    *
-   * @param request the request
+   * @param request the id of the household and the user
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes a user from a household",
@@ -172,7 +172,7 @@ public class HouseholdController {
   /**
    * Deletes a household with the given ID. The user must be the owner of the household.
    *
-   * @param request the request
+   * @param request the id of the household and the owner
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Deletes a household", description = "Deletes the household with the given ID")
@@ -198,7 +198,7 @@ public class HouseholdController {
    * Removes an unregistered member from a household with the given ID. The user must not be
    * registered in the system.
    *
-   * @param request the request
+   * @param request the id of the member to remove
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes an unregistered member from a household",
@@ -222,7 +222,7 @@ public class HouseholdController {
   /**
    * Gets household details.
    *
-   * @param request the request
+   * @param request id of the user
    * @return the household details
    */
   @Operation(summary = "Gets household details",
