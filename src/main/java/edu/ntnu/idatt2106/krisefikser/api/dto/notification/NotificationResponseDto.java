@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 public class NotificationResponseDto {
   private Long id;
   private NotificationType type;
-  private Long recipientId;
+  private String recipientId;
   private LocalDateTime timestamp;
   private boolean read;
   private String message;
 
-  public NotificationResponseDto(Long id, NotificationType type, Long recipientId,
+  public NotificationResponseDto(Long id, NotificationType type, String recipientId,
                                  LocalDateTime timestamp, String message, boolean read) {
     this.type = type;
     this.recipientId = recipientId;
@@ -49,11 +49,11 @@ public class NotificationResponseDto {
   }
 
 
-  public Long getRecipientId() {
+  public String getRecipientId() {
     return recipientId;
   }
 
-  public void setRecipientId(Long recipientId) {
+  public void setRecipientId(String recipientId) {
     this.recipientId = recipientId;
   }
 

@@ -21,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-class JwtAuthenticationFilterTest {
+public class JwtAuthenticationFilterTest {
 
   @InjectMocks
   private JwtAuthenticationFilter jwtAuthenticationFilter;

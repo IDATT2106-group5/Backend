@@ -8,13 +8,13 @@ package edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers;
 public class UnregisteredMemberHouseholdAssignmentRequestDto {
 
   private String fullName;
-  private Long householdId;
+  private String householdId;
 
   public String getFullName() {
     return fullName;
   }
 
-  public Long getHouseholdId() {
+  public String getHouseholdId() {
     return householdId;
   }
 }

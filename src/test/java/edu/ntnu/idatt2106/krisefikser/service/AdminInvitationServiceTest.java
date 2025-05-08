@@ -271,7 +271,7 @@ class AdminInvitationServiceTest {
   @Test
   void deleteAdmin_shouldDeleteAdminUser_whenUserIsAdmin() {
     // Arrange
-    Long adminId = 1L;
+    String adminId = "1L";
     User adminUser = new User();
     adminUser.setId(adminId);
     adminUser.setEmail("admin@example.com");
@@ -289,7 +289,7 @@ class AdminInvitationServiceTest {
   @Test
   void deleteAdmin_shouldThrowException_whenUserNotFound() {
     // Arrange
-    Long adminId = 1L;
+    String adminId = "1L";
     when(userRepository.findById(adminId)).thenReturn(Optional.empty());
 
     // Act & Assert
@@ -302,7 +302,7 @@ class AdminInvitationServiceTest {
   @Test
   void deleteAdmin_shouldThrowException_whenUserIsNotAdmin() {
     // Arrange
-    Long userId = 1L;
+    String userId = "1L";
     User normalUser = new User();
     normalUser.setId(userId);
     normalUser.setEmail("user@example.com");
@@ -320,7 +320,7 @@ class AdminInvitationServiceTest {
   @Test
   void deleteAdmin_shouldThrowException_whenUserIsSuperAdmin() {
     // Arrange
-    Long superAdminId = 1L;
+    String superAdminId = "1L";
     User superAdmin = new User();
     superAdmin.setId(superAdminId);
     superAdmin.setEmail("superadmin@example.com");

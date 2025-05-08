@@ -54,14 +54,14 @@ public class NotificationService {
    * @param userId       the user id
    * @param notification the notification
    */
-  public void sendPrivateNotification(Long userId, NotificationDto notification) {
+  public void sendPrivateNotification(String userId, NotificationDto notification) {
     logger.info("Sending private notification to user {}: type={}, message={}, timestamp={}",
         userId, notification.getType(), notification.getMessage(),
         notification.getTimestamp());
 
     try {
       messagingTemplate.convertAndSendToUser(
-          String.valueOf(userId),
+          userId,
           "/queue/notifications",
           notification
       );
@@ -71,7 +71,7 @@ public class NotificationService {
     }
   }
 
-  public void sendHouseholdPositionUpdate(Long householdId, PositionDto position) {
+  public void sendHouseholdPositionUpdate(String householdId, PositionDto position) {
     logger.info("Sending position update to household {}: userId={}, latitude={}, longitude={}",
         householdId, position.getUserId(), position.getLatitude(), position.getLongitude());
 
@@ -122,7 +122,7 @@ public class NotificationService {
    * @param notification the notification
    * @param householdId  the household id
    */
-  public void saveHouseholdNotification(NotificationDto notification, Long householdId) {
+  public void saveHouseholdNotification(NotificationDto notification, String householdId) {
     Notification notificationEntity = new Notification();
     notificationEntity.setType(notification.getType());
     notificationEntity.setIsRead(notification.isRead());
@@ -147,7 +147,7 @@ public class NotificationService {
    * @param userId the user id
    * @return the user notifications
    */
-  public List<NotificationResponseDto> getUserNotifications(Long userId) {
+  public List<NotificationResponseDto> getUserNotifications(String userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("User not found"));
     List<Notification> notifications =

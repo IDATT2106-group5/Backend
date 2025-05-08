@@ -19,7 +19,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-class CaptchaServiceTest {
+public class CaptchaServiceTest {
 
   private final String TEST_SECRET_KEY = "test-secret-key";
   private final String VERIFY_URL = "https://hcaptcha.com/siteverify";

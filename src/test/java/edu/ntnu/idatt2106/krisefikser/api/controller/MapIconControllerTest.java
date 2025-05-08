@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 /**
  * Unit tests for the MapIconController class.
  */
-class MapIconControllerTest {
+public class MapIconControllerTest {
 
   @Mock
   private MapIconService mapIconService;

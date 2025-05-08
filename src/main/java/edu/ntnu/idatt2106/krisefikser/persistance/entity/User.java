@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.Date;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * The type User.
@@ -21,8 +22,12 @@ import java.util.Date;
 public class User {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(
+      name = "UUID",
+      strategy = "org.hibernate.id.UUIDGenerator"
+  )
+  private String id;
 
   @Column(unique = true, nullable = false)
   private String email;
@@ -104,7 +109,7 @@ public class User {
    *
    * @return the id
    */
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
@@ -113,7 +118,7 @@ public class User {
    *
    * @param id the id
    */
-  public void setId(Long id) {
+  public void setId(String id) {
     this.id = id;
   }
 

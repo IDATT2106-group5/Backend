@@ -36,7 +36,7 @@ class CustomUserDetailsServiceTest {
     MockitoAnnotations.openMocks(this);
 
     testUser = new User();
-    testUser.setId(1L);
+    testUser.setId("1L");
     testUser.setEmail(TEST_EMAIL);
     testUser.setPassword(TEST_PASSWORD);
     testUser.setFullName("Test User");

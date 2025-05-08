@@ -333,8 +333,8 @@ public class HouseholdController {
    */
   @Operation(summary = "Search for a household by household id", description = "Search for a household by household id")
   @PostMapping("/search")
-  public ResponseEntity<?> searchHouseholdById(@RequestBody Map<String, Long> request) {
-    Long householdId = request.get("householdId");
+  public ResponseEntity<?> searchHouseholdById(@RequestBody Map<String, String> request) {
+    String householdId = request.get("householdId");
     LOGGER.info("Received request to search for household with ID: {}", householdId);
     try {
       HouseholdBasicResponseDto response = householdService.searchHouseholdById(householdId);

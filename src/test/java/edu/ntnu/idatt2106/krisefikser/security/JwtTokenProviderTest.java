@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-class JwtTokenProviderTest {
+public class JwtTokenProviderTest {
 
   @InjectMocks
   private JwtTokenProvider tokenProvider;

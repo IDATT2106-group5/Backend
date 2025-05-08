@@ -1,11 +1,9 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -13,6 +11,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  * The type Household.
@@ -20,12 +19,11 @@ import java.util.List;
 @Entity
 @Table(name = "household")
 public class Household {
-
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Column(name = "id", updatable = false, nullable = false, columnDefinition = "CHAR(36)")
+  private String id;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false)
   private String name;
 
   @Column(nullable = false)
@@ -65,7 +63,7 @@ public class Household {
    *
    * @return the id
    */
-  public Long getId() {
+  public String getId() {
     return id;
   }
 
@@ -74,7 +72,7 @@ public class Household {
    *
    * @param id the id
    */
-  public void setId(Long id) {
+  public void setId(String id) {
     this.id = id;
   }
 

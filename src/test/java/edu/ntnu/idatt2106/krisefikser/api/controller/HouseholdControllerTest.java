@@ -30,7 +30,7 @@ import org.springframework.http.ResponseEntity;
  * Unit tests for the HouseholdController class.
  * This class contains nested test classes for testing various endpoints of the HouseholdController.
  */
-class HouseholdControllerTest {
+public class HouseholdControllerTest {
 
   @Mock
   private HouseholdService householdService;
@@ -61,7 +61,7 @@ class HouseholdControllerTest {
       CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
       when(request.getName()).thenReturn("TestHousehold");
       when(request.getAddress()).thenReturn("TestAddress");
-      when(request.getOwnerId()).thenReturn(1L);
+      when(request.getOwnerId()).thenReturn("1L");
 
       doNothing().when(householdService).createHousehold(any(CreateHouseholdRequestDto.class));
 
@@ -131,7 +131,7 @@ class HouseholdControllerTest {
     void addUserToHousehold_ValidRequest_ReturnsOk() {
       // Arrange
       UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
-      when(request.getHouseholdId()).thenReturn(1L);
+      when(request.getHouseholdId()).thenReturn("1L");
 
       doNothing().when(householdService)
           .addUserToHousehold(any(UserHouseholdAssignmentRequestDto.class));
@@ -173,7 +173,7 @@ class HouseholdControllerTest {
     void addUserToHousehold_UnexpectedException_ReturnsInternalServerError() {
       // Arrange
       UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
-      when(request.getHouseholdId()).thenReturn(1L);
+      when(request.getHouseholdId()).thenReturn("1L");
 
       doThrow(new RuntimeException("Database error"))
           .when(householdService).addUserToHousehold(any(UserHouseholdAssignmentRequestDto.class));
@@ -203,7 +203,7 @@ class HouseholdControllerTest {
       UnregisteredMemberHouseholdAssignmentRequestDto request =
           mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
       when(request.getFullName()).thenReturn("John Doe");
-      when(request.getHouseholdId()).thenReturn(1L);
+      when(request.getHouseholdId()).thenReturn("1L");
 
       doNothing().when(householdService).addUnregisteredMemberToHousehold(
           any(UnregisteredMemberHouseholdAssignmentRequestDto.class));
@@ -252,7 +252,7 @@ class HouseholdControllerTest {
       UnregisteredMemberHouseholdAssignmentRequestDto request =
           mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
       when(request.getFullName()).thenReturn("John Doe");
-      when(request.getHouseholdId()).thenReturn(1L);
+      when(request.getHouseholdId()).thenReturn("1L");
 
       doThrow(new RuntimeException("Database error"))
           .when(householdService).addUnregisteredMemberToHousehold(
@@ -373,7 +373,7 @@ class HouseholdControllerTest {
     @Test
     void getHouseholdDetails_ValidHouseholdId_ReturnsDetails() {
       // Arrange
-      Long householdId = 1L;
+      String householdId = "1L";
       Map<String, Object> details =
           Map.of("name", "Test Household", "members", List.of("John Doe"));
       when(householdService.getHouseholdDetails(householdId)).thenReturn(details);
@@ -384,7 +384,7 @@ class HouseholdControllerTest {
     @Test
     void getHouseholdDetails_InvalidHouseholdId_ReturnsBadRequest() {
       // Arrange
-      Long householdId = -1L;
+      String householdId = "-1L";
       String errorMessage = "Invalid household ID";
       when(householdService.getHouseholdDetails(householdId)).thenThrow(
           new IllegalArgumentException(errorMessage));
@@ -394,7 +394,7 @@ class HouseholdControllerTest {
     @Test
     void getHouseholdDetails_ServiceThrowsUnexpectedException_ReturnsInternalServerError() {
       // Arrange
-      Long householdId = 1L;
+      String householdId = "1L";
       when(householdService.getHouseholdDetails(householdId)).thenThrow(
           new RuntimeException("Unexpected error"));
 

@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 /**
  * Unit tests for the ScenarioController class.
  */
-class ScenarioControllerTest {
+public class ScenarioControllerTest {
 
   @Mock
   private ScenarioService scenarioService;

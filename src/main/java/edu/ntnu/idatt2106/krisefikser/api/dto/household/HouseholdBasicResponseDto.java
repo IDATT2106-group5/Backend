@@ -5,7 +5,7 @@ package edu.ntnu.idatt2106.krisefikser.api.dto.household;
  */
 public class HouseholdBasicResponseDto {
 
-  private final Long id;
+  private final String id;
   private final String name;
 
   /**
@@ -14,13 +14,13 @@ public class HouseholdBasicResponseDto {
    * @param id   the id of the household
    * @param name the name of the household
    */
-  public HouseholdBasicResponseDto(Long id, String name) {
+  public HouseholdBasicResponseDto(String id, String name) {
     this.id = id;
     this.name = name;
   }
 
   // Getters and setters
-  public Long getId() {
+  public String getId() {
     return id;
   }
 

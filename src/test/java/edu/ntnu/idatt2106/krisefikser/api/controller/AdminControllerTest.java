@@ -198,8 +198,8 @@ public class AdminControllerTest {
   void getAllAdmins_shouldReturnAdminList() throws Exception {
     // Arrange
     List<UserResponseDto> adminList = Arrays.asList(
-        new UserResponseDto(1L, "admin1@example.com", "Admin One", null, Role.ADMIN),
-        new UserResponseDto(2L, "admin2@example.com", "Admin Two", null, Role.ADMIN)
+        new UserResponseDto("1L", "admin1@example.com", "Admin One", null, Role.ADMIN),
+        new UserResponseDto("2L", "admin2@example.com", "Admin Two", null, Role.ADMIN)
     );
 
     when(userService.getAllAdmins()).thenReturn(adminList);
@@ -213,8 +213,8 @@ public class AdminControllerTest {
 
   @Test
   void deleteAdmin_shouldDeleteAdmin_whenIdIsValid() throws Exception {
-    Long adminId = 1L;
-    Map<String, Long> requestBody = Map.of("adminId", adminId);
+    String adminId = "1L";
+    Map<String, String> requestBody = Map.of("adminId", adminId);
     ObjectMapper objectMapper = new ObjectMapper();
     String requestJson = objectMapper.writeValueAsString(requestBody);
 
@@ -229,8 +229,8 @@ public class AdminControllerTest {
 
   @Test
   void deleteAdmin_shouldReturnBadRequest_whenIdIsInvalid() throws Exception {
-    Long invalidId = 999L;
-    Map<String, Long> requestBody = Map.of("adminId", invalidId);
+    String invalidId = "999L";
+    Map<String, String> requestBody = Map.of("adminId", invalidId);
     ObjectMapper objectMapper = new ObjectMapper();
     String requestJson = objectMapper.writeValueAsString(requestBody);
 

@@ -25,7 +25,7 @@ public interface StorageItemRepository extends JpaRepository<StorageItem, Long> 
    * @param householdId the household id
    * @return the list
    */
-  List<StorageItem> findByHouseholdId(Long householdId);
+  List<StorageItem> findByHouseholdId(String householdId);
 
   /**
    * Find a list of items by household id and item type.
@@ -34,7 +34,7 @@ public interface StorageItemRepository extends JpaRepository<StorageItem, Long> 
    * @param itemType    the item type
    * @return the list
    */
-  List<StorageItem> findByHouseholdIdAndItemItemType(Long householdId, ItemType itemType);
+  List<StorageItem> findByHouseholdIdAndItemItemType(String householdId, ItemType itemType);
 
   /**
    * Find by household id and expiration date before.
@@ -43,7 +43,7 @@ public interface StorageItemRepository extends JpaRepository<StorageItem, Long> 
    * @param date        the date
    * @return the list
    */
-  List<StorageItem> findByHouseholdIdAndExpirationDateBefore(Long householdId, LocalDateTime date);
+  List<StorageItem> findByHouseholdIdAndExpirationDateBefore(String householdId, LocalDateTime date);
 
   /**
    * Delete by household id and item id.
@@ -51,7 +51,7 @@ public interface StorageItemRepository extends JpaRepository<StorageItem, Long> 
    * @param householdId the household id
    * @param itemId      the item id
    */
-  void deleteByHouseholdIdAndItemId(Long householdId, Long itemId);
+  void deleteByHouseholdIdAndItemId(String householdId, Long itemId);
 
   /**
    * Finds all storage items that expire between the given dates and haven't had a notification sent yet.

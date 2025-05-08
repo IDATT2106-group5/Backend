@@ -32,7 +32,7 @@ import org.mockito.MockitoAnnotations;
 
 class StorageServiceTest {
 
-  private final Long householdId = 1L;
+  private final String householdId = "1L";
   private final Long itemId = 2L;
   private final Long storageItemId = 3L;
   @Mock

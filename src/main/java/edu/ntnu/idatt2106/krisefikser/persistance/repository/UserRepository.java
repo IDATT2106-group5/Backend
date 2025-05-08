@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Repository for User entities.
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, String> {
 
   /**
    * Find a user by their unique email address.
@@ -50,7 +50,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
   @Modifying
   @Transactional
   @Query("UPDATE User u SET u.household.id = :householdId WHERE u.id = :userId")
-  void updateHouseholdId(@Param("userId") Long userId, @Param("householdId") Long householdId);
+  void updateHouseholdId(@Param("userId") String userId, @Param("householdId") String householdId);
 
   /**
    * Find a user by their reset password token.
@@ -64,11 +64,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Object findUsersByHousehold(Household household);
 
-  List<User> getUsersByHouseholdId(Long householdId);
+  List<User> getUsersByHouseholdId(String householdId);
 
   Optional<User> getUserByEmail(String email);
 
-  Optional<User> getUsersById(Long userId);
+  Optional<User> getUsersById(String userId);
 
   @Query(value = "SELECT u.* FROM user u WHERE " +
          "(6371 * acos(cos(radians(:latitude)) * cos(radians(u.latitude)) * " +
