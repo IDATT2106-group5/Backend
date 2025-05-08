@@ -300,7 +300,7 @@ public class MembershipRequestService {
     // Get the active requests for the user
     List<MembershipRequest> invitations =
         membershipRequestRepository.findAllBySenderAndTypeAndStatus(
-        user, RequestType.INVITATION, RequestStatus.PENDING);
+            user, RequestType.INVITATION, RequestStatus.PENDING);
     logger.debug("Found {} pending invitations sent by user", invitations.size());
 
     List<MembershipRequestResponseDto> result = invitations.stream().map(invitation ->
@@ -347,7 +347,7 @@ public class MembershipRequestService {
     // Get the active requests for the user
     List<MembershipRequest> invitations =
         membershipRequestRepository.findAllByReceiverAndTypeAndStatus(
-        user, RequestType.INVITATION, RequestStatus.PENDING);
+            user, RequestType.INVITATION, RequestStatus.PENDING);
     logger.debug("Found {} pending invitations received by user", invitations.size());
 
     List<MembershipRequestResponseDto> result = invitations.stream().map(invitation ->
@@ -382,7 +382,7 @@ public class MembershipRequestService {
 
     List<MembershipRequest> requests =
         membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(
-        householdId, RequestType.JOIN_REQUEST, RequestStatus.PENDING);
+            householdId, RequestType.JOIN_REQUEST, RequestStatus.PENDING);
     logger.debug("Found {} pending join requests for household {}", requests.size(), householdId);
 
     List<MembershipRequestResponseDto> result = requests.stream().map(request ->
@@ -418,7 +418,7 @@ public class MembershipRequestService {
 
     List<MembershipRequest> requests =
         membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(
-        householdId, RequestType.JOIN_REQUEST, RequestStatus.ACCEPTED);
+            householdId, RequestType.JOIN_REQUEST, RequestStatus.ACCEPTED);
     logger.debug("Found {} accepted join requests for household {}", requests.size(), householdId);
 
     List<MembershipRequestResponseDto> result = requests.stream().map(request ->
@@ -462,7 +462,7 @@ public class MembershipRequestService {
 
     List<MembershipRequest> invitations =
         membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatusIn(
-        householdId, RequestType.INVITATION, statuses);
+            householdId, RequestType.INVITATION, statuses);
     logger.debug("Found {} invitations sent by household {}", invitations.size(), householdId);
 
     List<MembershipRequestResponseDto> result = invitations.stream().map(invitation ->
