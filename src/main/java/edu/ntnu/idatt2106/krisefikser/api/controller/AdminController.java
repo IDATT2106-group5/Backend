@@ -151,7 +151,7 @@ public class AdminController {
   public ResponseEntity<?> initiateAdminPasswordReset(@RequestBody Map<String, String> request) {
     try {
       String email = request.get("email");
-      authService.initiatePasswordReset(email);
+      authService.initiateAdminPasswordReset(email);
       logger.info("Password reset email sent to admin: {}", email);
       return ResponseEntity.ok(Map.of("message", "Password reset email sent successfully"));
     } catch (IllegalArgumentException e) {
