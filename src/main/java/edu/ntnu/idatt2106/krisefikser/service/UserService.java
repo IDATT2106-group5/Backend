@@ -24,7 +24,6 @@ public class UserService {
   private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
   private final UserRepository userRepository;
-
   private final NotificationService notificationService;
 
   /**
@@ -36,8 +35,8 @@ public class UserService {
   public UserService(UserRepository userRepository, NotificationService notificationService) {
     this.userRepository = userRepository;
     this.notificationService = notificationService;
+    logger.info("UserService instantiated");
   }
-
 
   /**
    * Gets current user.
@@ -45,11 +44,17 @@ public class UserService {
    * @return the current user
    */
   public UserResponseDto getCurrentUser() {
+    logger.info("getCurrentUser() called");
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
+    logger.debug("Authenticated email: {}", email);
 
     User user = userRepository.getUserByEmail(email)
-        .orElseThrow(() -> new IllegalArgumentException("No user logged in"));
+        .orElseThrow(() -> {
+          logger.error("No user logged in with email={}", email);
+          return new IllegalArgumentException("No user logged in");
+        });
+    logger.info("User found: id={}, email={}", user.getId(), user.getEmail());
 
     UserResponseDto userDto = new UserResponseDto(
         user.getId(),
@@ -58,7 +63,7 @@ public class UserService {
         user.getTlf(),
         user.getRole()
     );
-
+    logger.debug("Returning UserResponseDto: {}", userDto);
     return userDto;
   }
 
@@ -69,8 +74,13 @@ public class UserService {
    * @return the userId
    */
   public String checkIfMailExists(String email) {
+    logger.info("checkIfMailExists() called for email={}", email);
     User user = userRepository.getUserByEmail(email)
-        .orElseThrow(() -> new IllegalArgumentException("No user with this email"));
+        .orElseThrow(() -> {
+          logger.error("No user found with email={}", email);
+          return new IllegalArgumentException("No user with this email");
+        });
+    logger.info("Email exists for userId={}", user.getId());
     return user.getId();
   }
 
@@ -81,19 +91,29 @@ public class UserService {
    * @return the household
    */
   public HouseholdResponseDto getHousehold(String userId) {
+    logger.info("getHousehold() called for userId={}", userId);
     User user = userRepository.getUsersById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("No user found"));
-
+        .orElseThrow(() -> {
+          logger.error("No user found with id={}", userId);
+          return new IllegalArgumentException("No user found");
+        });
     Household household = user.getHousehold();
+    logger.info("Found household: id={}, name={}", household.getId(), household.getName());
 
-    return new HouseholdResponseDto(household.getId(),
+    HouseholdResponseDto dto = new HouseholdResponseDto(
+        household.getId(),
         household.getName(),
         household.getAddress(),
-        new UserResponseDto(household.getOwner().getId(),
+        new UserResponseDto(
+            household.getOwner().getId(),
             household.getOwner().getEmail(),
             household.getOwner().getFullName(),
             household.getOwner().getTlf(),
-            household.getOwner().getRole()));
+            household.getOwner().getRole()
+        )
+    );
+    logger.debug("Returning HouseholdResponseDto: {}", dto);
+    return dto;
   }
 
   /**
@@ -102,19 +122,26 @@ public class UserService {
    * @return List of admin users as DTOs
    */
   public List<UserResponseDto> getAllAdmins() {
+    logger.info("getAllAdmins() called");
     List<User> adminUsers = userRepository.findAll().stream()
         .filter(user -> user.getRole() == Role.ADMIN || user.getRole() == Role.SUPERADMIN)
         .toList();
+    logger.info("Found {} admin/superadmin users", adminUsers.size());
 
-    return adminUsers.stream()
-        .map(admin -> new UserResponseDto(
-            admin.getId(),
-            admin.getEmail(),
-            admin.getFullName(),
-            admin.getTlf(),
-            admin.getRole()
-        ))
+    List<UserResponseDto> dtos = adminUsers.stream()
+        .map(admin -> {
+          logger.debug("Mapping admin user id={} to DTO", admin.getId());
+          return new UserResponseDto(
+              admin.getId(),
+              admin.getEmail(),
+              admin.getFullName(),
+              admin.getTlf(),
+              admin.getRole()
+          );
+        })
         .collect(Collectors.toList());
+    logger.info("Returning {} UserResponseDto objects for admins", dtos.size());
+    return dtos;
   }
 
   /**
@@ -123,13 +150,22 @@ public class UserService {
    * @param position the position
    */
   public void updatePosition(PositionDto position) {
+    logger.info("updatePosition() called for userId={}, lat={}, lon={}",
+        position.getUserId(), position.getLatitude(), position.getLongitude());
+
     User user = userRepository.getUsersById(position.getUserId())
-        .orElseThrow(() -> new IllegalArgumentException("No user found"));
+        .orElseThrow(() -> {
+          logger.error("No user found with id={}", position.getUserId());
+          return new IllegalArgumentException("No user found");
+        });
 
     user.setLongitude(position.getLongitude());
     user.setLatitude(position.getLatitude());
-
     userRepository.save(user);
+    logger.info("Saved new position for userId={}", user.getId());
+
     notificationService.sendHouseholdPositionUpdate(user.getHousehold().getId(), position);
+    logger.info("Sent household position update notification for householdId={}",
+        user.getHousehold().getId());
   }
 }

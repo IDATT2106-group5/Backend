@@ -1,6 +1,5 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.DeleteHouseholdRequestDto;
@@ -13,8 +12,6 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
@@ -62,11 +59,6 @@ public class HouseholdController {
    */
   @Operation(summary = "Creates a household",
       description = "Creates a household with the given name and address for a given user")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Household created successfully"),
-      @ApiResponse(responseCode = "400", description = "Invalid household data"),
-      @ApiResponse(responseCode = "500", description = "Internal server error")
-  })
   @PostMapping("/create")
   public ResponseEntity<String> createHousehold(
       @RequestBody CreateHouseholdRequestDto request) {
@@ -135,7 +127,7 @@ public class HouseholdController {
   /**
    * Removes a user from a household with the given ID. The user must be registered in the system.
    *
-   * @param request the request
+   * @param request the id of the household and the user
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes a user from a household",
@@ -169,8 +161,10 @@ public class HouseholdController {
       householdService.leaveCurrentUserFromHousehold();
       return ResponseEntity.ok("Du har forlatt husstanden.");
     } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during household leave: {}", e.getMessage());
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
+      LOGGER.error("Unexpected error during household leave: {}", e.getMessage(), e);
       return ResponseEntity.status(500).body("Uventet feil under utmelding fra husstand.");
     }
   }
@@ -178,7 +172,7 @@ public class HouseholdController {
   /**
    * Deletes a household with the given ID. The user must be the owner of the household.
    *
-   * @param request the request
+   * @param request the id of the household and the owner
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Deletes a household", description = "Deletes the household with the given ID")
@@ -204,7 +198,7 @@ public class HouseholdController {
    * Removes an unregistered member from a household with the given ID. The user must not be
    * registered in the system.
    *
-   * @param request the request
+   * @param request the id of the member to remove
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Removes an unregistered member from a household",
@@ -228,9 +222,11 @@ public class HouseholdController {
   /**
    * Gets household details.
    *
-   * @param request the request
+   * @param request id of the user
    * @return the household details
    */
+  @Operation(summary = "Gets household details",
+      description = "Gets the details of the user's household")
   @PostMapping("/details")
   public ResponseEntity<?> getHouseholdDetails(@RequestBody GetUserInfoRequestDto request) {
     try {
@@ -251,15 +247,14 @@ public class HouseholdController {
     }
   }
 
-
   /**
    * Edit unregistered member in household response entity.
    *
-   * @param request the request
-   * @return the response entity
+   * @param request data about the member to edit
+   * @return a response entity indicating the result of the operation
    */
-  @Operation(summary = "Edits a unregistered member in a household",
-      description = "Edits a unregistered member in a household with the given ID")
+  @Operation(summary = "Edits an unregistered member in a household",
+      description = "Edits an unregistered member in a household with the given ID")
   @PostMapping("/edit-unregistered-member")
   public ResponseEntity<String> editUnregisteredMemberInHousehold(
       @RequestBody EditMemberDto request) {
@@ -280,8 +275,8 @@ public class HouseholdController {
   /**
    * Changes the owner of a household.
    *
-   * @param request the request
-   * @return the response entity
+   * @param request the id of the user and the household
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Changes the owner of a household",
       description = "Changes the owner of a household with the given ID")
@@ -304,8 +299,8 @@ public class HouseholdController {
   /**
    * Edits a household's details.
    *
-   * @param request the request
-   * @return the response entity
+   * @param request the updated household data
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Edits the details of a household",
       description = "Edits the details of a household with the given ID")
@@ -328,10 +323,11 @@ public class HouseholdController {
   /**
    * Search for a household by household id.
    *
-   * @param request the request
-   * @return the response entity
+   * @param request the id of the given household
+   * @return the household id and name
    */
-  @Operation(summary = "Search for a household by household id", description = "Search for a household by household id")
+  @Operation(summary = "Search for a household by household id",
+      description = "Search for a household by household id")
   @PostMapping("/search")
   public ResponseEntity<?> searchHouseholdById(@RequestBody Map<String, String> request) {
     String householdId = request.get("householdId");
@@ -354,6 +350,8 @@ public class HouseholdController {
    *
    * @return the household positions
    */
+  @Operation(summary = "Gets the position of all the users in the household",
+      description = "Gets the position of all the users in the household for the current user")
   @GetMapping("/positions")
   public ResponseEntity<?> getHouseholdPositions() {
     try {
@@ -368,5 +366,4 @@ public class HouseholdController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
-
 }

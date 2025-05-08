@@ -4,25 +4,27 @@ import java.security.SecureRandom;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
  * Service class for handling two-factor authentication (2FA) using One-Time Passwords (OTP). This
  * service generates OTPs, sends them via email, and verifies user-provided OTPs.
  */
-
 @Service
 public class TwoFactorService {
 
-  // OTP validity period in milliseconds (10 minutes)
-  private static final long OTP_VALIDITY_PERIOD = 10 * 60 * 1000;
+  private static final Logger logger = LoggerFactory.getLogger(TwoFactorService.class);
+  private static final long OTP_VALIDITY_PERIOD = 10 * 60 * 1000; // 10 minutes
+
   private final EmailService emailService;
   private final Random random = new SecureRandom();
-  // Store OTP codes with expiration time (email -> [OTP, expiration timestamp])
   private final Map<String, Object[]> otpStorage = new ConcurrentHashMap<>();
 
   public TwoFactorService(EmailService emailService) {
     this.emailService = emailService;
+    logger.info("TwoFactorService instantiated. OTP validity set to {} ms", OTP_VALIDITY_PERIOD);
   }
 
   /**
@@ -32,17 +34,14 @@ public class TwoFactorService {
    * @return The generated OTP.
    */
   public String generateAndSendOtp(String email) {
-    // Generate 6-digit OTP
-    String otp = String.format("%06d", random.nextInt(1000000));
-
-    // Calculate expiration time (current time + 10 minutes)
+    logger.info("Generating OTP for email={}", email);
+    String otp = String.format("%06d", random.nextInt(1_000_000));
     long expirationTime = System.currentTimeMillis() + OTP_VALIDITY_PERIOD;
-
-    // Store OTP and its expiration time
     otpStorage.put(email, new Object[]{otp, expirationTime});
+    logger.debug("Stored OTP={} for email={} with expiration={}", otp, email, expirationTime);
 
-    // Send OTP via email
     emailService.sendOtpEmail(email, otp);
+    logger.info("Sent OTP to email={}", email);
 
     return otp;
   }
@@ -56,29 +55,33 @@ public class TwoFactorService {
    * @return True if the OTP is valid and matches the stored OTP; false otherwise.
    */
   public boolean verifyOtp(String email, String providedOtp) {
-    // Get stored OTP data
+    logger.info("Verifying OTP for email={}", email);
     Object[] otpData = otpStorage.get(email);
-
-    // If no OTP exists for this email
     if (otpData == null) {
+      logger.warn("No OTP found for email={}", email);
       return false;
     }
 
     String storedOtp = (String) otpData[0];
     long expirationTime = (long) otpData[1];
+    long now = System.currentTimeMillis();
 
-    // Check if OTP has expired
-    if (System.currentTimeMillis() > expirationTime) {
-      // Remove expired OTP
+    if (now > expirationTime) {
       otpStorage.remove(email);
+      logger.warn("OTP for email={} expired at {}, now={}", email, expirationTime, now);
       return false;
     }
 
-    // Check if provided OTP matches stored OTP
     boolean isValid = storedOtp.equals(providedOtp);
+    if (isValid) {
+      logger.info("OTP for email={} is valid", email);
+    } else {
+      logger.warn("OTP for email={} is invalid (provided={}, expected={})", email, providedOtp,
+          storedOtp);
+    }
 
-    // Remove OTP after verification attempt (one-time use)
     otpStorage.remove(email);
+    logger.debug("Removed OTP entry for email={}", email);
 
     return isValid;
   }

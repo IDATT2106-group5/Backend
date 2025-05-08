@@ -1,10 +1,9 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.CreateNotificationRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
+import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.NotificationService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
@@ -12,19 +11,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling notification related requests.
+ */
 @Tag(name = "Notification", description = "Endpoints for managing notifications")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/notifications")
 public class NotificationController {
+
   private final NotificationService notificationService;
   private final Logger logger = LoggerFactory.getLogger(NotificationController.class);
 
+  /**
+   * Constructor for NotificationController.
+   *
+   * @param notificationService the service for managing notifications
+   */
   public NotificationController(NotificationService notificationService) {
     this.notificationService = notificationService;
   }
@@ -35,7 +45,8 @@ public class NotificationController {
    * @param request the request containing the user ID
    * @return a list of all notifications for the user
    */
-
+  @Operation(summary = "Gets notifications for a user",
+      description = "Gets notifications for a user with a given id")
   @PostMapping("/get")
   public ResponseEntity<?> getNotifications(@RequestBody GetUserInfoRequestDto request) {
     try {
@@ -52,7 +63,14 @@ public class NotificationController {
     }
   }
 
-
+  /**
+   * Marks a notification as read.
+   *
+   * @param notificationId the ID of the notification to mark as read
+   * @return a response entity indicating the result of the operation
+   */
+  @Operation(summary = "Marks a notification as read",
+      description = "Marks a notification with a given id as read")
   @PutMapping("/{notificationId}/read")
   public ResponseEntity<?> markNotificationAsRead(@PathVariable Long notificationId) {
     try {

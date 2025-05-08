@@ -142,7 +142,7 @@ public class LoginAttemptServiceTest {
   }
 
   private int getMaxAttempt() throws Exception {
-    Field field = LoginAttemptService.class.getDeclaredField("maxAttempt");
+    Field field = LoginAttemptService.class.getDeclaredField("MAXATTEMPT");
     field.setAccessible(true);
     return (int) field.get(loginAttemptService);
   }

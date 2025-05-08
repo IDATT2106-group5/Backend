@@ -3,6 +3,8 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioResponseDto;
 import edu.ntnu.idatt2106.krisefikser.service.ScenarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Controller for handling scenario related requests.
  */
+@Tag(name = "Scenario", description = "Endpoints for managing scenarios")
 @RestController
 @RequestMapping("/api/scenarios")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -43,10 +46,12 @@ public class ScenarioController {
    * Create a new scenario.
    *
    * @param request the scenario request DTO
-   * @return a response entity with the result of the operation
+   * @return a response entity indicating the result of the operation
    */
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
+  @Operation(summary = "Creates a scenario",
+      description = "Creates a new scenario. Only accessible to admins")
   public ResponseEntity<Map<String, String>> createScenario(
       @Valid
       @RequestBody ScenarioRequestDto request) {
@@ -68,8 +73,10 @@ public class ScenarioController {
    *
    * @param id      the ID of the scenario to update
    * @param request the updated scenario data
-   * @return a response entity with the result of the operation
+   * @return a response entity indicating the result of the operation
    */
+  @Operation(summary = "Updates a scenario",
+      description = "Updates an existing scenario with a given id. Only accessible to admins")
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> updateScenario(
@@ -93,6 +100,8 @@ public class ScenarioController {
    *
    * @return a response entity with the list of scenarios
    */
+  @Operation(summary = "Gets all scenarios",
+      description = "Gets all scenarios. Accessible to all users")
   @GetMapping
   public ResponseEntity<List<ScenarioResponseDto>> getAllScenarios() {
     try {
@@ -111,6 +120,8 @@ public class ScenarioController {
    * @param id the ID of the scenario to retrieve
    * @return a response entity with the scenario data
    */
+  @Operation(summary = "Gets a scenario",
+      description = "Gets a scenario with a given id. Accessible to all users")
   @GetMapping("/{id}")
   public ResponseEntity<ScenarioResponseDto> getScenarioById(@PathVariable Long id) {
     try {

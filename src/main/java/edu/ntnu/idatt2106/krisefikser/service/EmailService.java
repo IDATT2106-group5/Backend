@@ -2,6 +2,8 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
+  private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
   private final JavaMailSender mailSender;
 
   /**
@@ -22,6 +25,7 @@ public class EmailService {
    */
   public EmailService(JavaMailSender mailSender) {
     this.mailSender = mailSender;
+    logger.info("EmailService initialized");
   }
 
   /**
@@ -31,6 +35,8 @@ public class EmailService {
    * @param token   the confirmation token
    */
   public void sendConfirmationEmail(String toEmail, String token) {
+    logger.info("Sending confirmation email to: {}", toEmail);
+
     String subject = "Bekreft e-post for Krisefikser";
     String confirmationUrl =
         "http://localhost:8080/api/auth/confirm?token=" + token;
@@ -40,14 +46,20 @@ public class EmailService {
         + "<a href=\"" + confirmationUrl + "\">Bekreft e-post</a>"
         + "</body></html>";
 
+    logger.debug("Confirmation URL generated for user: {}", toEmail);
+
     MimeMessage message = mailSender.createMimeMessage();
     try {
       MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
       helper.setTo(toEmail);
       helper.setSubject(subject);
       helper.setText(body, true);
+
+      logger.debug("Attempting to send confirmation email");
       mailSender.send(message);
+      logger.info("Confirmation email sent successfully to: {}", toEmail);
     } catch (MessagingException e) {
+      logger.error("Failed to send confirmation email to {}: {}", toEmail, e.getMessage());
       throw new RuntimeException("Failed to send email", e);
     }
   }
@@ -59,6 +71,8 @@ public class EmailService {
    * @param invitationLink the link for admin account setup
    */
   public void sendAdminInvitation(String toEmail, String invitationLink) {
+    logger.info("Sending admin invitation email to: {}", toEmail);
+
     String subject = "Admin Invitation for Krisefikser";
     String body = "<html><body>"
         + "<h1>Admin Invitation</h1>"
@@ -68,14 +82,20 @@ public class EmailService {
         + "<a href=\"" + invitationLink + "\">Set up admin account</a>"
         + "</body></html>";
 
+    logger.debug("Admin invitation link generated for: {}", toEmail);
+
     MimeMessage message = mailSender.createMimeMessage();
     try {
       MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
       helper.setTo(toEmail);
       helper.setSubject(subject);
       helper.setText(body, true);
+
+      logger.debug("Attempting to send admin invitation email");
       mailSender.send(message);
+      logger.info("Admin invitation email sent successfully to: {}", toEmail);
     } catch (MessagingException e) {
+      logger.error("Failed to send admin invitation email to {}: {}", toEmail, e.getMessage());
       throw new RuntimeException("Failed to send admin invitation email", e);
     }
   }
@@ -87,6 +107,8 @@ public class EmailService {
    * @param otp     the one-time password
    */
   public void sendOtpEmail(String toEmail, String otp) {
+    logger.info("Sending OTP verification email to: {}", toEmail);
+
     String subject = "Your Krisefikser verification code";
     String body = "<html><body>"
         + "<h1>Your verification code</h1>"
@@ -96,14 +118,20 @@ public class EmailService {
         + "<p>This code will expire in 10 minutes.</p>"
         + "</body></html>";
 
+    logger.debug("OTP code generated for user: {}", toEmail);
+
     MimeMessage message = mailSender.createMimeMessage();
     try {
       MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
       helper.setTo(toEmail);
       helper.setSubject(subject);
       helper.setText(body, true);
+
+      logger.debug("Attempting to send OTP email");
       mailSender.send(message);
+      logger.info("OTP email sent successfully to: {}", toEmail);
     } catch (MessagingException e) {
+      logger.error("Failed to send OTP email to {}: {}", toEmail, e.getMessage());
       throw new RuntimeException("Failed to send verification code", e);
     }
   }
@@ -115,13 +143,18 @@ public class EmailService {
    * @param token   the reset token
    */
   public void sendPasswordResetEmail(String toEmail, String token) {
+    logger.info("Sending password reset email to: {}", toEmail);
+
     String subject = "Tilbakestill passordet ditt – Krisefikser";
     String resetUrl = "http://localhost:5173/reset-password?token=" + token;
     String body = "<html><body>"
         + "<h1>Glemt passord?</h1>"
-        + "<p>Klikk på lenken under for å tilbakestille passordet ditt. Lenken er gyldig i 1 time:</p>"
+        + "<p>Klikk på lenken under for å tilbakestille passordet ditt. "
+        + "Lenken er gyldig i 1 time:</p>"
         + "<a href=\"" + resetUrl + "\">Tilbakestill passord</a>"
         + "</body></html>";
+
+    logger.debug("Password reset URL generated for user: {}", toEmail);
 
     MimeMessage message = mailSender.createMimeMessage();
     try {
@@ -129,8 +162,12 @@ public class EmailService {
       helper.setTo(toEmail);
       helper.setSubject(subject);
       helper.setText(body, true);
+
+      logger.debug("Attempting to send password reset email");
       mailSender.send(message);
+      logger.info("Password reset email sent successfully to: {}", toEmail);
     } catch (MessagingException e) {
+      logger.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage());
       throw new RuntimeException("Failed to send password reset email", e);
     }
   }

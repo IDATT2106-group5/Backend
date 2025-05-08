@@ -4,7 +4,6 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Scenario;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Severity;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.IncidentRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.ScenarioRepository;
@@ -34,12 +33,13 @@ public class IncidentService {
    * @param notificationService the notification service
    */
   public IncidentService(IncidentRepository incidentRepository,
-                         ScenarioRepository scenarioRepository,
-                         NotificationService notificationService, UserRepository userRepository) {
+      ScenarioRepository scenarioRepository,
+      NotificationService notificationService, UserRepository userRepository) {
     this.incidentRepository = incidentRepository;
     this.scenarioRepository = scenarioRepository;
     this.notificationService = notificationService;
     this.userRepository = userRepository;
+    logger.info("IncidentService initialized");
   }
 
   /**
@@ -48,23 +48,38 @@ public class IncidentService {
    * @param request the incident request containing details for the new incident
    */
   public void createIncident(IncidentRequestDto request) {
+    logger.info("Creating new incident: {}", request.getName());
+    logger.debug(
+        "Incident creation request details: scenario={}, "
+            + "severity={}, coordinates=({},{}), radius={}",
+        request.getScenarioId(), request.getSeverity(), request.getLatitude(),
+        request.getLongitude(),
+        request.getImpactRadius());
+
     if (request.getScenarioId() == null) {
       logger.error("Scenario ID is required for creating an incident.");
       throw new IllegalArgumentException("Scenario ID is required for creating an incident.");
     }
 
     Long scenarioId = request.getScenarioId();
+    logger.debug("Looking up scenario with ID: {}", scenarioId);
 
     Scenario scenario = scenarioRepository.findById(scenarioId)
         .orElseThrow(() -> {
           logger.error("Scenario not found with ID: {}", scenarioId);
           return new IllegalArgumentException("Scenario not found with ID: " + scenarioId);
         });
+    logger.debug("Found scenario: {}", scenario.getName());
 
     Incident incident = request.toEntity(scenario);
+    logger.debug("Converting request to incident entity");
+
     incidentRepository.save(incident);
-    notificationService.notifyIncident("[EMERGENCY ALERT]: " + scenario.getName() +
-        " is in progress near you. Specific instructions can be found in the app.",
+    logger.debug("Incident saved to database with ID: {}", incident.getId());
+
+    logger.debug("Sending notification for incident: {}", incident.getName());
+    notificationService.notifyIncident("[EMERGENCY ALERT]: " + scenario.getName()
+            + " is in progress near you. Specific instructions can be found in the app.",
         incident);
     logger.info("Incident created successfully: {}", incident.getName());
   }
@@ -76,24 +91,32 @@ public class IncidentService {
    * @param request the request
    */
   public void updateIncident(Long id, IncidentRequestDto request) {
+    logger.info("Updating incident with ID: {}", id);
+    logger.debug("Update request details: name={}, scenario={}, severity={}",
+        request.getName(), request.getScenarioId(), request.getSeverity());
+
     Incident incident = incidentRepository.findById(id)
         .orElseThrow(() -> {
           logger.error("Incident not found with ID: {}", id);
           return new IllegalArgumentException("Incident not found with ID: " + id);
         });
+    logger.debug("Found existing incident: {}", incident.getName());
 
     if (request.getScenarioId() == null) {
       logger.error("Scenario ID is required when updating an incident.");
       throw new IllegalArgumentException("Scenario ID is required when updating an incident.");
     }
 
+    logger.debug("Looking up scenario with ID: {}", request.getScenarioId());
     Scenario scenario = scenarioRepository.findById(request.getScenarioId())
         .orElseThrow(() -> {
           logger.error("Scenario not found with ID: {}", request.getScenarioId());
           return new IllegalArgumentException(
               "Scenario not found with ID: " + request.getScenarioId());
         });
+    logger.debug("Found scenario: {}", scenario.getName());
 
+    logger.debug("Updating incident properties");
     incident.setName(request.getName());
     incident.setDescription(request.getDescription());
     incident.setLatitude(request.getLatitude());
@@ -105,17 +128,21 @@ public class IncidentService {
     incident.setScenario(scenario);
 
     incidentRepository.save(incident);
+    logger.debug("Incident saved to database after update");
     logger.info("Incident with ID {} updated successfully", id);
 
-    if(incident.getEndedAt() != null) {
-      notificationService.notifyIncident(incident.getName() +
-          " har avsluttet. Ta kontakt med dine nermeste.",
+    if (incident.getEndedAt() != null) {
+      logger.debug("Incident has ended, sending closure notification");
+      notificationService.notifyIncident(incident.getName()
+              + " har avsluttet. Ta kontakt med dine nermeste.",
           incident);
     } else {
-      notificationService.notifyIncident(incident.getName() +
-          " har utviklet seg. Les mer på nyhetssiden.",
+      logger.debug("Incident updated, sending update notification");
+      notificationService.notifyIncident(incident.getName()
+              + " har utviklet seg. Les mer på nyhetssiden.",
           incident);
     }
+    logger.debug("Notifications sent for updated incident");
   }
 
   /**
@@ -124,10 +151,13 @@ public class IncidentService {
    * @param id the id
    */
   public void deleteIncident(Long id) {
+    logger.info("Deleting incident with ID: {}", id);
+
     if (!incidentRepository.existsById(id)) {
       logger.error("Incident not found with ID: {}", id);
       throw new IllegalArgumentException("Incident not found with ID: " + id);
     }
+    logger.debug("Verified incident exists with ID: {}", id);
 
     incidentRepository.deleteById(id);
     logger.info("Incident with ID {} deleted successfully", id);
@@ -140,9 +170,16 @@ public class IncidentService {
    */
   public List<IncidentResponseDto> getAllIncidents() {
     logger.info("Fetching all incidents");
-    return incidentRepository.findAll()
-        .stream()
+
+    List<Incident> incidents = incidentRepository.findAll();
+    logger.debug("Retrieved {} incidents from database", incidents.size());
+
+    List<IncidentResponseDto> dtos = incidents.stream()
         .map(IncidentResponseDto::fromEntity)
         .toList();
+    logger.debug("Converted incidents to DTOs");
+
+    logger.info("Returning {} incidents", dtos.size());
+    return dtos;
   }
 }
