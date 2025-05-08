@@ -184,7 +184,7 @@ public class AdminControllerTest {
     Map<String, String> request = Map.of("email", "invalid@example.com");
 
     doThrow(new IllegalArgumentException("No user registered with that email."))
-        .when(authService).initiatePasswordReset(anyString());
+        .when(authService).initiateAdminPasswordReset(anyString());
 
     // Act & Assert
     mockMvc.perform(post("/api/admin/reset-password/initiate")
@@ -221,10 +221,10 @@ public class AdminControllerTest {
     doNothing().when(adminInvitationService).deleteAdmin(adminId);
 
     mockMvc.perform(post("/api/admin/delete")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestJson))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.message").value("Admin deleted successfully"));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestJson))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("Admin deleted successfully"));
   }
 
   @Test
@@ -235,13 +235,13 @@ public class AdminControllerTest {
     String requestJson = objectMapper.writeValueAsString(requestBody);
 
     doThrow(new IllegalArgumentException("Admin user not found"))
-            .when(adminInvitationService).deleteAdmin(invalidId);
+        .when(adminInvitationService).deleteAdmin(invalidId);
 
     mockMvc.perform(post("/api/admin/delete") // Added the leading slash here
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestJson))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.error").value("Admin user not found"));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestJson))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Admin user not found"));
   }
 }
 

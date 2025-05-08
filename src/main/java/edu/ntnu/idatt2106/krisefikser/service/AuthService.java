@@ -285,6 +285,12 @@ public class AuthService {
         });
     logger.debug("User found for password reset: {}", email);
 
+    if (user.getRole() == Role.ADMIN || user.getRole() == Role.SUPERADMIN) {
+      logger.warn("Password reset through this link is not allowed for admin users: {}", email);
+      throw new IllegalArgumentException(
+          "Admin brukere må resette passord via link fra superadmin");
+    }
+
     String token = UUID.randomUUID().toString();
     Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
     logger.debug("Generated password reset token with 1 hour expiration for user: {}", email);
@@ -299,6 +305,38 @@ public class AuthService {
       logger.info("Password reset email sent to: {}", email);
     } catch (Exception e) {
       logger.error("Failed to send password reset email to {}: {}", email, e.getMessage());
+    }
+  }
+
+  /**
+   * Initiates the password reset process for admin users.
+   *
+   * @param email the admin user's email address
+   */
+  public void initiateAdminPasswordReset(String email) {
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("Admin reset requested for non-existent email: {}", email);
+          return new IllegalArgumentException("No user registered with that email.");
+        });
+
+    if (user.getRole() != Role.ADMIN && user.getRole() != Role.SUPERADMIN) {
+      logger.warn("Attempted to reset password for non-admin user via admin flow: {}", email);
+      throw new IllegalArgumentException("Only admin users can be reset using this method.");
+    }
+
+    String token = UUID.randomUUID().toString();
+    Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
+
+    user.setResetPasswordToken(token);
+    user.setResetPasswordTokenExpiration(expiration);
+    userRepository.save(user);
+
+    try {
+      emailService.sendPasswordResetEmail(user.getEmail(), token);
+      logger.info("Admin password reset email sent to: {}", email);
+    } catch (Exception e) {
+      logger.error("Failed to send admin reset email to {}: {}", email, e.getMessage());
     }
   }
 
