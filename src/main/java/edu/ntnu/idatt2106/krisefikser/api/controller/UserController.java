@@ -69,15 +69,14 @@ public class UserController {
   /**
    * Retrieves the household information for a given user ID.
    *
-   * @param userId the ID of the user
    * @return a ResponseEntity containing the household information
    */
   @Operation(summary = "Gets the household information for a given user",
       description = "Gets the household information about a user with a given id")
-  @GetMapping("/me/household/{userId}")
-  public ResponseEntity<?> getHousehold(@PathVariable String userId) {
+  @GetMapping("/me/household")
+  public ResponseEntity<?> getHousehold() {
     try {
-      HouseholdResponseDto household = userService.getHousehold(userId);
+      HouseholdResponseDto household = userService.getHousehold();
       LOGGER.info("Fetched household: {}", household.getName());
       LOGGER.info("Fetched info for current user");
       return ResponseEntity.ok(household);
@@ -126,10 +125,9 @@ public class UserController {
   public ResponseEntity<?> getCurrentUserStorageItems() {
     try {
       UserResponseDto userDto = userService.getCurrentUser();
-      HouseholdResponseDto household = userService.getHousehold(userDto.getId());
+      HouseholdResponseDto household = userService.getHousehold();
 
-      List<StorageItemResponseDto> storageItems = storageService.getStorageItemsByHousehold(
-          household.getId());
+      List<StorageItemResponseDto> storageItems = storageService.getStorageItemsByHousehold();
       LOGGER.info("Fetched {} storage items for user {}", storageItems.size(),
           userDto.getFullName());
 

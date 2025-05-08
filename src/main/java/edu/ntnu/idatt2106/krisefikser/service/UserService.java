@@ -87,17 +87,18 @@ public class UserService {
   /**
    * Gets a user's household.
    *
-   * @param userId the user id
    * @return the household
    */
-  public HouseholdResponseDto getHousehold(String userId) {
-    logger.info("getHousehold() called for userId={}", userId);
-    User user = userRepository.getUsersById(userId)
+  public HouseholdResponseDto getHousehold() {
+    logger.info("getHousehold() called for current user");
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    Household household = userRepository.getUserByEmail(email)
         .orElseThrow(() -> {
-          logger.error("No user found with id={}", userId);
-          return new IllegalArgumentException("No user found");
-        });
-    Household household = user.getHousehold();
+          logger.error("No user logged in with email={}", email);
+          return new IllegalArgumentException("No user logged in");
+        }).getHousehold();
+
     logger.info("Found household: id={}, name={}", household.getId(), household.getName());
 
     HouseholdResponseDto dto = new HouseholdResponseDto(
