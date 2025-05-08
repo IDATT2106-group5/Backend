@@ -5,7 +5,6 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.ItemRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -40,12 +39,9 @@ public class ItemService {
     List<Item> items = itemRepository.findAll();
     logger.debug("Retrieved {} items from database", items.size());
 
-    List<ItemResponseDto> dtos = items.stream()
+    return items.stream()
         .map(this::mapToDto)
-        .collect(Collectors.toList());
-
-    logger.debug("Converted all items to DTOs, returning {} items", dtos.size());
-    return dtos;
+        .toList();
   }
 
   private ItemResponseDto mapToDto(Item item) {
@@ -97,11 +93,9 @@ public class ItemService {
       logger.debug("Found {} items of type {}", items.size(), type);
 
       // Convert to DTOs and return
-      List<ItemResponseDto> dtos = items.stream()
+      return items.stream()
           .map(this::mapToDto)
-          .collect(Collectors.toList());
-
-      return dtos;
+          .toList();
     } catch (IllegalArgumentException e) {
       logger.warn("Invalid item type provided: {}", itemType);
       throw new IllegalArgumentException("Invalid item type: " + itemType);
