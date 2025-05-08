@@ -58,18 +58,16 @@ public class AdminInvitationService {
       throw new IllegalArgumentException("A user with that email already exists");
     }
 
-    String token = UUID.randomUUID().toString();
-    logger.debug("Generated unique token for admin invitation");
-
-    String randomPlaceholder = UUID.randomUUID().toString() + UUID.randomUUID();
-    String encodedPlaceholder = passwordEncoder.encode(randomPlaceholder);
-    logger.debug("Generated placeholder password for admin invitation");
-
     User adminUser = new User();
     adminUser.setEmail(email);
     adminUser.setFullName(fullName);
+    String randomPlaceholder = UUID.randomUUID().toString() + UUID.randomUUID();
+    String encodedPlaceholder = passwordEncoder.encode(randomPlaceholder);
+    logger.debug("Generated placeholder password for admin invitation");
     adminUser.setPassword(encodedPlaceholder);
     adminUser.setRole(Role.ADMIN);
+    String token = UUID.randomUUID().toString();
+    logger.debug("Generated unique token for admin invitation");
     adminUser.setConfirmationToken(token);
     adminUser.setConfirmed(false);
 
