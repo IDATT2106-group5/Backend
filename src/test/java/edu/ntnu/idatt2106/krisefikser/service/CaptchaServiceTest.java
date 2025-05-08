@@ -37,7 +37,7 @@ public class CaptchaServiceTest {
     MockitoAnnotations.openMocks(this);
 
     // Set the private fields using ReflectionTestUtils
-    ReflectionTestUtils.setField(captchaService, "hCaptchaSecret", TEST_SECRET_KEY);
+    ReflectionTestUtils.setField(captchaService, "hcaptchasecret", TEST_SECRET_KEY);
 
     // Mock responses for valid token
     Map<String, Object> successResponse = new HashMap<>();
