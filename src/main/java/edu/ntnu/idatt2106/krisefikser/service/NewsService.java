@@ -3,6 +3,9 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.api.dto.EditNewsDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.News;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.NewsRepository;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -31,11 +34,11 @@ public class NewsService {
    */
   public void createNewsItem(EditNewsDto newsDto) {
     News news = new News();
-    news.setName(newsDto.getName());
     news.setTitle(newsDto.getTitle());
     news.setUrl(newsDto.getUrl());
     news.setContent(newsDto.getContent());
     news.setSource(newsDto.getSource());
+    news.setCreatedAt(LocalDateTime.now());
 
     newsRepository.save(news);
   }
@@ -103,6 +106,6 @@ public class NewsService {
    * @return a paginated list of news items
    */
   public Page<News> findPaginatedList(int page, int size) {
-    return newsRepository.findPaginatedList(PageRequest.of(page, size));
+    return newsRepository.findByOrderByCreatedAtDesc(PageRequest.of(page, size));
   }
 }

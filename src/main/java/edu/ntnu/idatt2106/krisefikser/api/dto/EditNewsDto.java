@@ -4,7 +4,6 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
  * The type Edit news dto.
  */
 public class EditNewsDto {
-  private String name;
   private String title;
   private String url;
   private String content;
@@ -19,38 +18,17 @@ public class EditNewsDto {
   /**
    * Instantiates a new Edit news dto.
    *
-   * @param name    the name
    * @param title   the title
    * @param url     the url
    * @param content the content
    * @param source  the source
    */
-  public EditNewsDto(String name, String title, String url, String content, String source) {
-    this.name = name;
+  public EditNewsDto(String title, String url, String content, String source) {
     this.title = title;
     this.url = url;
     this.content = content;
     this.source = source;
   }
-
-  /**
-   * Gets name.
-   *
-   * @return the name
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Sets name.
-   *
-   * @param name the name
-   */
-  public void setName(String name) {
-    this.name = name;
-  }
-
   /**
    * Gets title.
    *

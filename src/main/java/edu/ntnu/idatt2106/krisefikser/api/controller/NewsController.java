@@ -46,7 +46,7 @@ public class NewsController {
    * @param size the size
    * @return the news
    */
-  @GetMapping("/get")
+  @GetMapping("/get/")
   public ResponseEntity<?> getNews(@RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size) {
     try {
@@ -126,7 +126,7 @@ public class NewsController {
    * @param newsId the news id
    * @return the response entity
    */
-  @DeleteMapping("/delete/{newsId}")
+  @PostMapping("/delete/{newsId}")
   public ResponseEntity<Void> deleteNews(@PathVariable Long newsId) {
     try {
       newsService.deleteNewsItem(newsId);

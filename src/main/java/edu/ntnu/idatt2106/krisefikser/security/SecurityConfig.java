@@ -73,7 +73,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/api/news").permitAll()
+                .requestMatchers("/api/news/**").permitAll()
                 .requestMatchers("/api/notifications/**").permitAll()
                 .requestMatchers("/api/scenarios/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()

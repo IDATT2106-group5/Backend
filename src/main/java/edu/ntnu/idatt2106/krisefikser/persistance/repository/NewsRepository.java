@@ -3,12 +3,15 @@ package edu.ntnu.idatt2106.krisefikser.persistance.repository;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.News;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  * The interface News repository.
  */
+@Repository
 public interface NewsRepository extends JpaRepository<News, Long> {
 
   /**
@@ -40,5 +43,6 @@ public interface NewsRepository extends JpaRepository<News, Long> {
    * @param pageable the pageable
    * @return the page
    */
-  Page<News> findPaginatedList(Pageable pageable);
+  Page<News> findByOrderByCreatedAtDesc(Pageable pageable);
+
 }

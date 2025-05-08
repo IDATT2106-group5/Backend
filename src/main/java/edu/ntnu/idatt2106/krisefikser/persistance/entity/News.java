@@ -1,16 +1,20 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * The type News.
  */
 @Entity
-@Table(name = "item")
+@Table(name = "news")
 public class News {
 
   /**
@@ -21,35 +25,35 @@ public class News {
   private Long id;
 
   /**
-   * The name of the item.
-   */
-  private String name;
-
-  /**
    * The title of the news story
    */
+  @Column(name = "title")
   private String title;
 
   /**
    * The url of the news story
    */
+  @Column(name = "url")
   private String url;
 
   /**
    * The content of the news story
    */
 
+  @Column(name = "content")
   private String content;
 
   /**
    * The source of the news story
    */
+  @Column(name = "source")
   private String source;
 
   /**
-   *  The time the news story was created
+   * The time the news story was created
    */
-    private String createdAt;
+  @Column(name = "created_at")
+  private LocalDateTime createdAt;
 
   /**
    * Instantiates a new News.
@@ -61,14 +65,12 @@ public class News {
   /**
    * Instantiates a new Item with all fields.
    *
-   * @param name    the name
    * @param title   the title
    * @param url     the url
    * @param content the content
    * @param source  the source
    */
-  public News(String name, String title, String url, String content, String source) {
-    this.name = name;
+  public News(String title, String url, String content, String source) {
     this.title = title;
     this.url = url;
     this.content = content;
@@ -81,8 +83,8 @@ public class News {
    * @return the id
    */
   public Long getId() {
-        return id;
-    }
+    return id;
+  }
 
   /**
    * Sets id.
@@ -90,26 +92,8 @@ public class News {
    * @param id the id
    */
   public void setId(Long id) {
-        this.id = id;
-    }
-
-  /**
-   * Gets name.
-   *
-   * @return the name
-   */
-  public String getName() {
-        return name;
-    }
-
-  /**
-   * Sets name.
-   *
-   * @param name the name
-   */
-  public void setName(String name) {
-        this.name = name;
-    }
+    this.id = id;
+  }
 
   /**
    * Gets title.
@@ -117,8 +101,8 @@ public class News {
    * @return the title
    */
   public String getTitle() {
-        return title;
-    }
+    return title;
+  }
 
   /**
    * Sets title.
@@ -126,8 +110,8 @@ public class News {
    * @param title the title
    */
   public void setTitle(String title) {
-        this.title = title;
-    }
+    this.title = title;
+  }
 
   /**
    * Gets url.
@@ -135,8 +119,8 @@ public class News {
    * @return the url
    */
   public String getUrl() {
-        return url;
-    }
+    return url;
+  }
 
   /**
    * Sets url.
@@ -144,8 +128,8 @@ public class News {
    * @param url the url
    */
   public void setUrl(String url) {
-        this.url = url;
-    }
+    this.url = url;
+  }
 
   /**
    * Gets content.
@@ -153,8 +137,8 @@ public class News {
    * @return the content
    */
   public String getContent() {
-        return content;
-    }
+    return content;
+  }
 
   /**
    * Sets content.
@@ -162,8 +146,8 @@ public class News {
    * @param content the content
    */
   public void setContent(String content) {
-        this.content = content;
-    }
+    this.content = content;
+  }
 
   /**
    * Gets source.
@@ -171,8 +155,8 @@ public class News {
    * @return the source
    */
   public String getSource() {
-        return source;
-    }
+    return source;
+  }
 
   /**
    * Sets source.
@@ -180,24 +164,24 @@ public class News {
    * @param source the source
    */
   public void setSource(String source) {
-        this.source = source;
-    }
+    this.source = source;
+  }
 
   /**
    * Gets created at.
    *
    * @return the created at
    */
-  public String getCreatedAt() {
-        return createdAt;
-    }
+  public LocalDateTime getCreatedAt() {
+    return createdAt;
+  }
 
   /**
    * Sets created at.
    *
    * @param createdAt the created at
    */
-  public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
+  public void setCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
 }
