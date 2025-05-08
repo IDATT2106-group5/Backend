@@ -70,12 +70,11 @@ public class HouseholdService {
    * @param householdRepository                   Repository for household operations.
    * @param notificationService                   the notification service
    * @param userRepository                        Repository for user operations.
-   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member
-   *                                              operations.
+   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member                                              operations.
    */
   public HouseholdService(HouseholdRepository householdRepository,
-      NotificationService notificationService, UserRepository userRepository,
-      UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
+                          NotificationService notificationService, UserRepository userRepository,
+                          UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
     this.householdRepository = householdRepository;
     this.notificationService = notificationService;
     this.userRepository = userRepository;
@@ -309,10 +308,8 @@ public class HouseholdService {
    * `UnregisteredHouseholdMember` entity, associates it with the household, and updates the
    * household's number of members.
    *
-   * @param request The DTO containing the full name of the unregistered member and the ID of the
-   *                household to which the member should be added.
-   * @throws IllegalArgumentException if the unregistered member already exists in the specified
-   *                                  household or if the household is not found.
+   * @param request The DTO containing the full name of the unregistered member and the ID of the                household to which the member should be added.
+   * @throws IllegalArgumentException if the unregistered member already exists in the specified                                  household or if the household is not found.
    */
   public void addUnregisteredMemberToHousehold(
       UnregisteredMemberHouseholdAssignmentRequestDto request) {
@@ -388,17 +385,19 @@ public class HouseholdService {
   /**
    * Gets the members of a household by household id.
    *
-   * @param userId the user id.
    * @return A map containing household details, registered users, and unregistered members.
    */
-  public Map<String, Object> getHouseholdDetails(String userId) {
-    logger.info("Getting household details for user with ID {}", userId);
+  public Map<String, Object> getHouseholdDetails() {
+    logger.info("Getting household details for current user");
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
 
     Map<String, Object> resultMap = new HashMap<>();
 
-    User user = userRepository.findById(userId)
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
-          logger.warn("Cannot get household details: User not found with ID: {}", userId);
+          logger.warn("Cannot get household details: No user logged in with email: {}", email);
           return new IllegalArgumentException("User not found");
         });
 
@@ -409,14 +408,13 @@ public class HouseholdService {
       throw new IllegalArgumentException("User does not belong to a household");
     }
 
-    logger.debug("Found household: {} for user: {}", household.getName(), user.getFullName());
-
     resultMap.put("household",
         new HouseholdResponseDto(household.getId(), household.getName(), household.getAddress(),
             new UserResponseDto(household.getOwner().getId(), household.getOwner().getEmail(),
                 household.getOwner().getFullName(), household.getOwner().getTlf(),
                 household.getOwner().getRole()
             )));
+
 
     List<UserResponseDto> userResponseDtos = userRepository.getUsersByHousehold(household).stream()
         .map(u -> new UserResponseDto(u.getId(), u.getEmail(), u.getFullName(), u.getTlf(),
@@ -441,8 +439,7 @@ public class HouseholdService {
   /**
    * Edits an unregistered member in a household.
    *
-   * @param request The request containing the full name of the unregistered member and the new full
-   *                name.
+   * @param request The request containing the full name of the unregistered member and the new full                name.
    */
   public void editUnregisteredMemberInHousehold(EditMemberDto request) {
     logger.info("Editing unregistered member with ID {} in household {}",
@@ -537,15 +534,22 @@ public class HouseholdService {
    * @param request the request
    */
   public void editHousehold(EditHouseholdRequestDto request) {
-    logger.info("Editing household with ID {}", request.getHouseholdId());
+    logger.info("Editing household");
 
-    Household household = householdRepository.findById(request.getHouseholdId())
-        .orElseThrow(() -> {
-          logger.warn("Cannot edit household: Household not found with ID: {}",
-              request.getHouseholdId());
-          return new IllegalArgumentException("Household not found");
-        });
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
 
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalArgumentException("No user logged in"));
+    Household household =
+        householdRepository.findById(user.getHousehold().getId()).orElseThrow(() ->
+            new IllegalArgumentException("Household not found"));
+
+    if (!household.getOwner().getId().equals(user.getId())) {
+      logger.warn("User {} is not authorized to edit household {}", user.getId(),
+          household.getId());
+      throw new IllegalArgumentException("Only the owner can edit the household");
+    }
     if (request.getName() != null) {
       logger.debug("Changing household name from {} to {}", household.getName(), request.getName());
       household.setName(request.getName());
@@ -571,32 +575,44 @@ public class HouseholdService {
   /**
    * Deletes a household and removes all associated users and unregistered members.
    *
-   * @param householdId the household id
-   * @param ownerId     the owner id
-   * @throws IllegalArgumentException if the household is not found or if the user is not the
-   *                                  owner.
+   * @throws IllegalArgumentException if the household is not found or if the user is not the                                  owner.
    */
-  public void deleteHousehold(String householdId, String ownerId) {
-    logger.info("Deleting household with ID {} by owner {}", householdId, ownerId);
+  public void deleteHousehold() {
+    logger.info("Deleting household");
 
-    Household household = householdRepository.findById(householdId)
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+
+    // Finding the current user
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
-          logger.warn("Cannot delete household: Household not found with ID: {}", householdId);
+          logger.warn("Cannot delete household: User not found with email: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
+
+    // Getting the current users household id
+    Household household = householdRepository.findById(user.getHousehold().getId())
+        .orElseThrow(() -> {
+          logger.warn("Cannot delete household: Household not found with ID: {}",
+              user.getHousehold().getId());
           return new IllegalArgumentException("Household not found");
         });
 
-    if (!household.getOwner().getId().equals(ownerId)) {
-      logger.warn("User {} is not authorized to delete household {}", ownerId, householdId);
+    if (!household.getOwner().getId().equals(user.getId())) {
+      logger.warn("User {} is not authorized to delete household {}", user.getId(),
+          household.getId());
       throw new IllegalArgumentException("Only the owner can delete the household");
     }
 
+    // Moving all registered users from the household
     List<User> users = userRepository.getUsersByHousehold(household);
     logger.debug("Removing {} registered users from household", users.size());
-    for (User user : users) {
-      user.setHousehold(null);
-      userRepository.save(user);
+    for (User u : users) {
+      u.setHousehold(null);
+      userRepository.save(u);
     }
 
+    // Deleting all unregistered members from the household
     List<UnregisteredHouseholdMember> unregistered =
         unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(
             household);
@@ -612,7 +628,7 @@ public class HouseholdService {
     householdRepository.delete(household);
     logger.info("Household {} deleted successfully", householdName);
 
-    notificationService.saveHouseholdNotification(notification, householdId);
+    notificationService.saveHouseholdNotification(notification, household.getId());
     logger.debug("Household deletion notification sent");
   }
 

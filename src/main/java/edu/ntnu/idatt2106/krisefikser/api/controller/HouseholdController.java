@@ -172,24 +172,22 @@ public class HouseholdController {
   /**
    * Deletes a household with the given ID. The user must be the owner of the household.
    *
-   * @param request the id of the household and the owner
    * @return A response entity indicating the result of the operation.
    */
   @Operation(summary = "Deletes a household", description = "Deletes the household with the given ID")
   @PostMapping("/delete")
-  public ResponseEntity<String> deleteHousehold(@RequestBody DeleteHouseholdRequestDto request) {
+  public ResponseEntity<String> deleteHousehold() {
     try {
-      householdService.deleteHousehold(request.getHouseholdId(), request.getOwnerId());
-      LOGGER.info("Household deleted successfully: householdId={}, ownerId={}",
-          request.getHouseholdId(), request.getOwnerId());
+      householdService.deleteHousehold();
+      LOGGER.info("Household deleted successfully!");
       return ResponseEntity.ok("Household deleted successfully");
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during household deletion: {}", e.getMessage());
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
       LOGGER.error(
-          "Unexpected error during household deletion: householdId={}, ownerId={}, message={}",
-          request.getHouseholdId(), request.getOwnerId(), e.getMessage(), e);
+          "Unexpected error during household deletion: {}",
+          e.getMessage(), e);
       return ResponseEntity.status(500).body("Internal server error");
     }
   }
@@ -222,18 +220,17 @@ public class HouseholdController {
   /**
    * Gets household details.
    *
-   * @param request id of the user
    * @return the household details
    */
   @Operation(summary = "Gets household details",
       description = "Gets the details of the user's household")
   @PostMapping("/details")
-  public ResponseEntity<?> getHouseholdDetails(@RequestBody GetUserInfoRequestDto request) {
+  public ResponseEntity<?> getHouseholdDetails() {
     try {
-      Map<String, Object> details = householdService.getHouseholdDetails(request.getUserId());
+      Map<String, Object> details = householdService.getHouseholdDetails();
 
       if (details == null || details.get("household") == null) {
-        LOGGER.info("User with ID {} has no household", request.getUserId());
+        LOGGER.info("User has no household");
         return ResponseEntity.status(404).body(Map.of("error", "Brukeren tilhører ingen husstand"));
       }
       LOGGER.info("Household members retrieved successfully: {}", details);
