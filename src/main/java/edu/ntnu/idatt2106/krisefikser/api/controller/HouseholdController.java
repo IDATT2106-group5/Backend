@@ -134,7 +134,7 @@ public class HouseholdController {
   public ResponseEntity<String> removeUserFromHousehold(
       @RequestBody UserHouseholdAssignmentRequestDto request) {
     try {
-      householdService.removeUserFromHousehold(request.getUserId(), request.getHouseholdId());
+      householdService.removeUserFromHousehold(request.getUserId());
       LOGGER.info("User removed from household successfully: {}", request.getUserId());
       return ResponseEntity.ok("User removed from household successfully");
     } catch (IllegalArgumentException e) {

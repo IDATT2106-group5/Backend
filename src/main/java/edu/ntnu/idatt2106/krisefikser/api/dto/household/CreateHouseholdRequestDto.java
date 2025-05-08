@@ -8,7 +8,6 @@ public class CreateHouseholdRequestDto {
 
   private String name;
   private String address;
-  private String ownerId; // The email of the user creating the household
 
   public String getAddress() {
     return address;
@@ -18,7 +17,4 @@ public class CreateHouseholdRequestDto {
     return name;
   }
 
-  public String getOwnerId() {
-    return ownerId;
-  }
 }

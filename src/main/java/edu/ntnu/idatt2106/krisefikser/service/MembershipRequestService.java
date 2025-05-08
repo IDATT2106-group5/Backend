@@ -191,7 +191,6 @@ public class MembershipRequestService {
 
     UserHouseholdAssignmentRequestDto assignment = new UserHouseholdAssignmentRequestDto();
     assignment.setUserId(request.getSender().getId());
-    assignment.setHouseholdId(request.getHousehold().getId());
     logger.debug("Created assignment: userId={}, householdId={}",
         request.getSender().getId(), request.getHousehold().getId());
 

@@ -93,32 +93,32 @@ public class HouseholdService {
   public void createHousehold(CreateHouseholdRequestDto request) {
     logger.info("Creating household with name: {}", request.getName());
 
-    if (request.getOwnerId() == null) {
-      logger.warn("Cannot create household: Owner ID is null");
-      throw new IllegalArgumentException("Owner id must not be null");
-    }
-
     String householdId = generateHouseholdId();
     logger.debug("Generated household ID: {}", householdId);
 
     Household household = new Household();
+    household.setId(householdId);  // Add this line to set the ID
     household.setName(request.getName());
     household.setAddress(request.getAddress());
     household.setNumberOfMembers(1);
 
-    logger.debug("Finding user with ID: {}", request.getOwnerId());
-    User owner = userRepository.findById(request.getOwnerId())
+    // Find current user
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+
+    User owner = userRepository.findByEmail(email)
         .orElseThrow(() -> {
-          logger.warn("Cannot create household: User not found with ID: {}", request.getOwnerId());
+          logger.warn("Cannot create household: No user logged in with email: {}", email);
           return new IllegalArgumentException("User not found");
         });
+
     household.setOwner(owner);
-    household.setId(householdId);
 
     householdRepository.save(household);
     logger.debug("Household saved to database with ID: {}", household.getId());
 
-    userRepository.updateHouseholdId(request.getOwnerId(), household.getId());
+    userRepository.updateHouseholdId(owner.getId(), household.getId());
+
     logger.debug("User {} associated with household {}", owner.getEmail(), household.getId());
 
     logger.info("Household created successfully: {}",
@@ -156,8 +156,8 @@ public class HouseholdService {
    * @throws IllegalArgumentException if the user is already a member of the specified household.
    */
   public void addUserToHousehold(UserHouseholdAssignmentRequestDto request) {
-    logger.info("Adding user with ID {} to household with ID {}",
-        request.getUserId(), request.getHouseholdId());
+    logger.info("Adding user with ID {} to current household",
+        request.getUserId());
 
     logger.debug("Finding user with ID: {}", request.getUserId());
     User user = userRepository.findById(request.getUserId())
@@ -167,7 +167,6 @@ public class HouseholdService {
           return new IllegalArgumentException("User not found");
         });
 
-    logger.debug("Finding household with ID: {}", request.getHouseholdId());
     Household household = householdRepository.findById(request.getHouseholdId())
         .orElseThrow(() -> {
           logger.warn("Cannot add user to household: Household not found with ID: {}",
@@ -176,7 +175,7 @@ public class HouseholdService {
         });
 
     if (user.getHousehold() != null
-        && Objects.equals(user.getHousehold().getId(), request.getHouseholdId())) {
+        && Objects.equals(user.getHousehold().getId(), household.getId())) {
       logger.warn("User {} is already a member of household {}",
           user.getFullName(), household.getName());
       throw new IllegalArgumentException("User is already a member of this household");
@@ -213,13 +212,12 @@ public class HouseholdService {
   /**
    * Removes a registered member from a household.
    *
-   * @param userId      the user id
-   * @param householdId the household id
+   * @param userId the user id
    * @throws IllegalArgumentException if the user with a specified id is not found.
    * @throws IllegalArgumentException if the user is not a member of any household.
    */
-  public void removeUserFromHousehold(String userId, String householdId) {
-    logger.info("Removing user with ID {} from household with ID {}", userId, householdId);
+  public void removeUserFromHousehold(String userId) {
+    logger.info("Removing user with ID {} from household", userId);
 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
@@ -232,9 +230,25 @@ public class HouseholdService {
       throw new IllegalArgumentException("User is not a member of any household");
     }
 
-    if (!user.getHousehold().getId().equals(householdId)) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+
+    User currentUser = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("Cannot remove user from household: No user logged in with email: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
+    Household household = householdRepository.findById(currentUser.getHousehold().getId())
+        .orElseThrow(() -> {
+          logger.warn("Cannot remove user from household: Household not found with ID: {}",
+              currentUser.getHousehold().getId());
+          return new IllegalArgumentException("Household not found");
+        });
+
+
+    if (!user.getHousehold().getId().equals(household.getId())) {
       logger.warn("User {} is not a member of household with ID {}",
-          user.getFullName(), householdId);
+          user.getFullName(), household.getId());
       throw new IllegalArgumentException("User is not a member of this household");
     }
 
@@ -248,7 +262,7 @@ public class HouseholdService {
         new NotificationDto(NotificationType.HOUSEHOLD, null, LocalDateTime.now(), false,
             user.getFullName() + " has been removed from household.");
 
-    notificationService.saveHouseholdNotification(notification, householdId);
+    notificationService.saveHouseholdNotification(notification, household.getId());
     logger.info("User {} successfully removed from household", user.getFullName());
   }
 
@@ -313,37 +327,36 @@ public class HouseholdService {
    */
   public void addUnregisteredMemberToHousehold(
       UnregisteredMemberHouseholdAssignmentRequestDto request) {
-    logger.info("Adding unregistered member {} to household with ID {}",
-        request.getFullName(), request.getHouseholdId());
+    logger.info("Adding unregistered member {} ",
+        request.getFullName());
 
-    if (unregisteredHouseholdMemberRepository.findByFullNameAndHouseholdId(request.getFullName(),
-        request.getHouseholdId()).isPresent()) {
-      logger.warn("Unregistered member {} already exists in household with ID {}",
-          request.getFullName(), request.getHouseholdId());
-      throw new IllegalArgumentException("Unregistered member already exists in this household");
-    }
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
 
-    logger.debug("Finding household with ID: {}", request.getHouseholdId());
-    Household household = householdRepository.findById(request.getHouseholdId())
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
-          logger.warn("Cannot add unregistered member: Household not found with ID: {}",
-              request.getHouseholdId());
-          return new IllegalArgumentException("Household not found");
+          logger.warn("Cannot add unregistered member: No user logged in with email: {}", email);
+          return new IllegalArgumentException("User not found");
         });
+    Household household = user.getHousehold();
+
+    if (household == null) {
+      logger.warn("User {} does not belong to a household", user.getFullName());
+      throw new IllegalArgumentException("User does not belong to a household");
+    }
 
     UnregisteredHouseholdMember member = new UnregisteredHouseholdMember();
     member.setFullName(request.getFullName());
-    member.setHousehold(household);
+    member.setHousehold(user.getHousehold());
 
     unregisteredHouseholdMemberRepository.save(member);
     logger.debug("Unregistered member saved to database");
 
-    householdRepository.updateNumberOfMembers(request.getHouseholdId(),
-        household.getNumberOfMembers() + 1);
-    logger.debug("Updated household member count to: {}", household.getNumberOfMembers() + 1);
+    householdRepository.updateNumberOfMembers(user.getHousehold().getId(),
+        user.getHousehold().getNumberOfMembers() + 1);
 
     logger.info("Unregistered member {} added to household {}",
-        request.getFullName(), household.getName());
+        request.getFullName(), user.getHousehold().getName());
   }
 
   /**
@@ -366,6 +379,20 @@ public class HouseholdService {
 
     if (member.getHousehold() == null) {
       logger.warn("Unregistered member doesn't belong to any household");
+    }
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("Cannot remove unregistered member: No user logged in with email: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
+
+    if (!user.getHousehold().getId().equals(member.getHousehold().getId())) {
+      logger.warn("User {} is not authorized to remove unregistered member {}",
+          user.getFullName(), member.getFullName());
+      throw new IllegalArgumentException("You are not authorized to remove this member");
     }
 
     String householdId = member.getHousehold().getId();
@@ -442,8 +469,18 @@ public class HouseholdService {
    * @param request The request containing the full name of the unregistered member and the new full                name.
    */
   public void editUnregisteredMemberInHousehold(EditMemberDto request) {
-    logger.info("Editing unregistered member with ID {} in household {}",
-        request.getMemberId(), request.getHouseholdId());
+    logger.info("Editing unregistered member with ID {}",
+        request.getMemberId());
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("Cannot edit unregistered member: No user logged in with email: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
+    Household household = user.getHousehold();
+
 
     UnregisteredHouseholdMember member =
         unregisteredHouseholdMemberRepository.findById(request.getMemberId()).orElseThrow(
@@ -452,6 +489,12 @@ public class HouseholdService {
                   request.getMemberId());
               return new IllegalArgumentException("Unregistered member not found in household");
             });
+
+    if (!member.getHousehold().getId().equals(household.getId())) {
+      logger.warn("User {} is not authorized to edit unregistered member {}",
+          user.getFullName(), member.getFullName());
+      throw new IllegalArgumentException("You are not authorized to edit this member");
+    }
 
     String oldName = member.getFullName();
 
@@ -462,7 +505,7 @@ public class HouseholdService {
 
     unregisteredHouseholdMemberRepository.save(member);
     logger.info("Unregistered member {} edited in household {}",
-        request.getNewFullName(), request.getHouseholdId());
+        request.getNewFullName(), member.getHousehold().getName());
   }
 
   /**
@@ -471,7 +514,7 @@ public class HouseholdService {
    * @param request the request
    */
   public void changeHouseholdOwner(UserHouseholdAssignmentRequestDto request) {
-    logger.info("Changing household owner for household {}", request.getHouseholdId());
+    logger.info("Changing household owner for current household");
 
     User newOwner = userRepository.findById(request.getUserId())
         .orElseThrow(() -> {
@@ -480,12 +523,17 @@ public class HouseholdService {
           return new IllegalArgumentException("User not found");
         });
 
-    Household household = householdRepository.findById(request.getHouseholdId())
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+
+    User currentUser = userRepository.findByEmail(email)
         .orElseThrow(() -> {
-          logger.warn("Cannot change household owner: Household not found with ID: {}",
-              request.getHouseholdId());
-          return new IllegalArgumentException("Household not found");
+          logger.warn("Cannot change household owner: No user logged in with email: {}", email);
+          return new IllegalArgumentException("User not found");
         });
+    Household household = householdRepository.findById(currentUser.getHousehold().getId())
+        .orElseThrow(() -> new IllegalArgumentException("Household not found"));
+
 
     if (household.getOwner().getId().equals(newOwner.getId())) {
       logger.warn("User {} is already the owner of household {}", newOwner.getFullName(),
