@@ -1,10 +1,11 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.StorageItemResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.service.StorageService;
 import edu.ntnu.idatt2106.krisefikser.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for managing user-related operations.
- * Provides endpoints for retrieving user information.
+ * Controller for managing user-related operations. Provides endpoints for retrieving user
+ * information.
  */
 @Tag(name = "User", description = "Endpoints for managing a user")
 @RestController
@@ -46,9 +47,10 @@ public class UserController {
   /**
    * Retrieves the details of the currently authenticated user.
    *
-   * @return a ResponseEntity containing the user details as a UserResponseDto
-   * or an appropriate error response
+   * @return a ResponseEntity containing the user details.
    */
+  @Operation(summary = "Gets details about the current user",
+      description = "Gets the details about the currently authenticated user")
   @GetMapping("/me")
   public ResponseEntity<?> getUser() {
     try {
@@ -64,6 +66,14 @@ public class UserController {
     }
   }
 
+  /**
+   * Retrieves the household information for a given user ID.
+   *
+   * @param userId the ID of the user
+   * @return a ResponseEntity containing the household information
+   */
+  @Operation(summary = "Gets the household information for a given user",
+      description = "Gets the household information about a user with a given id")
   @GetMapping("/me/household/{userId}")
   public ResponseEntity<?> getHousehold(@PathVariable String userId) {
     try {
@@ -80,6 +90,15 @@ public class UserController {
     }
   }
 
+  /**
+   * Checks if a given email address exists in the system.
+   *
+   * @param request a map containing the email address to check
+   * @return a ResponseEntity indicating whether the email exists or not
+   */
+  @Operation(summary = "Check if an email exists in the system",
+      description = "Checks if a given email address exists in the system. "
+          + "If it does, returns the user ID associated with that email.")
   @PostMapping("/check-mail")
   public ResponseEntity<?> verifyIfMailExists(@RequestBody Map<String, String> request) {
     try {
@@ -101,6 +120,8 @@ public class UserController {
    *
    * @return a ResponseEntity containing the list of storage items.
    */
+  @Operation(summary = "Gets the current user's household's storage items",
+      description = "Gets the storage items for the current user's household")
   @GetMapping("/me/storage")
   public ResponseEntity<?> getCurrentUserStorageItems() {
     try {

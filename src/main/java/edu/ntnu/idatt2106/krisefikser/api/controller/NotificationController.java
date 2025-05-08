@@ -67,7 +67,7 @@ public class NotificationController {
    * Marks a notification as read.
    *
    * @param notificationId the ID of the notification to mark as read
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Marks a notification as read",
       description = "Marks a notification with a given id as read")

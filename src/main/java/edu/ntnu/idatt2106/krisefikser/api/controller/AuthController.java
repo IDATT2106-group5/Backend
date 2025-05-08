@@ -44,7 +44,7 @@ public class AuthController {
    * Register a new user.
    *
    * @param request the user to register
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Registers a new user",
       description = "Registers a new user and sends a confirmation email")
@@ -134,7 +134,7 @@ public class AuthController {
    * Initiates a password reset process by sending a reset link to the user's email.
    *
    * @param request the request containing the user's email
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    * @throws IllegalArgumentException if the email is invalid or not found
    */
   @Operation(summary = "Initiates password reset process",
@@ -165,7 +165,7 @@ public class AuthController {
    * Validates the reset password token
    *
    * @param request the request containing the reset password token
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    * @throws IllegalArgumentException if the token is invalid or expired
    */
   @Operation(summary = "Validates the reset password token",
@@ -196,7 +196,7 @@ public class AuthController {
    * Resets the user's password using a reset token.
    *
    * @param request the request containing the new password and token
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    * @throws IllegalArgumentException if the token or new password is invalid
    */
   @Operation(summary = "Resets the user's password",

@@ -143,7 +143,7 @@ public class MembershipRequestController {
    * Sends a membership invitation to a user for a given household.
    *
    * @param request the request containing the email and household ID
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Send a membership invitation",
       description = "Sends a membership invitation to a user for a given household")
@@ -193,7 +193,7 @@ public class MembershipRequestController {
    * Sends a join request to a household for a given user.
    *
    * @param request the request containing the user ID and household ID
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Send a join request",
       description = "Sends a join request to a household for a given user")
@@ -216,7 +216,7 @@ public class MembershipRequestController {
    * Declines a membership request.
    *
    * @param request the request containing the request ID
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Decline a membership request",
       description = "Declines a membership request with the given ID")
@@ -239,7 +239,7 @@ public class MembershipRequestController {
    * Accepts a membership join request.
    *
    * @param request the request containing the request ID
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Accept a membership join request",
       description = "Accepts a membership join request with the given ID")
@@ -262,7 +262,7 @@ public class MembershipRequestController {
    * Accepts a membership invitation request.
    *
    * @param request the request containing the request ID
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Accept a membership invitation request",
       description = "Accepts a membership request with the given ID")
@@ -285,7 +285,7 @@ public class MembershipRequestController {
    * Cancels a membership request.
    *
    * @param request the request containing the request ID
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Cancels a membership request",
       description = "Cancels a membership request with a given ID")

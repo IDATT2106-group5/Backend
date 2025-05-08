@@ -250,8 +250,8 @@ public class HouseholdController {
   /**
    * Edit unregistered member in household response entity.
    *
-   * @param request the request
-   * @return the response entity
+   * @param request data about the member to edit
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Edits an unregistered member in a household",
       description = "Edits an unregistered member in a household with the given ID")
@@ -275,8 +275,8 @@ public class HouseholdController {
   /**
    * Changes the owner of a household.
    *
-   * @param request the request
-   * @return the response entity
+   * @param request the id of the user and the household
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Changes the owner of a household",
       description = "Changes the owner of a household with the given ID")
@@ -299,8 +299,8 @@ public class HouseholdController {
   /**
    * Edits a household's details.
    *
-   * @param request the request
-   * @return the response entity
+   * @param request the updated household data
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Edits the details of a household",
       description = "Edits the details of a household with the given ID")
@@ -323,8 +323,8 @@ public class HouseholdController {
   /**
    * Search for a household by household id.
    *
-   * @param request the request
-   * @return the response entity
+   * @param request the id of the given household
+   * @return the household id and name
    */
   @Operation(summary = "Search for a household by household id",
       description = "Search for a household by household id")

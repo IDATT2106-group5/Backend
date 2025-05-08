@@ -46,7 +46,7 @@ public class ScenarioController {
    * Create a new scenario.
    *
    * @param request the scenario request DTO
-   * @return a response entity with the result of the operation
+   * @return a response entity indicating the result of the operation
    */
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
@@ -73,7 +73,7 @@ public class ScenarioController {
    *
    * @param id      the ID of the scenario to update
    * @param request the updated scenario data
-   * @return a response entity with the result of the operation
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Updates a scenario",
       description = "Updates an existing scenario with a given id. Only accessible to admins")

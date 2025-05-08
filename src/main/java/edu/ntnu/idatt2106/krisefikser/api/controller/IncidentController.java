@@ -47,7 +47,7 @@ public class IncidentController {
    * Creates a new incident.
    *
    * @param request the incident to create
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Creates an incident",
       description = "Creates a new incident. Only accessible by admins")
@@ -74,7 +74,7 @@ public class IncidentController {
    *
    * @param id      the ID of the incident to update
    * @param request the updated incident data
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Updates an incident",
       description = "Updates an incident. Only accessible by admins")
@@ -101,7 +101,7 @@ public class IncidentController {
    * Deletes an incident.
    *
    * @param id the ID of the incident to delete
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Deletes an incident",
       description = "Deletes an incident. Only accessible by admins")

@@ -48,7 +48,7 @@ public class MapIconController {
    * Creates a new map icon.
    *
    * @param request the map icon to create
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Creates a map icon",
       description = "Creates a new map icon. Only accessible by admins")
@@ -74,7 +74,7 @@ public class MapIconController {
    *
    * @param id      the ID of the map icon to update
    * @param request the updated map icon data
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Updates a map icon",
       description = "Updates an existing map icon with a given id. Only accessible by admins")
@@ -100,7 +100,7 @@ public class MapIconController {
    * Deletes a map icon.
    *
    * @param id the ID of the map icon to delete
-   * @return a response entity with a message
+   * @return a response entity indicating the result of the operation
    */
   @Operation(summary = "Deletes a map icon",
       description = "Deletes a map icon with a given id. Only accessible by admins")
