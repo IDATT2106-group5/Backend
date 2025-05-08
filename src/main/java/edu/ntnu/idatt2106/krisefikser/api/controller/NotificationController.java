@@ -42,17 +42,16 @@ public class NotificationController {
   /**
    * Retrieves notifications for a user.
    *
-   * @param request the request containing the user ID
    * @return a list of all notifications for the user
    */
   @Operation(summary = "Gets notifications for a user",
       description = "Gets notifications for a user with a given id")
   @PostMapping("/get")
-  public ResponseEntity<?> getNotifications(@RequestBody GetUserInfoRequestDto request) {
+  public ResponseEntity<?> getNotifications() {
     try {
       List<NotificationResponseDto> notifications =
-          notificationService.getUserNotifications(request.getUserId());
-      logger.info("Retrieved notifications for user: {}", request.getUserId());
+          notificationService.getUserNotifications();
+      logger.info("Retrieved notifications for user");
       return ResponseEntity.ok(notifications);
     } catch (IllegalArgumentException e) {
       logger.warn("Validation error retrieving notifications: {}", e.getMessage());

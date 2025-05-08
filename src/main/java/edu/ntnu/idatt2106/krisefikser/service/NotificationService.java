@@ -17,6 +17,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -130,24 +132,24 @@ public class NotificationService {
   /**
    * Gets user notifications.
    *
-   * @param userId the user id
    * @return the user notifications
    */
-  public List<NotificationResponseDto> getUserNotifications(String userId) {
-    logger.info("Fetching notifications for user: {}", userId);
+  public List<NotificationResponseDto> getUserNotifications() {
+    logger.info("Fetching notifications for user");
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
 
     try {
-      logger.debug("Verifying user exists with ID: {}", userId);
-      User user = userRepository.findById(userId)
+      User user = userRepository.getUserByEmail(email)
           .orElseThrow(() -> {
-            logger.warn("User not found with ID: {}", userId);
+            logger.warn("User not found with email: {}", email);
             return new IllegalArgumentException("User not found");
           });
-      logger.debug("Found user: {}", user.getFullName());
 
       logger.debug("Retrieving notifications for user ordered by timestamp");
       List<Notification> notifications =
-          notificationRepository.findAllByUserIdOrderByTimestampDesc(userId);
+          notificationRepository.findAllByUserIdOrderByTimestampDesc(user.getId());
       logger.debug("Retrieved {} notifications for user", notifications.size());
 
       List<NotificationResponseDto> result = notifications.stream()
@@ -160,10 +162,10 @@ public class NotificationService {
               notification.getIsRead()))
           .toList();
 
-      logger.info("Returning {} notifications for user {}", result.size(), userId);
+      logger.info("Returning {} notifications for user {}", result.size(), user.getId());
       return result;
     } catch (Exception e) {
-      logger.error("Error fetching notifications for user {}: {}", userId, e.getMessage(), e);
+      logger.error("Error fetching notifications for user: {}", e.getMessage(), e);
       throw e;
     }
   }
