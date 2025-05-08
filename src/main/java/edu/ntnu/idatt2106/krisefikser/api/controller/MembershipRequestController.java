@@ -24,8 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequestMapping("/api/membership-requests")
 public class MembershipRequestController {
-  private final MembershipRequestService membershipRequestService;
+
   private static final Logger LOGGER = LoggerFactory.getLogger(MembershipRequestController.class);
+  private final MembershipRequestService membershipRequestService;
 
   public MembershipRequestController(MembershipRequestService membershipRequestService) {
     this.membershipRequestService = membershipRequestService;
@@ -66,13 +67,15 @@ public class MembershipRequestController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
+
   @Operation(summary = "Gets all accepted join requests sent to a household", description = "Retrieves all accepted join requests sent to a household")
   @PostMapping("/join-requests/received/accepted")
   public ResponseEntity<?> getActiveAcceptedJoinRequests(
       @RequestBody Map<String, Long> request) {
     try {
       List<MembershipRequestResponseDto> requests =
-          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold(request.get("householdId"));
+          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold(
+              request.get("householdId"));
       return ResponseEntity.ok(requests);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving join requests: {}", e.getMessage());
@@ -103,17 +106,19 @@ public class MembershipRequestController {
 
   @Operation(summary = "Send a membership invitation", description = "Sends a membership invitation to a user for a given household")
   @PostMapping("/send-invitation")
-  public ResponseEntity<String> sendInvitation(@RequestBody MembershipInviteDto request) {
+  public ResponseEntity<Map<String, String>> sendInvitation(
+      @RequestBody MembershipInviteDto request) {
     try {
       membershipRequestService.sendInvitation(request.getEmail(), request.getHouseholdId());
       LOGGER.info("Invitation sent successfully to {}", request.getEmail());
-      return ResponseEntity.ok("Invitation sent successfully");
+      return ResponseEntity.ok(Map.of("Message", "Invitation sent successfully"));
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Invitation failed: {}", e.getMessage());
-      return ResponseEntity.badRequest().body(e.getMessage());
+      return ResponseEntity.badRequest()
+          .body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
       LOGGER.error("Unexpected error during invitation: {}", e.getMessage(), e);
-      return ResponseEntity.status(500).body("Internal server error");
+      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
 
