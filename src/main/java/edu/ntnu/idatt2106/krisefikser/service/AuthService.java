@@ -69,10 +69,19 @@ public class AuthService {
     this.captchaService = captchaService;
     this.loginAttemptService = loginAttemptService;
     this.twoFactorService = twoFactorService;
+    logger.info("AuthService initialized");
   }
 
+  /**
+   * Validates a password against security requirements.
+   *
+   * @param password the password to validate
+   * @return true if the password meets all requirements, false otherwise
+   */
   public boolean validatePassword(String password) {
-    return PASSWORD_PATTERN.matcher(password).matches();
+    boolean isValid = PASSWORD_PATTERN.matcher(password).matches();
+    logger.debug("Password validation result: {}", isValid);
+    return isValid;
   }
 
   /**
@@ -81,15 +90,19 @@ public class AuthService {
    * @param request the user to register
    */
   public void registerUser(RegisterRequestDto request) {
+    logger.info("Processing user registration for email: {}", request.getEmail());
+
     if (!captchaService.verifyToken(request.getHCaptchaToken())) {
       logger.warn("hCaptcha validation failed for email: {}", request.getEmail());
       throw new IllegalArgumentException("hCaptcha verification failed. Please try again.");
     }
+    logger.debug("hCaptcha validation successful for email: {}", request.getEmail());
 
     if (userRepository.existsByEmail(request.getEmail())) {
       logger.warn("Email already in use: {}", request.getEmail());
       throw new IllegalArgumentException("Email already in use");
     }
+    logger.debug("Email availability check passed for: {}", request.getEmail());
 
     User user = new User();
     user.setFullName(request.getFullName());
@@ -102,10 +115,16 @@ public class AuthService {
     user.setConfirmationToken(token);
     user.setConfirmed(false);
 
+    logger.debug("Created user entity with confirmation token for email: {}", request.getEmail());
     userRepository.save(user);
     logger.info("User registered successfully: {}", user.getEmail());
 
-    emailService.sendConfirmationEmail(user.getEmail(), token);
+    try {
+      emailService.sendConfirmationEmail(user.getEmail(), token);
+      logger.info("Confirmation email sent to: {}", user.getEmail());
+    } catch (Exception e) {
+      logger.error("Failed to send confirmation email to {}: {}", user.getEmail(), e.getMessage());
+    }
   }
 
   /**
@@ -114,12 +133,20 @@ public class AuthService {
    * @param token the confirmation token
    */
   public void confirmUser(String token) {
-    User user = userRepository.findByConfirmationToken(token)
-        .orElseThrow(() -> new IllegalArgumentException("Invalid confirmation token"));
+    logger.info("Processing user confirmation with token");
+    logger.debug("Confirmation token being validated: {}", token);
 
+    User user = userRepository.findByConfirmationToken(token)
+        .orElseThrow(() -> {
+          logger.warn("Invalid confirmation token: {}", token);
+          return new IllegalArgumentException("Invalid confirmation token");
+        });
+
+    logger.debug("Found user for confirmation token: {}", user.getEmail());
     user.setConfirmed(true);
     user.setConfirmationToken(null);
     userRepository.save(user);
+    logger.info("User confirmed successfully: {}", user.getEmail());
   }
 
 
@@ -132,9 +159,9 @@ public class AuthService {
    * @throws IllegalArgumentException if the email or password is invalid, or if the account is
    *                                  locked.
    */
-
   public LoginResponse loginUser(LoginRequest request) throws IllegalArgumentException {
     String email = request.getEmail();
+    logger.info("Processing login request for email: {}", email);
 
     // Check if the account is locked due to too many failed attempts
     if (loginAttemptService.isBlocked(email)) {
@@ -142,14 +169,16 @@ public class AuthService {
       throw new IllegalArgumentException(
           "Account is locked. Please try again later or reset password.");
     }
+    logger.debug("Account not locked, proceeding with authentication for: {}", email);
 
     // Find user by email if they exist
     User user = userRepository.findByEmail(request.getEmail())
         .orElseThrow(() -> {
           logger.warn("User not found during login attempt: {}", email);
           loginAttemptService.loginFailed(email);
-          throw new IllegalArgumentException("Invalid email or password");
+          return new IllegalArgumentException("Invalid email or password");
         });
+    logger.debug("User found in database: {}", email);
 
     // Checks if typed password matches encrypted
     if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -157,6 +186,7 @@ public class AuthService {
       loginAttemptService.loginFailed(email);
       throw new IllegalArgumentException("Invalid email or password");
     }
+    logger.debug("Password validated successfully for user: {}", email);
 
     try {
       Authentication authentication = authenticationManager.authenticate(
@@ -165,11 +195,13 @@ public class AuthService {
               request.getPassword()
           )
       );
+      logger.debug("User authenticated by AuthenticationManager: {}", email);
 
       SecurityContextHolder.getContext().setAuthentication(authentication);
 
       // For admin users, return a flag indicating 2FA is required
       if (user.getRole() == Role.ADMIN || user.getRole() == Role.SUPERADMIN) {
+        logger.info("2FA required for admin user: {}", email);
         LoginResponse response = new LoginResponse(null);
         response.setRequires2Fa(true);
         return response;
@@ -197,20 +229,30 @@ public class AuthService {
    * @throws IllegalArgumentException if the code is invalid or user is not an admin
    */
   public LoginResponse verify2Fa(String email, String otpCode) {
+    logger.info("Verifying 2FA for user: {}", email);
+
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        .orElseThrow(() -> {
+          logger.warn("User not found during 2FA verification: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
+    logger.debug("User found for 2FA verification: {}", email);
 
     // Only admin users require 2FA
     if (user.getRole() != Role.ADMIN && user.getRole() != Role.SUPERADMIN) {
+      logger.warn("2FA attempted for non-admin user: {}", email);
       throw new IllegalArgumentException("2FA not required for this user");
     }
+    logger.debug("User role verified for 2FA: {}", email);
 
     // Verify OTP code
     boolean isValidOtp = twoFactorService.verifyOtp(email, otpCode);
     if (!isValidOtp) {
+      logger.warn("Invalid 2FA code provided for user: {}", email);
       loginAttemptService.loginFailed(email);
       throw new IllegalArgumentException("Invalid verification code");
     }
+    logger.debug("2FA code verified successfully for user: {}", email);
 
     // Create authentication with the user's role as the authority
     List<GrantedAuthority> authorities = Collections.singletonList(
@@ -219,10 +261,12 @@ public class AuthService {
     Authentication authentication = new UsernamePasswordAuthenticationToken(
         email, null, authorities);
     SecurityContextHolder.getContext().setAuthentication(authentication);
+    logger.debug("Authentication context set for user: {}", email);
 
     String jwt = tokenProvider.generateToken(authentication);
     loginAttemptService.loginSucceeded(email);
 
+    logger.info("2FA verification successful, user logged in: {}", email);
     return new LoginResponse(jwt);
   }
 
@@ -232,17 +276,30 @@ public class AuthService {
    * @param email the user's email address
    */
   public void initiatePasswordReset(String email) {
+    logger.info("Initiating password reset for email: {}", email);
+
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalArgumentException("No user registered with that email."));
+        .orElseThrow(() -> {
+          logger.warn("Password reset requested for non-existent email: {}", email);
+          return new IllegalArgumentException("No user registered with that email.");
+        });
+    logger.debug("User found for password reset: {}", email);
 
     String token = UUID.randomUUID().toString();
     Date expiration = Date.from(Instant.now().plus(1, ChronoUnit.HOURS));
+    logger.debug("Generated password reset token with 1 hour expiration for user: {}", email);
 
     user.setResetPasswordToken(token);
     user.setResetPasswordTokenExpiration(expiration);
     userRepository.save(user);
+    logger.debug("Password reset token saved to database for user: {}", email);
 
-    emailService.sendPasswordResetEmail(user.getEmail(), token);
+    try {
+      emailService.sendPasswordResetEmail(user.getEmail(), token);
+      logger.info("Password reset email sent to: {}", email);
+    } catch (Exception e) {
+      logger.error("Failed to send password reset email to {}: {}", email, e.getMessage());
+    }
   }
 
   /**
@@ -251,11 +308,15 @@ public class AuthService {
    * @param token the reset password token
    */
   public void validateResetPasswordToken(String token) {
+    logger.info("Validating password reset token");
+    logger.debug("Reset token being validated: {}", token);
+
     User user = userRepository.findByResetPasswordToken(token)
         .orElseThrow(() -> {
           logger.warn("Invalid reset token received: {}", token);
           return new IllegalArgumentException("Invalid token");
         });
+    logger.debug("Found user for reset token: {}", user.getEmail());
 
     if (user.getResetPasswordTokenExpiration().before(new Date())) {
       logger.warn("Reset token expired for user: {}", user.getEmail());
@@ -271,17 +332,21 @@ public class AuthService {
    * @param newPassword the new password
    */
   public void resetPassword(String token, String newPassword) {
+    logger.info("Processing password reset with token");
+    logger.debug("Reset token being processed: {}", token);
+
     User user = userRepository.findByResetPasswordToken(token)
         .orElseThrow(() -> {
           logger.warn("Invalid reset token received: {}", token);
           return new IllegalArgumentException("Invalid token");
         });
+    logger.debug("Found user for reset token: {}", user.getEmail());
 
     if (user.getResetPasswordTokenExpiration().before(new Date())) {
       logger.warn("Reset token expired for user: {}", user.getEmail());
       throw new IllegalArgumentException("Token expired");
     }
-    logger.info("Reset token validated successfully for user: {}", user.getEmail());
+    logger.debug("Reset token is valid and not expired for user: {}", user.getEmail());
 
     user.setPassword(passwordEncoder.encode(newPassword));
     user.setResetPasswordToken(null);

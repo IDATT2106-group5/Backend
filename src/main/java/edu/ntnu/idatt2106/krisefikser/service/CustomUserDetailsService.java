@@ -3,6 +3,8 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.CustomUserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,19 +18,33 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
+  private static final Logger logger = LoggerFactory.getLogger(CustomUserDetailsService.class);
   private final UserRepository userRepository;
 
   @Autowired
   public CustomUserDetailsService(UserRepository userRepository) {
     this.userRepository = userRepository;
+    logger.info("CustomUserDetailsService initialized");
   }
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    // In our application, the username is the email
-    User user = userRepository.findByEmail(username)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+    logger.info("Loading user details for username: {}", username);
 
-    return new CustomUserDetails(user);
+    try {
+      User user = userRepository.findByEmail(username)
+          .orElseThrow(() -> {
+            logger.warn("User not found with email: {}", username);
+            return new UsernameNotFoundException("User not found with email: " + username);
+          });
+
+      logger.debug("User found for email {}: {}", username, user.getFullName());
+      return new CustomUserDetails(user);
+    } catch (Exception e) {
+      if (!(e instanceof UsernameNotFoundException)) {
+        logger.error("Error while loading user by username {}: {}", username, e.getMessage());
+      }
+      throw e;
+    }
   }
 }
