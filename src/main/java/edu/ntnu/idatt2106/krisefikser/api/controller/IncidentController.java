@@ -3,6 +3,8 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentResponseDto;
 import edu.ntnu.idatt2106.krisefikser.service.IncidentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller for handling incident related requests.
+ */
+@Tag(name = "Incident", description = "Endpoints for incident related requests")
 @RestController
 @RequestMapping("/api/incidents")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
@@ -28,10 +34,23 @@ public class IncidentController {
   private static final Logger logger = LoggerFactory.getLogger(IncidentController.class);
   private final IncidentService incidentService;
 
+  /**
+   * Constructor for IncidentController.
+   *
+   * @param incidentService the service for handling incident related requests
+   */
   public IncidentController(IncidentService incidentService) {
     this.incidentService = incidentService;
   }
 
+  /**
+   * Creates a new incident.
+   *
+   * @param request the incident to create
+   * @return a response entity with a message
+   */
+  @Operation(summary = "Creates an incident",
+      description = "Creates a new incident. Only accessible by admins")
   @PostMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> createIncident(
@@ -50,6 +69,15 @@ public class IncidentController {
     }
   }
 
+  /**
+   * Updates an existing incident.
+   *
+   * @param id      the ID of the incident to update
+   * @param request the updated incident data
+   * @return a response entity with a message
+   */
+  @Operation(summary = "Updates an incident",
+      description = "Updates an incident. Only accessible by admins")
   @PutMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> updateIncident(
@@ -69,6 +97,14 @@ public class IncidentController {
     }
   }
 
+  /**
+   * Deletes an incident.
+   *
+   * @param id the ID of the incident to delete
+   * @return a response entity with a message
+   */
+  @Operation(summary = "Deletes an incident",
+      description = "Deletes an incident. Only accessible by admins")
   @DeleteMapping("/{id}")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Map<String, String>> deleteIncident(@PathVariable Long id) {
@@ -85,6 +121,13 @@ public class IncidentController {
     }
   }
 
+  /**
+   * Retrieves all incidents.
+   *
+   * @return a list of incidents
+   */
+  @Operation(summary = "Gets all incidents",
+      description = "Gets all incidents. Accessible to all users")
   @GetMapping
   public ResponseEntity<List<IncidentResponseDto>> getAllIncidents() {
     try {

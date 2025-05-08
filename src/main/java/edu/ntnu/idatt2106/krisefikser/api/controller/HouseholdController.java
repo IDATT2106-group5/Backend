@@ -12,8 +12,6 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.user.GetUserInfoRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Map;
@@ -61,11 +59,6 @@ public class HouseholdController {
    */
   @Operation(summary = "Creates a household",
       description = "Creates a household with the given name and address for a given user")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Household created successfully"),
-      @ApiResponse(responseCode = "400", description = "Invalid household data"),
-      @ApiResponse(responseCode = "500", description = "Internal server error")
-  })
   @PostMapping("/create")
   public ResponseEntity<String> createHousehold(
       @RequestBody CreateHouseholdRequestDto request) {
@@ -168,8 +161,10 @@ public class HouseholdController {
       householdService.leaveCurrentUserFromHousehold();
       return ResponseEntity.ok("Du har forlatt husstanden.");
     } catch (IllegalArgumentException e) {
+      LOGGER.warn("Validation error during household leave: {}", e.getMessage());
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (Exception e) {
+      LOGGER.error("Unexpected error during household leave: {}", e.getMessage(), e);
       return ResponseEntity.status(500).body("Uventet feil under utmelding fra husstand.");
     }
   }
@@ -230,6 +225,8 @@ public class HouseholdController {
    * @param request the request
    * @return the household details
    */
+  @Operation(summary = "Gets household details",
+      description = "Gets the details of the user's household")
   @PostMapping("/details")
   public ResponseEntity<?> getHouseholdDetails(@RequestBody GetUserInfoRequestDto request) {
     try {
@@ -250,15 +247,14 @@ public class HouseholdController {
     }
   }
 
-
   /**
    * Edit unregistered member in household response entity.
    *
    * @param request the request
    * @return the response entity
    */
-  @Operation(summary = "Edits a unregistered member in a household",
-      description = "Edits a unregistered member in a household with the given ID")
+  @Operation(summary = "Edits an unregistered member in a household",
+      description = "Edits an unregistered member in a household with the given ID")
   @PostMapping("/edit-unregistered-member")
   public ResponseEntity<String> editUnregisteredMemberInHousehold(
       @RequestBody EditMemberDto request) {
@@ -330,7 +326,8 @@ public class HouseholdController {
    * @param request the request
    * @return the response entity
    */
-  @Operation(summary = "Search for a household by household id", description = "Search for a household by household id")
+  @Operation(summary = "Search for a household by household id",
+      description = "Search for a household by household id")
   @PostMapping("/search")
   public ResponseEntity<?> searchHouseholdById(@RequestBody Map<String, String> request) {
     String householdId = request.get("householdId");
@@ -353,6 +350,8 @@ public class HouseholdController {
    *
    * @return the household positions
    */
+  @Operation(summary = "Gets the position of all the users in the household",
+      description = "Gets the position of all the users in the household for the current user")
   @GetMapping("/positions")
   public ResponseEntity<?> getHouseholdPositions() {
     try {
@@ -367,5 +366,4 @@ public class HouseholdController {
       return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
     }
   }
-
 }
