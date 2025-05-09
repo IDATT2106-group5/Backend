@@ -59,4 +59,13 @@ public interface MembershipRequestRepository extends JpaRepository<MembershipReq
   List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatusIn(
       String householdId, RequestType type, List<RequestStatus> statuses
   );
+
+  /**
+   * Deletes all MembershipRequests associated with the given household ID.
+   *
+   * @param householdId the ID of the household
+   */
+  @Modifying
+  @Query("DELETE FROM MembershipRequest m WHERE m.household.id = :householdId")
+  void deleteAllByHouseholdId(String householdId);
 }

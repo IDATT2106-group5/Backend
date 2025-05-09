@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
@@ -30,6 +29,7 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.MembershipRequestRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.util.Arrays;
@@ -64,6 +64,9 @@ class HouseholdServiceTest {
 
   @InjectMocks
   private HouseholdService householdService;
+
+  @Mock
+  private MembershipRequestRepository membershipRequestRepository;
 
   @BeforeEach
   void setUp() {
@@ -1006,7 +1009,9 @@ class HouseholdServiceTest {
 
       householdService.deleteHousehold();
 
-      // Update this verification to match the actual implementation
+      verify(membershipRequestRepository).deleteAllByHouseholdId("household123");
+      
+      verify(membershipRequestRepository).deleteAllByHouseholdId("household123");
       verify(userRepository).save(user);
       verify(unregisteredHouseholdMemberRepository).deleteAll(List.of(member));
       verify(householdRepository).delete(household);
