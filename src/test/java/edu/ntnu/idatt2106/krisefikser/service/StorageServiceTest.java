@@ -2,6 +2,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -61,14 +62,12 @@ class StorageServiceTest {
   @Nested
   class GetStorageItemsByHouseholdTests {
 
-    private Authentication authentication;
-    private SecurityContext securityContext;
     private User user;
 
     @BeforeEach
     void setUp() {
-      authentication = mock(Authentication.class);
-      securityContext = mock(SecurityContext.class);
+      Authentication authentication = mock(Authentication.class);
+      SecurityContext securityContext = mock(SecurityContext.class);
       SecurityContextHolder.setContext(securityContext);
 
       user = new User();
@@ -144,17 +143,13 @@ class StorageServiceTest {
   @Nested
   class GetStorageItemsByHouseholdAndTypeTests {
 
-    private Authentication authentication;
-    private SecurityContext securityContext;
-    private User user;
-
     @BeforeEach
     void setUp() {
-      authentication = mock(Authentication.class);
-      securityContext = mock(SecurityContext.class);
+      Authentication authentication = mock(Authentication.class);
+      SecurityContext securityContext = mock(SecurityContext.class);
       SecurityContextHolder.setContext(securityContext);
 
-      user = new User();
+      User user = new User();
       Household household = new Household();
       household.setId(householdId);
       user.setHousehold(household);
@@ -214,18 +209,15 @@ class StorageServiceTest {
   @Nested
   class GetExpiringItemsTests {
 
-    private Authentication authentication;
-    private SecurityContext securityContext;
-    private User user;
     private LocalDateTime before;
 
     @BeforeEach
     void setUp() {
-      authentication = mock(Authentication.class);
-      securityContext = mock(SecurityContext.class);
+      Authentication authentication = mock(Authentication.class);
+      SecurityContext securityContext = mock(SecurityContext.class);
       SecurityContextHolder.setContext(securityContext);
 
-      user = new User();
+      User user = new User();
       Household household = new Household();
       household.setId(householdId);
       user.setHousehold(household);
@@ -307,15 +299,13 @@ class StorageServiceTest {
   @Nested
   class AddItemToStorageTests {
 
-    private Authentication authentication;
-    private SecurityContext securityContext;
     private User user;
 
     @BeforeEach
     void setUp() {
       // Create and set up security context mock
-      authentication = mock(Authentication.class);
-      securityContext = mock(SecurityContext.class);
+      Authentication authentication = mock(Authentication.class);
+      SecurityContext securityContext = mock(SecurityContext.class);
       SecurityContextHolder.setContext(securityContext);
 
       // Create user with household
@@ -460,8 +450,6 @@ class StorageServiceTest {
     void updateStorageItem_shouldUpdateOnlyProvidedFields() {
       // Arrange
       String newUnit = "kilograms";
-      Integer newAmount = null;
-      LocalDateTime newExpirationDate = null;
 
       StorageItem existingItem = new StorageItem();
       existingItem.setId(storageItemId);
@@ -475,14 +463,14 @@ class StorageServiceTest {
           invocation -> invocation.getArgument(0));
 
       // Act
-      StorageItem result = storageService.updateStorageItem(storageItemId, newUnit, newAmount,
-          newExpirationDate);
+      StorageItem result = storageService.updateStorageItem(storageItemId, newUnit, null,
+          null);
 
       // Assert
       assertNotNull(result);
       assertEquals(newUnit, result.getUnit());
       assertEquals(existingItem.getAmount(), result.getAmount());
-      assertEquals(newExpirationDate, result.getExpirationDate());
+      assertNull(result.getExpirationDate());
 
       ArgumentCaptor<StorageItem> captor = ArgumentCaptor.forClass(StorageItem.class);
       verify(storageItemRepository).save(captor.capture());
@@ -490,7 +478,7 @@ class StorageServiceTest {
       StorageItem capturedItem = captor.getValue();
       assertEquals(newUnit, capturedItem.getUnit());
       assertEquals(existingItem.getAmount(), capturedItem.getAmount());
-      assertEquals(newExpirationDate, capturedItem.getExpirationDate());
+      assertNull(capturedItem.getExpirationDate());
     }
 
     @Test
