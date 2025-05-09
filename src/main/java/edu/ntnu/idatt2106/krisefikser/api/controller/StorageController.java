@@ -60,8 +60,7 @@ public class StorageController {
   /**
    * Get all storage items of a given type for a given household.
    *
-   * @param householdId the id of the household
-   * @param itemType    the type of the item
+   * @param itemType the type of the item
    * @return a list of storage items
    */
   @Operation(summary = "Gets storage items by type for a household",
@@ -76,7 +75,7 @@ public class StorageController {
   /**
    * Get all storage items that are expiring before a given date.
    *
-   * @param before      the date to check for expiration
+   * @param before the date to check for expiration
    * @return a list of expiring storage items
    */
   @Operation(summary = "Gets expiring items for a household",
@@ -91,9 +90,8 @@ public class StorageController {
   /**
    * Add an item to the storage of a household.
    *
-   * @param householdId the id of the household
-   * @param itemId      the id of the item
-   * @param request     the request body containing item details
+   * @param itemId  the id of the item
+   * @param request the request body containing item details
    * @return the added storage item
    */
   @Operation(summary = "Adds an item to the storage",
@@ -149,8 +147,8 @@ public class StorageController {
     try {
       // Extract values from request body
       String unit = (String) request.get("unit");
-      Integer amount = request.get("amount") != null ?
-          Integer.valueOf(request.get("amount").toString()) : null;
+      Integer amount = request.get("amount") != null
+          ? Integer.valueOf(request.get("amount").toString()) : null;
 
       // Handle expiration date (could be null)
       LocalDateTime expirationDate = null;

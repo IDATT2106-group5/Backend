@@ -16,6 +16,10 @@ public class LoginAttemptService {
   private static final int MAXATTEMPT = 5;
   private final ConcurrentHashMap<String, Integer> attemptsCache;
 
+  /**
+   * Constructor for LoginAttemptService. Initializes the attempts cache.
+   */
+
   public LoginAttemptService() {
     attemptsCache = new ConcurrentHashMap<>();
     logger.info("LoginAttemptService initialized with maximum {} attempts", MAXATTEMPT);

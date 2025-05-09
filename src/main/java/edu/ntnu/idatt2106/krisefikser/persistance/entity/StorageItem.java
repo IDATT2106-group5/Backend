@@ -36,7 +36,6 @@ public class StorageItem {
   @Column(nullable = false)
   private Integer amount;
 
-//  @Column(name = "expiration_date")
   private LocalDateTime expirationDate;
 
   @Column(name = "date_added", nullable = false)

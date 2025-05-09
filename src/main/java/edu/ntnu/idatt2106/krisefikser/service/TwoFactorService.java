@@ -22,6 +22,12 @@ public class TwoFactorService {
   private final Random random = new SecureRandom();
   private final Map<String, Object[]> otpStorage = new ConcurrentHashMap<>();
 
+  /**
+   * Constructor for TwoFactorService.
+   *
+   * @param emailService The email service used to send OTPs.
+   */
+  
   public TwoFactorService(EmailService emailService) {
     this.emailService = emailService;
     logger.info("TwoFactorService instantiated. OTP validity set to {} ms", OTP_VALIDITY_PERIOD);

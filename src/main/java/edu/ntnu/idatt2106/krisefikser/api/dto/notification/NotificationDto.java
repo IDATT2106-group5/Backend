@@ -3,21 +3,35 @@ package edu.ntnu.idatt2106.krisefikser.api.dto.notification;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object (DTO) for notifications. This class is used to encapsulate the data sent
+ * from the server to the client when a user receives a notification.
+ */
+
 public class NotificationDto {
+
   private NotificationType type;
   private String recipientId;
   private LocalDateTime timestamp;
   private boolean read;
   private String message;
 
+  /**
+   * Default constructor for NotificationDto.
+   */
+
   public NotificationDto(NotificationType type, String recipientId, LocalDateTime timestamp,
-                         boolean read, String message) {
+      boolean read, String message) {
     this.type = type;
     this.recipientId = recipientId;
     this.timestamp = timestamp;
     this.read = read;
     this.message = message;
   }
+
+  /**
+   * Default constructor for NotificationDto.
+   */
 
   public NotificationDto() {
   }

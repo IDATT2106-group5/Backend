@@ -26,6 +26,10 @@ public class IncidentRequestDto {
   @NotNull
   private Long scenarioId;
 
+  /**
+   * Default constructor for IncidentRequestDto.
+   */
+  
   public Incident toEntity(Scenario scenario) {
     Incident incident = new Incident();
     incident.setName(this.name);

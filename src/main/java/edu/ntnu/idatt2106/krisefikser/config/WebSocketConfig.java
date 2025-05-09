@@ -11,32 +11,23 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
+/**
+ * WebSocket configuration class for enabling STOMP protocol and configuring message broker.
+ *
+ * <p>This class sets up the WebSocket endpoints,
+ * message broker, and user destination prefix. It also handles user authentication during the
+ * WebSocket handshake.
+ */
+
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   /**
-   * Configures the message broker for WebSocket communication.
-   * <p>
-   * Sets up destination prefixes for messages:
-   * - "/topic" and "/queue" for broker destinations (server-to-client)
-   * - "/app" for application destinations (client-to-server)
-   * - "/user" for user-specific destinations
-   *
-   * @param registry the MessageBrokerRegistry to configure
-   */
-  @Override
-  public void configureMessageBroker(MessageBrokerRegistry registry) {
-    registry.enableSimpleBroker("/topic", "/queue");
-    registry.setApplicationDestinationPrefixes("/app");
-    registry.setUserDestinationPrefix("/user/");  // Add trailing slash
-  }
-
-  /**
    * Registers STOMP endpoints for WebSocket connections.
-   * <p>
-   * Configures the "/ws" endpoint with SockJS fallback support and
-   * sets CORS allowed origins to permit connections from the frontend application.
+   *
+   * <p>Configures the "/ws" endpoint with SockJS fallback support and sets CORS allowed origins to
+   * permit connections from the frontend application.
    *
    * @param registry the StompEndpointRegistry to configure
    */
@@ -47,8 +38,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         .setHandshakeHandler(new DefaultHandshakeHandler() {
           @Override
           protected Principal determineUser(ServerHttpRequest request,
-                                            WebSocketHandler wsHandler,
-                                            Map<String, Object> attributes) {
+              WebSocketHandler wsHandler,
+              Map<String, Object> attributes) {
             // Get user ID from request headers or query parameters
             String userId = getUserIdFromRequest(request);
             if (userId != null) {
@@ -58,6 +49,22 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
           }
         })
         .withSockJS();
+  }
+
+  /**
+   * Configures the message broker for WebSocket communication.
+   *
+   * <p>Sets up destination prefixes for messages: - "/topic" and "/queue" for broker destinations
+   * (server-to-client) - "/app" for application destinations (client-to-server) - "/user" for
+   * user-specific destinations
+   *
+   * @param registry the MessageBrokerRegistry to configure
+   */
+  @Override
+  public void configureMessageBroker(MessageBrokerRegistry registry) {
+    registry.enableSimpleBroker("/topic", "/queue");
+    registry.setApplicationDestinationPrefixes("/app");
+    registry.setUserDestinationPrefix("/user/");  // Add trailing slash
   }
 
   private String getUserIdFromRequest(ServerHttpRequest request) {
@@ -75,6 +82,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   }
 
   private static class StompPrincipal implements Principal {
+
     private final String name;
 
     public StompPrincipal(String name) {

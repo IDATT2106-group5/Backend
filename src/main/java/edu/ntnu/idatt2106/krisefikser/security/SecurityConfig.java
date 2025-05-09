@@ -103,16 +103,36 @@ public class SecurityConfig {
     return provider;
   }
 
+  /**
+   * Configures the password encoder for the application.
+   *
+   * @return The configured PasswordEncoder.
+   */
+
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
+
+  /**
+   * Configures the authentication manager for the application.
+   *
+   * @param authConfig The AuthenticationConfiguration object to configure.
+   * @return The configured AuthenticationManager.
+   * @throws Exception If an error occurs during configuration.
+   */
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
       throws Exception {
     return authConfig.getAuthenticationManager();
   }
+
+  /**
+   * Configures the role hierarchy for the application.
+   *
+   * @return The configured RoleHierarchy.
+   */
 
   @Bean
   public RoleHierarchy roleHierarchy() {

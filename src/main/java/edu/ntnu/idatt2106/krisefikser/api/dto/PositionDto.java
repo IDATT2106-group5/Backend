@@ -4,6 +4,7 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
  * The type Position dto.
  */
 public class PositionDto {
+
   /**
    * The Longitude.
    */
@@ -13,7 +14,7 @@ public class PositionDto {
    */
   String latitude;
   /**
-   * The user token
+   * The user token.
    */
   String token;
 

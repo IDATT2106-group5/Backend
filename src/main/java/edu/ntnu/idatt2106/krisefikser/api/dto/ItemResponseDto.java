@@ -3,6 +3,10 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
 
+/**
+ * A simple DTO for Item, to avoid infinite loops and expose only safe data.
+ */
+
 public class ItemResponseDto {
 
   private Long id;
@@ -10,8 +14,21 @@ public class ItemResponseDto {
   private int caloricAmount;
   private ItemType itemType;
 
+  /**
+   * Default constructor for ItemResponseDto.
+   */
+
   public ItemResponseDto() {
   }
+
+  /**
+   * Constructor for ItemResponseDto.
+   *
+   * @param id            the id
+   * @param name          the name
+   * @param caloricAmount the caloric amount
+   * @param itemType      the item type
+   */
 
   public ItemResponseDto(Long id, String name, int caloricAmount, ItemType itemType) {
     this.id = id;
@@ -20,6 +37,13 @@ public class ItemResponseDto {
     this.itemType = itemType;
   }
 
+  /**
+   * Converts an Item entity to an ItemResponseDto.
+   *
+   * @param item the item entity
+   * @return the ItemResponseDto
+   */
+  
   public static ItemResponseDto fromEntity(Item item) {
     return new ItemResponseDto(
         item.getId(),

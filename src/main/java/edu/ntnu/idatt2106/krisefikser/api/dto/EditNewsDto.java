@@ -4,6 +4,7 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
  * The type Edit news dto.
  */
 public class EditNewsDto {
+
   private String title;
   private String url;
   private String content;
@@ -29,11 +30,13 @@ public class EditNewsDto {
     this.content = content;
     this.source = source;
   }
+
   /**
    * Gets title.
    *
    * @return the title
    */
+
   public String getTitle() {
     return title;
   }

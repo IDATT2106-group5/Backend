@@ -17,6 +17,10 @@ public class MapIconResponseDto {
   private String openingHours;
   private String contactInfo;
 
+  /**
+   * Default constructor for MapIconResponseDto.
+   */
+  
   public static MapIconResponseDto fromEntity(MapIcon mapIcon) {
     MapIconResponseDto dto = new MapIconResponseDto();
     dto.setId(mapIcon.getId());

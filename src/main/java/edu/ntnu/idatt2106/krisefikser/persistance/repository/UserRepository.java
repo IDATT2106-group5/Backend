@@ -92,10 +92,10 @@ public interface UserRepository extends JpaRepository<User, String> {
    * @param radius    the radius in kilometers
    * @return a list of users within the specified radius
    */
-  @Query(value = "SELECT u.* FROM user u WHERE " +
-      "(6371 * acos(cos(radians(:latitude)) * cos(radians(u.latitude)) * " +
-      "cos(radians(u.longitude) - radians(:longitude)) + " +
-      "sin(radians(:latitude)) * sin(radians(u.latitude)))) <= :radius",
+  @Query(value = "SELECT u.* FROM user u WHERE "
+      + "(6371 * acos(cos(radians(:latitude)) * cos(radians(u.latitude)) * "
+      + "cos(radians(u.longitude) - radians(:longitude)) + "
+      + "sin(radians(:latitude)) * sin(radians(u.latitude)))) <= :radius",
       nativeQuery = true)
   List<User> findUsersWithinRadius(@Param("latitude") double latitude,
       @Param("longitude") double longitude,
