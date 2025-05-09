@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,9 @@ public class EmailService {
 
   private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
   private final JavaMailSender mailSender;
+  
+  @Value("${app.mail.enabled:true}")
+  private boolean mailEnabled;
 
   /**
    * Constructor for EmailService.
@@ -25,7 +29,7 @@ public class EmailService {
    */
   public EmailService(JavaMailSender mailSender) {
     this.mailSender = mailSender;
-    logger.info("EmailService initialized");
+    logger.info("EmailService initialized with mail enabled: {}", mailEnabled);
   }
 
   /**
@@ -47,6 +51,11 @@ public class EmailService {
         + "</body></html>";
 
     logger.debug("Confirmation URL generated for user: {}", toEmail);
+
+    if (!mailEnabled) {
+      logger.info("Test mode: Would send confirmation email to {} with token {}", toEmail, token);
+      return;
+    }
 
     MimeMessage message = mailSender.createMimeMessage();
     try {
@@ -81,6 +90,11 @@ public class EmailService {
         + "This link is valid for 1 hour.</p>"
         + "<a href=\"" + invitationLink + "\">Set up admin account</a>"
         + "</body></html>";
+
+    if (!mailEnabled) {
+      logger.info("Test mode: Would send admin invitation to {} with link {}", toEmail, invitationLink);
+      return;
+    }
 
     logger.debug("Admin invitation link generated for: {}", toEmail);
 
@@ -118,6 +132,11 @@ public class EmailService {
         + "<p>This code will expire in 10 minutes.</p>"
         + "</body></html>";
 
+    if (!mailEnabled) {
+      logger.info("Test mode: Would send OTP email to {} with code {}", toEmail, otp);
+      return;
+    }
+
     logger.debug("OTP code generated for user: {}", toEmail);
 
     MimeMessage message = mailSender.createMimeMessage();
@@ -153,6 +172,11 @@ public class EmailService {
         + "Lenken er gyldig i 1 time:</p>"
         + "<a href=\"" + resetUrl + "\">Tilbakestill passord</a>"
         + "</body></html>";
+
+    if (!mailEnabled) {
+      logger.info("Test mode: Would send password reset email to {} with token {}", toEmail, token);
+      return;
+    }
 
     logger.debug("Password reset URL generated for user: {}", toEmail);
 
