@@ -85,6 +85,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_SUPERADMIN")
                 .requestMatchers("/api/user/**").permitAll()
                 .requestMatchers("/api/household/**").permitAll()
+                .requestMatchers("/api/test/**").permitAll()
 //            .hasAnyAuthority("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPERADMIN")
                 .anyRequest().authenticated()
         )

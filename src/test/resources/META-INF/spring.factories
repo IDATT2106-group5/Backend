@@ -1,0 +1,1 @@
+org.springframework.boot.env.EnvironmentPostProcessor=edu.ntnu.idatt2106.krisefikser.config.TestEnvironmentPostProcessor
