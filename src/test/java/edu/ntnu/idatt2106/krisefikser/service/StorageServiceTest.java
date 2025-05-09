@@ -160,7 +160,7 @@ class StorageServiceTest {
           invocation -> invocation.getArgument(0));
 
       // Act
-      StorageItem result = storageService.addItemToStorage(householdId, itemId, unit, amount,
+      StorageItem result = storageService.addItemToStorage(itemId, unit, amount,
           expirationDate);
 
       // Assert
@@ -189,7 +189,7 @@ class StorageServiceTest {
 
       // Act & Assert
       IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-          storageService.addItemToStorage(householdId, itemId, "liters", 5, LocalDateTime.now()));
+          storageService.addItemToStorage(itemId, "liters", 5, LocalDateTime.now()));
 
       assertEquals("Household not found", exception.getMessage());
       verify(householdRepository).findById(householdId);
@@ -207,7 +207,7 @@ class StorageServiceTest {
 
       // Act & Assert
       IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-          storageService.addItemToStorage(householdId, itemId, "liters", 5, LocalDateTime.now()));
+          storageService.addItemToStorage(itemId, "liters", 5, LocalDateTime.now()));
 
       assertEquals("Item not found", exception.getMessage());
       verify(householdRepository).findById(householdId);
