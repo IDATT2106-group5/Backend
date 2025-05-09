@@ -16,6 +16,9 @@ public class TestConfig {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.H2)
+                .addScript("classpath:db/schema-test.sql")  
+                .addScript("classpath:db/data-test.sql")    
+                .setName("e2e-testdb")                      
                 .build();
     }
 }
