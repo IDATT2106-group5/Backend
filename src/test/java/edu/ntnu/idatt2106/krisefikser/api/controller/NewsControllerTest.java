@@ -99,56 +99,6 @@ public class NewsControllerTest {
   }
 
   @Nested
-  class GetNewsByIdTests {
-
-    @Test
-    void getNewsById_Success() {
-      // Arrange
-      Long newsId = 1L;
-      when(newsService.findNewsById(newsId)).thenReturn(newsItem);
-
-      // Act
-      ResponseEntity<?> response = newsController.getNewsById(newsId);
-
-      // Assert
-      assertEquals(HttpStatus.OK, response.getStatusCode());
-      assertEquals(newsItem, response.getBody());
-      verify(newsService, times(1)).findNewsById(newsId);
-    }
-
-    @Test
-    void getNewsById_NotFound() {
-      // Arrange
-      Long newsId = 99L;
-      when(newsService.findNewsById(newsId)).thenThrow(
-          new IllegalArgumentException("News with given id not found"));
-
-      // Act
-      ResponseEntity<?> response = newsController.getNewsById(newsId);
-
-      // Assert
-      assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-      assertEquals(Map.of("error", "News with given id not found"), response.getBody());
-      verify(newsService, times(1)).findNewsById(newsId);
-    }
-
-    @Test
-    void getNewsById_Exception() {
-      // Arrange
-      Long newsId = 1L;
-      when(newsService.findNewsById(newsId)).thenThrow(new RuntimeException("Database error"));
-
-      // Act
-      ResponseEntity<?> response = newsController.getNewsById(newsId);
-
-      // Assert
-      assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-      assertEquals(Map.of("error", "Internal server error"), response.getBody());
-      verify(newsService, times(1)).findNewsById(newsId);
-    }
-  }
-
-  @Nested
   class CreateNewsTests {
 
     @Test

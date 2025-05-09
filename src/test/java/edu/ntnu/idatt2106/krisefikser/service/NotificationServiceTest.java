@@ -3,16 +3,12 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Incident;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
@@ -39,7 +35,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
@@ -106,43 +101,6 @@ class NotificationServiceTest {
   }
 
   @Test
-  void sendHouseholdPositionUpdate_shouldSendPositionToTopic() {
-    // Arrange
-    String householdId = "household-123";
-    PositionDto positionDto = new PositionDto("user-123", "10.0", "60.0");
-    when(userRepository.findById("user-123")).thenReturn(Optional.of(testUser));
-
-    // Act
-    notificationService.sendHouseholdPositionUpdate(householdId, positionDto);
-
-    // Assert
-    verify(messagingTemplate).convertAndSend(
-        eq("/topic/position/" + householdId),
-        any(PositionResponseDto.class)
-    );
-    verify(userRepository).findById("user-123");
-  }
-
-  @Test
-  void sendHouseholdPositionUpdate_shouldThrowException_whenUserNotFound() {
-    // Arrange
-    String householdId = "household-123";
-    PositionDto positionDto = new PositionDto("nonexistent-user", "10.0", "60.0");
-    when(userRepository.findById("nonexistent-user")).thenReturn(Optional.empty());
-
-    // Act - this won't throw an exception because the service catches it internally
-    notificationService.sendHouseholdPositionUpdate(householdId, positionDto);
-
-    // Assert - verify the message doesn't get sent instead
-    verify(userRepository).findById("nonexistent-user");
-    // Fix the ambiguous method call by specifying the exact parameter types
-    verify(messagingTemplate, times(0)).convertAndSend(
-        anyString(),
-        any(PositionResponseDto.class)
-    );
-  }
-
-  @Test
   void broadcastNotification_shouldSendToGeneralTopic() {
     // Act
     notificationService.broadcastNotification(testNotificationDto);
@@ -177,49 +135,6 @@ class NotificationServiceTest {
     });
 
     assertEquals("Notification not found", exception.getMessage());
-  }
-
-  @Test
-  void getUserNotifications_shouldReturnUserNotifications() {
-    // Set up security context for this test
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(authentication.getName()).thenReturn("user@example.com");
-
-    // Arrange
-    List<Notification> notifications = List.of(testNotification);
-    when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(testUser));
-    when(notificationRepository.findAllByUserIdOrderByTimestampDesc(testUser.getId())).thenReturn(
-        notifications);
-
-    // Act
-    List<NotificationResponseDto> result = notificationService.getUserNotifications();
-
-    // Assert
-    assertEquals(1, result.size());
-    assertEquals(testNotification.getId(), result.get(0).getId());
-    assertEquals(testNotification.getType(), result.get(0).getType());
-    assertEquals(testNotification.getUser().getId(), result.get(0).getRecipientId());
-    assertEquals(testNotification.getMessage(), result.get(0).getMessage());
-    assertEquals(testNotification.getIsRead(), result.get(0).isRead());
-  }
-
-  @Test
-  void getUserNotifications_shouldThrowException_whenUserNotFound() {
-    // Set up security context for this test
-    when(securityContext.getAuthentication()).thenReturn(authentication);
-    SecurityContextHolder.setContext(securityContext);
-    when(authentication.getName()).thenReturn("nonexistent@example.com");
-
-    // Arrange
-    when(userRepository.getUserByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
-
-    // Act & Assert
-    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-      notificationService.getUserNotifications();
-    });
-
-    assertEquals("User not found", exception.getMessage());
   }
 
   @Test

@@ -15,7 +15,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
@@ -845,6 +844,7 @@ class HouseholdServiceTest {
 
   @Nested
   class EditHouseholdTests {
+
     @Test
     void editHouseholdSuccessfullyUpdatesNameAndAddress() {
       EditHouseholdRequestDto request = new EditHouseholdRequestDto();
@@ -973,6 +973,7 @@ class HouseholdServiceTest {
 
   @Nested
   class DeleteHouseholdTests {
+
     @Test
     void deleteHouseholdSuccessfullyRemovesHouseholdAndAssociatedEntities() {
       User user = new User();
@@ -1092,6 +1093,7 @@ class HouseholdServiceTest {
 
   @Nested
   class getHouseholdTests {
+
     @Test
     void getHouseholdReturnsHouseholdSuccessfully() {
       Household household = new Household();
@@ -1132,90 +1134,8 @@ class HouseholdServiceTest {
   }
 
   @Nested
-  class GetHouseholdPositionsTests {
-    @Test
-    void getHouseholdPositionsReturnsPositionsSuccessfully() {
-      User user = new User();
-      user.setId("user123");
-      user.setEmail("test@example.com");
-
-      Household household = new Household();
-      household.setId("household123");
-      household.setName("Test Household");
-      user.setHousehold(household);
-
-      User member1 = new User();
-      member1.setId("member1");
-      member1.setFullName("Member One");
-      member1.setLongitude("10.0");
-      member1.setLatitude("20.0");
-
-      User member2 = new User();
-      member2.setId("member2");
-      member2.setFullName("Member Two");
-      member2.setLongitude("30.0");
-      member2.setLatitude("40.0");
-
-      Authentication authentication = mock(Authentication.class);
-      SecurityContext securityContext = mock(SecurityContext.class);
-      when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(authentication.getName()).thenReturn("test@example.com");
-      SecurityContextHolder.setContext(securityContext);
-
-      when(userRepository.getUserByEmail("test@example.com")).thenReturn(Optional.of(user));
-      when(userRepository.getUsersByHouseholdId("household123")).thenReturn(
-          List.of(member1, member2));
-
-      List<PositionResponseDto> result = householdService.getHouseholdPositions();
-
-      assertEquals(2, result.size());
-      assertEquals("member1", result.get(0).getUserId());
-      assertEquals("Member One", result.get(0).getFullName());
-      assertEquals("10.0", result.get(0).getLongitude());
-      assertEquals("20.0", result.get(0).getLatitude());
-      assertEquals("member2", result.get(1).getUserId());
-      assertEquals("Member Two", result.get(1).getFullName());
-      assertEquals("30.0", result.get(1).getLongitude());
-      assertEquals("40.0", result.get(1).getLatitude());
-    }
-
-    @Test
-    void getHouseholdPositionsThrowsExceptionWhenUserNotFound() {
-      Authentication authentication = mock(Authentication.class);
-      SecurityContext securityContext = mock(SecurityContext.class);
-      when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(authentication.getName()).thenReturn("test@example.com");
-      SecurityContextHolder.setContext(securityContext);
-
-      when(userRepository.getUserByEmail("test@example.com")).thenReturn(Optional.empty());
-
-      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-          () -> householdService.getHouseholdPositions());
-      assertEquals("No user logged in", exception.getMessage());
-    }
-
-    @Test
-    void getHouseholdPositionsThrowsExceptionWhenUserNotInHousehold() {
-      User user = new User();
-      user.setId("user123");
-      user.setEmail("test@example.com");
-
-      Authentication authentication = mock(Authentication.class);
-      SecurityContext securityContext = mock(SecurityContext.class);
-      when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(authentication.getName()).thenReturn("test@example.com");
-      SecurityContextHolder.setContext(securityContext);
-
-      when(userRepository.getUserByEmail("test@example.com")).thenReturn(Optional.of(user));
-
-      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-          () -> householdService.getHouseholdPositions());
-      assertEquals("User does not belong to a household", exception.getMessage());
-    }
-  }
-
-  @Nested
   class GetHouseholdDetailsTests {
+
     @Test
     void successfullyReturnsHouseholdDetails() {
       // Setup

@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,7 +48,7 @@ public class NewsController {
    */
   @GetMapping("/get/")
   public ResponseEntity<?> getNews(@RequestParam(defaultValue = "0") int page,
-                                   @RequestParam(defaultValue = "10") int size) {
+      @RequestParam(defaultValue = "10") int size) {
     try {
       Page<News> paginatedNews = newsService.findPaginatedList(page, size);
       Map<String, Object> response = new HashMap<>();
@@ -64,30 +64,13 @@ public class NewsController {
   }
 
   /**
-   * Gets news by id.
-   *
-   * @param newsId the news id
-   * @return the news by id
-   */
-  @GetMapping("/{newsId}")
-  public ResponseEntity<?> getNewsById(@PathVariable Long newsId) {
-    try {
-      News news = newsService.findNewsById(newsId);
-      return ResponseEntity.ok(news);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.status(400).body(Map.of("error", "News with given id not found"));
-    } catch (Exception e) {
-      return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
-    }
-  }
-
-  /**
    * Create news response entity.
    *
    * @param request the request
    * @return the response entity
    */
   @PostMapping("/create")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> createNews(@RequestBody EditNewsDto request) {
     try {
       newsService.createNewsItem(request);
@@ -107,8 +90,9 @@ public class NewsController {
    * @return the response entity
    */
   @PostMapping("/edit/{newsId}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<?> editNews(@PathVariable Long newsId,
-                                    @RequestBody EditNewsDto request) {
+      @RequestBody EditNewsDto request) {
     try {
       newsService.updateNewsItem(newsId, request);
       return ResponseEntity.ok(Map.of("message", "News updated successfully"));
@@ -127,6 +111,7 @@ public class NewsController {
    * @return the response entity
    */
   @PostMapping("/delete/{newsId}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteNews(@PathVariable Long newsId) {
     try {
       newsService.deleteNewsItem(newsId);

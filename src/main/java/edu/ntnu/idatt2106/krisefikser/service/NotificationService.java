@@ -51,24 +51,25 @@ public class NotificationService {
   /**
    * Send position update to a household.
    *
+   * @param userId      the user id
    * @param householdId the household id
    * @param position    the position data
    */
-  public void sendHouseholdPositionUpdate(String householdId, PositionDto position) {
-    logger.info("Sending position update to household {}: userId={}, latitude={}, longitude={}",
-        householdId, position.getUserId(), position.getLatitude(), position.getLongitude());
+  public void sendHouseholdPositionUpdate(String userId, String householdId, PositionDto position) {
+    logger.info("Sending position update to household {}: latitude={}, longitude={}",
+        householdId, position.getLatitude(), position.getLongitude());
 
     try {
-      logger.debug("Looking up user with ID: {}", position.getUserId());
-      User user = userRepository.findById(position.getUserId())
+      logger.debug("Looking up user with ID: {}", userId);
+      User user = userRepository.findById(userId)
           .orElseThrow(() -> {
-            logger.warn("User not found with ID: {}", position.getUserId());
+            logger.warn("User not found with ID: {}", userId);
             return new IllegalArgumentException("User does not exist");
           });
       logger.debug("Found user: {}", user.getFullName());
 
       PositionResponseDto response = new PositionResponseDto(
-          position.getUserId(),
+          user.getId(),
           user.getFullName(),
           position.getLongitude(),
           position.getLatitude()
@@ -141,7 +142,7 @@ public class NotificationService {
     String email = authentication.getName();
 
     try {
-      User user = userRepository.getUserByEmail(email)
+      User user = userRepository.findByEmail(email)
           .orElseThrow(() -> {
             logger.warn("User not found with email: {}", email);
             return new IllegalArgumentException("User not found");
@@ -294,6 +295,7 @@ public class NotificationService {
    * @param latitude  the latitude.
    * @param longitude the longitude.
    * @param radius    the radius.
+   * @return the list
    */
   public List<User> findUsersWithinIncidentRadius(double latitude, double longitude,
       double radius) {

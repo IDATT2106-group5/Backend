@@ -70,11 +70,13 @@ public class HouseholdService {
    * @param householdRepository                   Repository for household operations.
    * @param notificationService                   the notification service
    * @param userRepository                        Repository for user operations.
-   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member                                              operations.
+   * @param unregisteredHouseholdMemberRepository Repository for unregistered household member
+   *
+   *                                              operations.
    */
   public HouseholdService(HouseholdRepository householdRepository,
-                          NotificationService notificationService, UserRepository userRepository,
-                          UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
+      NotificationService notificationService, UserRepository userRepository,
+      UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
     this.householdRepository = householdRepository;
     this.notificationService = notificationService;
     this.userRepository = userRepository;
@@ -245,7 +247,6 @@ public class HouseholdService {
           return new IllegalArgumentException("Household not found");
         });
 
-
     if (!user.getHousehold().getId().equals(household.getId())) {
       logger.warn("User {} is not a member of household with ID {}",
           user.getFullName(), household.getId());
@@ -322,8 +323,11 @@ public class HouseholdService {
    * `UnregisteredHouseholdMember` entity, associates it with the household, and updates the
    * household's number of members.
    *
-   * @param request The DTO containing the full name of the unregistered member and the ID of the                household to which the member should be added.
-   * @throws IllegalArgumentException if the unregistered member already exists in the specified                                  household or if the household is not found.
+   * @param request The DTO containing the full name of the unregistered member and the ID of the
+   *                household to which the member should be added.
+   * @throws IllegalArgumentException if the unregistered member already exists in the specified
+   *                                                               household or if the household is
+   *                                  not found.
    */
   public void addUnregisteredMemberToHousehold(
       UnregisteredMemberHouseholdAssignmentRequestDto request) {
@@ -410,11 +414,6 @@ public class HouseholdService {
   }
 
   /**
-   * Gets the members of a household by household id.
-   *
-   * @return A map containing household details, registered users, and unregistered members.
-   */
-  /**
    * Gets the details of the current user's household.
    *
    * @return A map containing household details, registered users, and unregistered members.
@@ -461,7 +460,6 @@ public class HouseholdService {
             household.getAddress(),
             ownerDto));  // This can now be null safely
 
-    // Get all registered users in the household
     List<UserResponseDto> userResponseDtos = userRepository.getUsersByHousehold(household).stream()
         .map(u -> new UserResponseDto(
             u.getId(),
@@ -472,7 +470,6 @@ public class HouseholdService {
         .collect(Collectors.toList());
     logger.debug("Found {} registered users in household", userResponseDtos.size());
 
-    // Get all unregistered members in the household
     List<UnregisteredMemberResponseDto> unregisteredMemberResponseDtos =
         unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(household)
             .stream()
@@ -493,7 +490,8 @@ public class HouseholdService {
   /**
    * Edits an unregistered member in a household.
    *
-   * @param request The request containing the full name of the unregistered member and the new fullname.
+   * @param request The request containing the full name of the unregistered member and the new full
+   *                name.
    */
   public void editUnregisteredMemberInHousehold(EditMemberDto request) {
     logger.info("Editing unregistered member with ID {}",
@@ -507,7 +505,6 @@ public class HouseholdService {
           return new IllegalArgumentException("User not found");
         });
     Household household = user.getHousehold();
-
 
     UnregisteredHouseholdMember member =
         unregisteredHouseholdMemberRepository.findById(request.getMemberId()).orElseThrow(
@@ -558,11 +555,9 @@ public class HouseholdService {
           logger.warn("Cannot change household owner: No user logged in with email: {}", email);
           return new IllegalArgumentException("User not found");
         });
-
     Household household = householdRepository.findById(currentUser.getHousehold().getId())
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
 
-    // Add this check to verify the current user is the owner
     if (!household.getOwner().getId().equals(currentUser.getId())) {
       logger.warn("User {} is not authorized to transfer ownership of household {}",
           currentUser.getFullName(), household.getName());
@@ -661,7 +656,8 @@ public class HouseholdService {
   /**
    * Deletes a household and removes all associated users and unregistered members.
    *
-   * @throws IllegalArgumentException if the household is not found or if the user is not the                                  owner.
+   * @throws IllegalArgumentException if the household is not found or if the user is not the
+   *                                  owner.
    */
   public void deleteHousehold() {
     logger.info("Deleting household");
@@ -751,7 +747,7 @@ public class HouseholdService {
 
     logger.info("Fetching household positions for user: {}", email);
 
-    User user = userRepository.getUserByEmail(email)
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
           logger.warn("Cannot get household positions: No user logged in with email: {}", email);
           return new IllegalArgumentException("No user logged in");

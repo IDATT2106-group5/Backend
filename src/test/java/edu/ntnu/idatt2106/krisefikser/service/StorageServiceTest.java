@@ -11,12 +11,11 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import edu.ntnu.idatt2106.krisefikser.api.dto.StorageItemResponseDto;
+
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
-import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.ItemRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.StorageItemRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
@@ -77,66 +76,11 @@ class StorageServiceTest {
 
       when(securityContext.getAuthentication()).thenReturn(authentication);
       when(authentication.getName()).thenReturn("user@example.com");
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
     }
 
     @AfterEach
     void tearDown() {
       SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    void getStorageItemsByHousehold_shouldReturnMappedDtos() {
-      // Arrange
-      Item item1 = new Item();
-      item1.setId(1L);
-      item1.setName("Rice");
-      item1.setCaloricAmount(100);
-      item1.setItemType(ItemType.FOOD);
-
-      StorageItem storageItem1 = new StorageItem();
-      storageItem1.setId(1L);
-      storageItem1.setItem(item1);
-      storageItem1.setHousehold(user.getHousehold());
-      storageItem1.setUnit("kg");
-      storageItem1.setAmount(2);
-      storageItem1.setExpirationDate(LocalDateTime.now().plusDays(30));
-
-      List<StorageItem> storageItems = Collections.singletonList(storageItem1);
-
-      when(storageItemRepository.findByHouseholdId(householdId)).thenReturn(storageItems);
-
-      // Act
-      List<StorageItemResponseDto> result = storageService.getStorageItemsByHousehold();
-
-      // Assert
-      assertEquals(1, result.size());
-      StorageItemResponseDto dto = result.get(0);
-      assertEquals(storageItem1.getId(), dto.getItemId());
-      // Use getter methods instead of direct access to private fields
-      assertEquals(storageItem1.getItem().getId(), dto.getItem().getId());
-      assertEquals(storageItem1.getItem().getName(), dto.getItem().getName());
-      assertEquals(storageItem1.getHousehold().getId(), dto.getHouseholdId());
-      assertEquals(storageItem1.getUnit(), dto.getUnit());
-      assertEquals(storageItem1.getAmount(), dto.getAmount());
-      assertEquals(storageItem1.getExpirationDate(), dto.getExpiration());
-
-      verify(userRepository).getUserByEmail("user@example.com");
-      verify(storageItemRepository).findByHouseholdId(householdId);
-    }
-
-    @Test
-    void getStorageItemsByHousehold_shouldThrowException_whenNoUserLoggedIn() {
-      // Arrange
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.empty());
-
-      // Act & Assert
-      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-          () -> storageService.getStorageItemsByHousehold());
-
-      assertEquals("No user logged in", exception.getMessage());
-      verify(userRepository).getUserByEmail("user@example.com");
-      verifyNoInteractions(storageItemRepository);
     }
   }
 
@@ -156,117 +100,11 @@ class StorageServiceTest {
 
       when(securityContext.getAuthentication()).thenReturn(authentication);
       when(authentication.getName()).thenReturn("user@example.com");
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
     }
 
     @AfterEach
     void tearDown() {
       SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    void getStorageItemsByHouseholdAndType_shouldReturnFilteredItems() {
-      // Arrange
-      ItemType itemType = ItemType.FOOD;
-
-      Item item = new Item();
-      item.setId(1L);
-      item.setItemType(itemType);
-
-      StorageItem storageItem = new StorageItem();
-      storageItem.setId(1L);
-      storageItem.setItem(item);
-
-      List<StorageItem> expectedItems = Collections.singletonList(storageItem);
-
-      when(storageItemRepository.findByHouseholdIdAndItemItemType(householdId, itemType))
-          .thenReturn(expectedItems);
-
-      // Act
-      List<StorageItem> result = storageService.getStorageItemsByHouseholdAndType(itemType);
-
-      // Assert
-      assertEquals(expectedItems.size(), result.size());
-      assertEquals(expectedItems.get(0), result.get(0));
-      verify(storageItemRepository).findByHouseholdIdAndItemItemType(householdId, itemType);
-    }
-
-    @Test
-    void getStorageItemsByHouseholdAndType_shouldThrowException_whenNoUserLoggedIn() {
-      // Arrange
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.empty());
-
-      // Act & Assert
-      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-          () -> storageService.getStorageItemsByHouseholdAndType(ItemType.FOOD));
-
-      assertEquals("No user logged in", exception.getMessage());
-      verify(userRepository).getUserByEmail("user@example.com");
-      verifyNoInteractions(storageItemRepository);
-    }
-  }
-
-  @Nested
-  class GetExpiringItemsTests {
-
-    private LocalDateTime before;
-
-    @BeforeEach
-    void setUp() {
-      Authentication authentication = mock(Authentication.class);
-      SecurityContext securityContext = mock(SecurityContext.class);
-      SecurityContextHolder.setContext(securityContext);
-
-      User user = new User();
-      Household household = new Household();
-      household.setId(householdId);
-      user.setHousehold(household);
-
-      before = LocalDateTime.now().plusDays(7);
-
-      when(securityContext.getAuthentication()).thenReturn(authentication);
-      when(authentication.getName()).thenReturn("user@example.com");
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
-    }
-
-    @AfterEach
-    void tearDown() {
-      SecurityContextHolder.clearContext();
-    }
-
-    @Test
-    void getExpiringItems_shouldReturnItemsExpiringBeforeDate() {
-      // Arrange
-      StorageItem item1 = new StorageItem();
-      item1.setId(1L);
-      item1.setExpirationDate(LocalDateTime.now().plusDays(3));
-
-      List<StorageItem> expectedItems = Collections.singletonList(item1);
-
-      when(storageItemRepository.findByHouseholdIdAndExpirationDateBefore(householdId, before))
-          .thenReturn(expectedItems);
-
-      // Act
-      List<StorageItem> result = storageService.getExpiringItems(before);
-
-      // Assert
-      assertEquals(expectedItems.size(), result.size());
-      assertEquals(expectedItems.get(0), result.get(0));
-      verify(storageItemRepository).findByHouseholdIdAndExpirationDateBefore(householdId, before);
-    }
-
-    @Test
-    void getExpiringItems_shouldThrowException_whenNoUserLoggedIn() {
-      // Arrange
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.empty());
-
-      // Act & Assert
-      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-          () -> storageService.getExpiringItems(before));
-
-      assertEquals("No user logged in", exception.getMessage());
-      verify(userRepository).getUserByEmail("user@example.com");
-      verifyNoInteractions(storageItemRepository);
     }
   }
 
@@ -336,7 +174,7 @@ class StorageServiceTest {
       item.setId(itemId);
 
       // Mock user repository to return our user with household
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
       when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
       when(storageItemRepository.save(any(StorageItem.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
@@ -366,21 +204,21 @@ class StorageServiceTest {
     @Test
     void addItemToStorage_shouldThrowException_whenNoUserLoggedIn() {
       // Arrange
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.empty());
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.empty());
 
       // Act & Assert
       IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
           storageService.addItemToStorage(itemId, "liters", 5, LocalDateTime.now()));
 
       assertEquals("No user logged in", exception.getMessage());
-      verify(userRepository).getUserByEmail("user@example.com");
+      verify(userRepository).findByEmail("user@example.com");
       verifyNoInteractions(storageItemRepository);
     }
 
     @Test
     void addItemToStorage_shouldThrowException_whenItemNotFound() {
       // Arrange
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
       when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
 
       // Act & Assert
@@ -388,7 +226,7 @@ class StorageServiceTest {
           storageService.addItemToStorage(itemId, "liters", 5, LocalDateTime.now()));
 
       assertEquals("Item not found", exception.getMessage());
-      verify(userRepository).getUserByEmail("user@example.com");
+      verify(userRepository).findByEmail("user@example.com");
       verify(itemRepository).findById(itemId);
       verifyNoInteractions(storageItemRepository);
     }

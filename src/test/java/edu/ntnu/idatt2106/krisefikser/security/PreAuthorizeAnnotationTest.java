@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.security;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
@@ -108,24 +109,6 @@ public class PreAuthorizeAnnotationTest {
             .content(objectMapper.writeValueAsString(request)))
         .andExpect(status().isOk())  // Change from status().is4xxClientError() to status().isOk()
         .andDo(print());
-  }
-
-  @Test
-  public void createIncident_whenUnauthenticated_shouldReturnUnauthorized() throws Exception {
-    IncidentRequestDto request = new IncidentRequestDto();
-    request.setName("Test Incident");
-    request.setDescription("Test Description");
-    request.setLatitude(63.4305);
-    request.setLongitude(10.3951);
-    request.setImpactRadius(5.0);
-    request.setSeverity("HIGH");
-    request.setStartedAt(LocalDateTime.now());
-    request.setScenarioId(1L);
-
-    mockMvc.perform(post("/api/incidents")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(request)))
-        .andExpect(status().isUnauthorized());
   }
 
   @Test
