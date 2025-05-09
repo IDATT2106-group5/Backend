@@ -1,25 +1,39 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -44,7 +58,6 @@ class UserServiceTest {
 
   @BeforeEach
   void setUp() {
-    // Set up common test objects
     testUser = new User();
     testUser.setId("user-123");
     testUser.setEmail("user@example.com");
@@ -52,22 +65,18 @@ class UserServiceTest {
     testUser.setTlf("12345678");
     testUser.setRole(Role.USER);
 
-    User householdOwner = new User();
-    householdOwner.setId("owner-123");
-    householdOwner.setEmail("owner@example.com");
-    householdOwner.setFullName("Household Owner");
-    householdOwner.setTlf("87654321");
-    householdOwner.setRole(Role.USER);
-
     testHousehold = new Household();
     testHousehold.setId("household-123");
     testHousehold.setName("Test Household");
     testHousehold.setAddress("123 Test Street");
-    testHousehold.setNumberOfMembers(3);
-    testHousehold.setOwner(householdOwner);
+
+    User owner = new User();
+    owner.setId("owner-123");
+    owner.setEmail("owner@example.com");
+    owner.setFullName("Household Owner");
+    testHousehold.setOwner(owner);
 
     testUser.setHousehold(testHousehold);
-
   }
 
   @Test
@@ -118,5 +127,230 @@ class UserServiceTest {
     assertTrue(foundAdmin2, "Admin2 should be in the result");
 
     verify(userRepository).findAll();
+  }
+
+  @Test
+  void extractUserFromToken_Success() throws Exception {
+    // Create a valid JWT token with base64-encoded payload
+    JSONObject payload = new JSONObject();
+    payload.put("sub", "user-123");
+    String encodedPayload = Base64.getEncoder().encodeToString(payload.toString().getBytes());
+    String token = "header." + encodedPayload + ".signature";
+
+    // Use reflection to access private method
+    java.lang.reflect.Method method = UserService.class.getDeclaredMethod("extractUserFromToken",
+        String.class);
+    method.setAccessible(true);
+
+    // Act
+    String result = (String) method.invoke(userService, token);
+
+    // Assert
+    assertEquals("user-123", result);
+  }
+
+  @Test
+  void getCurrentUser_Success() {
+    // Use try-with-resources to restore the original security context after test
+    try (MockedStatic<SecurityContextHolder> mockedStatic = Mockito.mockStatic(
+        SecurityContextHolder.class)) {
+      // Arrange
+      mockedStatic.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("user@example.com");
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+      // Act
+      UserResponseDto result = userService.getCurrentUser();
+
+      // Assert
+      assertNotNull(result);
+      assertEquals("user-123", result.getId());
+      assertEquals("user@example.com", result.getEmail());
+      assertEquals("Test User", result.getFullName());
+      assertEquals("12345678", result.getTlf());
+      assertEquals(Role.USER, result.getRole());
+      verify(userRepository).findByEmail("user@example.com");
+    }
+  }
+
+  @Test
+  void getCurrentUser_UserNotFound() {
+    // Use try-with-resources to restore the original security context after test
+    try (MockedStatic<SecurityContextHolder> mockedStatic = Mockito.mockStatic(
+        SecurityContextHolder.class)) {
+      // Arrange
+      mockedStatic.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("unknown@example.com");
+      when(userRepository.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(
+          IllegalArgumentException.class,
+          () -> userService.getCurrentUser()
+      );
+      assertEquals("No user logged in", exception.getMessage());
+      verify(userRepository).findByEmail("unknown@example.com");
+    }
+  }
+
+  @Test
+  void checkIfMailExists_Success() {
+    // Arrange
+    String email = "user@example.com";
+    when(userRepository.findByEmail(email)).thenReturn(Optional.of(testUser));
+
+    // Act
+    String result = userService.checkIfMailExists(email);
+
+    // Assert
+    assertEquals("user-123", result);
+    verify(userRepository).findByEmail(email);
+  }
+
+  @Test
+  void checkIfMailExists_EmailNotFound() {
+    // Arrange
+    String email = "nonexistent@example.com";
+    when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+    // Act & Assert
+    IllegalArgumentException exception = assertThrows(
+        IllegalArgumentException.class,
+        () -> userService.checkIfMailExists(email)
+    );
+    assertEquals("No user with this email", exception.getMessage());
+    verify(userRepository).findByEmail(email);
+  }
+
+  @Test
+  void getHousehold_Success() {
+    // Use try-with-resources to restore the original security context after test
+    try (MockedStatic<SecurityContextHolder> mockedStatic = Mockito.mockStatic(
+        SecurityContextHolder.class)) {
+      // Arrange
+      mockedStatic.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("user@example.com");
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(testUser));
+
+      // Act
+      HouseholdResponseDto result = userService.getHousehold();
+
+      // Assert
+      assertNotNull(result);
+      assertEquals("household-123", result.getId());
+      assertEquals("Test Household", result.getName());
+      assertEquals("123 Test Street", result.getAddress());
+      assertEquals("owner-123", result.getOwner().getId());
+      verify(userRepository).findByEmail("user@example.com");
+    }
+  }
+
+  @Test
+  void getHousehold_UserNotFound() {
+    try (MockedStatic<SecurityContextHolder> mockedStatic = Mockito.mockStatic(
+        SecurityContextHolder.class)) {
+      // Arrange
+      mockedStatic.when(SecurityContextHolder::getContext).thenReturn(securityContext);
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("unknown@example.com");
+      when(userRepository.findByEmail("unknown@example.com")).thenReturn(Optional.empty());
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(
+          IllegalArgumentException.class,
+          () -> userService.getHousehold()
+      );
+      assertEquals("No user logged in", exception.getMessage());
+      verify(userRepository).findByEmail("unknown@example.com");
+    }
+  }
+
+  @Test
+  void updatePosition_Success() {
+    // Arrange
+    PositionDto positionDto = new PositionDto();
+    positionDto.setLatitude("63.4305");
+    positionDto.setLongitude("10.3951");
+
+    // Create valid JWT token
+    JSONObject payload = new JSONObject();
+    payload.put("sub", "user-123");
+    String encodedPayload = Base64.getUrlEncoder().encodeToString(payload.toString().getBytes());
+    String token = "header." + encodedPayload + ".signature";
+    positionDto.setToken(token);
+
+    when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(testUser));
+
+    // Act
+    userService.updatePosition(positionDto);
+
+    // Assert
+    assertEquals("63.4305", testUser.getLatitude());
+    assertEquals("10.3951", testUser.getLongitude());
+    verify(userRepository).save(testUser);
+    verify(notificationService).sendHouseholdPositionUpdate(
+        eq("user-123"),
+        eq("household-123"),
+        eq(positionDto)
+    );
+  }
+
+  @Test
+  void updatePosition_InvalidToken() {
+    // Arrange
+    PositionDto positionDto = new PositionDto();
+    positionDto.setLatitude("63.4305");
+    positionDto.setLongitude("10.3951");
+    positionDto.setToken("invalid-token");
+
+    // Act & Assert
+    Exception exception = assertThrows(
+        IllegalArgumentException.class,
+        () -> userService.updatePosition(positionDto)
+    );
+
+    // The message could vary depending on how the actual token processing fails
+    // We should verify it's either one of these expected messages
+    assertTrue(
+        exception.getMessage().contains("Invalid JWT format") ||
+            exception.getMessage().contains("Failed to extract user from token"),
+        "Expected exception message about invalid token, but got: " + exception.getMessage()
+    );
+
+    verify(userRepository, never()).findByEmail(anyString());
+    verify(userRepository, never()).save(any());
+    verify(notificationService, never()).sendHouseholdPositionUpdate(anyString(), anyString(),
+        any());
+  }
+
+  @Test
+  void updatePosition_UserNotFound() {
+    // Arrange
+    PositionDto positionDto = new PositionDto();
+    positionDto.setLatitude("63.4305");
+    positionDto.setLongitude("10.3951");
+
+    // Create valid JWT token
+    JSONObject payload = new JSONObject();
+    payload.put("sub", "user-123");
+    String encodedPayload = Base64.getUrlEncoder().encodeToString(payload.toString().getBytes());
+    String token = "header." + encodedPayload + ".signature";
+    positionDto.setToken(token);
+
+    when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+    // Act & Assert
+    IllegalArgumentException exception = assertThrows(
+        IllegalArgumentException.class,
+        () -> userService.updatePosition(positionDto)
+    );
+    assertEquals("No user found", exception.getMessage());
+    verify(userRepository).findByEmail(anyString());
+    verify(userRepository, never()).save(any());
+    verify(notificationService, never()).sendHouseholdPositionUpdate(anyString(), anyString(),
+        any());
   }
 }
