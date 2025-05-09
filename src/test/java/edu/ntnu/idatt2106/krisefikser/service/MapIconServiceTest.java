@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.MapIcon;
@@ -29,7 +30,7 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit tests for the MapIconService class.
  */
-public class MapIconServiceTest {
+class MapIconServiceTest {
 
   @Mock
   private MapIconRepository mapIconRepository;
@@ -160,12 +161,12 @@ public class MapIconServiceTest {
 
     @Test
     void getMapIcons_shouldReturnOnlyNearbyMatches() {
-      List<MapIcon> icons = new ArrayList<>();
 
       MapIcon near = new MapIcon();
       near.setLatitude(63.42);
       near.setLongitude(10.39);
       near.setDescription("nearby");
+      List<MapIcon> icons = new ArrayList<>();
       icons.add(near);
 
       MapIcon far = new MapIcon();
@@ -187,9 +188,6 @@ public class MapIconServiceTest {
 
     @Test
     void findClosestMapIcon_shouldReturnClosest_whenMultipleIconsExist() {
-      // Arrange
-      List<MapIcon> icons = new ArrayList<>();
-
       // Create a closer icon
       MapIcon closerIcon = new MapIcon();
       closerIcon.setId(1L);
@@ -204,6 +202,7 @@ public class MapIconServiceTest {
       fartherIcon.setLatitude(63.43); // Further from search point
       fartherIcon.setLongitude(10.41);
 
+      List<MapIcon> icons = new ArrayList<>();
       icons.add(fartherIcon);
       icons.add(closerIcon);
 

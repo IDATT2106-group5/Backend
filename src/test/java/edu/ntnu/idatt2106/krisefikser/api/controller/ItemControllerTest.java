@@ -2,6 +2,7 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.ItemResponseDto;
 import edu.ntnu.idatt2106.krisefikser.service.ItemService;
 import java.util.List;
@@ -20,7 +21,7 @@ import org.springframework.http.ResponseEntity;
 /**
  * Unit tests for the ItemController class.
  */
-public class ItemControllerTest {
+class ItemControllerTest {
 
   @Mock
   private ItemService itemService;

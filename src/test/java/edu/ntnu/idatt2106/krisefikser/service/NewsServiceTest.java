@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.EditNewsDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.News;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.NewsRepository;
@@ -86,8 +87,6 @@ class NewsServiceTest {
   void updateNewsItem_withPartialData_shouldOnlyUpdateProvidedFields() {
     // Arrange
     Long id = 1L;
-    String originalTitle = testNews.getTitle();
-    String originalContent = testNews.getContent();
 
     EditNewsDto partialUpdateDto = new EditNewsDto();
     partialUpdateDto.setUrl("http://updated.com");
@@ -103,8 +102,10 @@ class NewsServiceTest {
     verify(newsRepository).save(newsCaptor.capture());
 
     News updatedNews = newsCaptor.getValue();
+    String originalTitle = testNews.getTitle();
     assertEquals(originalTitle, updatedNews.getTitle());
     assertEquals(partialUpdateDto.getUrl(), updatedNews.getUrl());
+    String originalContent = testNews.getContent();
     assertEquals(originalContent, updatedNews.getContent());
     assertEquals(partialUpdateDto.getSource(), updatedNews.getSource());
   }

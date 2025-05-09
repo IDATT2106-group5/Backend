@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Scenario;
@@ -24,7 +25,7 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit tests for the ScenarioService class.
  */
-public class ScenarioServiceTest {
+class ScenarioServiceTest {
 
   @Mock
   private ScenarioRepository scenarioRepository;

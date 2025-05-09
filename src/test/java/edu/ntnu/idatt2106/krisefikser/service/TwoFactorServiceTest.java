@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
+
 import java.lang.reflect.Field;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class TwoFactorServiceTest {
+class TwoFactorServiceTest {
 
   private final String testEmail = "test@example.com";
   private final String testOtp = "123456";
@@ -59,7 +60,7 @@ public class TwoFactorServiceTest {
   }
 
   /**
-   * Helper method to set test OTP in the private storage map
+   * Helper method to set test OTP in the private storage map.
    */
   private void setTestOtpWithExpiration(String email, String otp, long expiryTime)
       throws Exception {
@@ -68,7 +69,7 @@ public class TwoFactorServiceTest {
   }
 
   /**
-   * Helper method to access private otpStorage field
+   * Helper method to access private otpStorage field.
    */
   @SuppressWarnings("unchecked")
   private Map<String, Object[]> getOtpStorage() throws Exception {

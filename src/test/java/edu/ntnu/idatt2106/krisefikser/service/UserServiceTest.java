@@ -130,7 +130,7 @@ class UserServiceTest {
   }
 
   @Test
-  void extractUserFromToken_Success() throws Exception {
+  void extractUserFromTokenSuccess() throws Exception {
     // Create a valid JWT token with base64-encoded payload
     JSONObject payload = new JSONObject();
     payload.put("sub", "user-123");
@@ -150,7 +150,7 @@ class UserServiceTest {
   }
 
   @Test
-  void getCurrentUser_Success() {
+  void getCurrentUserSuccess() {
     // Use try-with-resources to restore the original security context after test
     try (MockedStatic<SecurityContextHolder> mockedStatic = Mockito.mockStatic(
         SecurityContextHolder.class)) {
@@ -175,7 +175,7 @@ class UserServiceTest {
   }
 
   @Test
-  void getCurrentUser_UserNotFound() {
+  void getCurrentUserUserNotFound() {
     // Use try-with-resources to restore the original security context after test
     try (MockedStatic<SecurityContextHolder> mockedStatic = Mockito.mockStatic(
         SecurityContextHolder.class)) {
@@ -196,7 +196,7 @@ class UserServiceTest {
   }
 
   @Test
-  void checkIfMailExists_Success() {
+  void checkIfMailExistsSuccess() {
     // Arrange
     String email = "user@example.com";
     when(userRepository.findByEmail(email)).thenReturn(Optional.of(testUser));
@@ -210,7 +210,7 @@ class UserServiceTest {
   }
 
   @Test
-  void checkIfMailExists_EmailNotFound() {
+  void checkIfMailExistsEmailNotFound() {
     // Arrange
     String email = "nonexistent@example.com";
     when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
@@ -225,7 +225,7 @@ class UserServiceTest {
   }
 
   @Test
-  void getHousehold_Success() {
+  void getHouseholdSuccess() {
     // Use try-with-resources to restore the original security context after test
     try (MockedStatic<SecurityContextHolder> mockedStatic = Mockito.mockStatic(
         SecurityContextHolder.class)) {
@@ -249,7 +249,7 @@ class UserServiceTest {
   }
 
   @Test
-  void getHousehold_UserNotFound() {
+  void getHouseholdUserNotFound() {
     try (MockedStatic<SecurityContextHolder> mockedStatic = Mockito.mockStatic(
         SecurityContextHolder.class)) {
       // Arrange
@@ -269,7 +269,7 @@ class UserServiceTest {
   }
 
   @Test
-  void updatePosition_Success() {
+  void updatePositionSuccess() {
     // Arrange
     PositionDto positionDto = new PositionDto();
     positionDto.setLatitude("63.4305");
@@ -299,7 +299,7 @@ class UserServiceTest {
   }
 
   @Test
-  void updatePosition_InvalidToken() {
+  void updatePositionInvalidToken() {
     // Arrange
     PositionDto positionDto = new PositionDto();
     positionDto.setLatitude("63.4305");
@@ -315,8 +315,8 @@ class UserServiceTest {
     // The message could vary depending on how the actual token processing fails
     // We should verify it's either one of these expected messages
     assertTrue(
-        exception.getMessage().contains("Invalid JWT format") ||
-            exception.getMessage().contains("Failed to extract user from token"),
+        exception.getMessage().contains("Invalid JWT format")
+            || exception.getMessage().contains("Failed to extract user from token"),
         "Expected exception message about invalid token, but got: " + exception.getMessage()
     );
 
@@ -327,7 +327,7 @@ class UserServiceTest {
   }
 
   @Test
-  void updatePosition_UserNotFound() {
+  void updatePositionUserNotFound() {
     // Arrange
     PositionDto positionDto = new PositionDto();
     positionDto.setLatitude("63.4305");

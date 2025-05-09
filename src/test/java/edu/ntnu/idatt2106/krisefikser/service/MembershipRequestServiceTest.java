@@ -360,7 +360,8 @@ class MembershipRequestServiceTest {
         .thenReturn(List.of(testInvitation));
 
     // Act
-    List<MembershipRequestResponseDto> result = membershipRequestService.getReceivedInvitationsByUser();
+    List<MembershipRequestResponseDto> result
+        = membershipRequestService.getReceivedInvitationsByUser();
 
     // Assert
     assertEquals(1, result.size());
@@ -382,7 +383,8 @@ class MembershipRequestServiceTest {
         .thenReturn(List.of(testJoinRequest));
 
     // Act
-    List<MembershipRequestResponseDto> result = membershipRequestService.getReceivedJoinRequestsByHousehold();
+    List<MembershipRequestResponseDto> result
+        = membershipRequestService.getReceivedJoinRequestsByHousehold();
 
     // Assert
     assertEquals(1, result.size());
@@ -416,7 +418,8 @@ class MembershipRequestServiceTest {
         .thenReturn(acceptedRequests);
 
     // Act
-    List<MembershipRequestResponseDto> result = membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold();
+    List<MembershipRequestResponseDto> result
+        = membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold();
 
     // Assert
     assertEquals(1, result.size());
@@ -435,7 +438,8 @@ class MembershipRequestServiceTest {
         .thenReturn(List.of(testInvitation));
 
     // Act
-    List<MembershipRequestResponseDto> result = membershipRequestService.getInvitationsSentByHousehold();
+    List<MembershipRequestResponseDto> result
+        = membershipRequestService.getInvitationsSentByHousehold();
 
     // Assert
     assertEquals(1, result.size());
