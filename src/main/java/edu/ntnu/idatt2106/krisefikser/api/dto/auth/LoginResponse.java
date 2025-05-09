@@ -12,6 +12,10 @@ public class LoginResponse {
   private String type = "Bearer";
   private boolean requires2Fa;
 
+  /**
+   * Default constructor for LoginResponse.
+   */
+  
   public LoginResponse(String token) {
     this.token = token;
   }

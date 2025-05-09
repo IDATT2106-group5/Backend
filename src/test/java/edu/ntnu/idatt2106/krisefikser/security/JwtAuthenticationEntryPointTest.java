@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.security;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,7 +16,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 
-public class JwtAuthenticationEntryPointTest {
+/**
+ * Unit tests for the JwtAuthenticationEntryPoint class.
+ */
+
+class JwtAuthenticationEntryPointTest {
 
   @InjectMocks
   private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;

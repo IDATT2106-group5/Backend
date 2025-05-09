@@ -9,8 +9,19 @@ public class AdminSetupRequest {
   private String token;
   private String password;
 
+  /**
+   * Default constructor for AdminSetupRequest.
+   */
+
   public AdminSetupRequest() {
   }
+
+  /**
+   * Constructor for AdminSetupRequest.
+   *
+   * @param token    The token received from the admin invitation email.
+   * @param password The password for the new admin account.
+   */
 
   public AdminSetupRequest(String token, String password) {
     this.token = token;

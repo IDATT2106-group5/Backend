@@ -6,10 +6,15 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
  * A simple DTO for Household, to avoid infinite loops and expose only safe data.
  */
 public class HouseholdResponseDto {
-  private String id;
-  private String name;
-  private String address;
-  private UserResponseDto owner;
+
+  private final String id;
+  private final String name;
+  private final String address;
+  private final UserResponseDto owner;
+
+  /**
+   * Default constructor for HouseholdResponseDto.
+   */
 
   public HouseholdResponseDto(String id, String name, String address, UserResponseDto owner) {
     this.id = id;

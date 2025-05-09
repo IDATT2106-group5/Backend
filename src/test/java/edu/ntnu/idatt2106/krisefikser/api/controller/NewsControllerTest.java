@@ -29,8 +29,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Unit tests for the NewsController class.
+ */
+
 @ExtendWith(MockitoExtension.class)
-public class NewsControllerTest {
+class NewsControllerTest {
 
   @Mock
   private NewsService newsService;
@@ -55,7 +59,7 @@ public class NewsControllerTest {
   class GetNewsTests {
 
     @Test
-    void getNews_Success() {
+    void getNewsSuccess() {
       // Arrange
       int page = 0;
       int size = 10;
@@ -82,7 +86,7 @@ public class NewsControllerTest {
     }
 
     @Test
-    void getNews_Exception() {
+    void getNewsException() {
       // Arrange
       int page = 0;
       int size = 10;
@@ -103,7 +107,7 @@ public class NewsControllerTest {
   class CreateNewsTests {
 
     @Test
-    void createNews_Success() {
+    void createNewsSuccess() {
       // Arrange
       doNothing().when(newsService).createNewsItem(editNewsDto);
 
@@ -117,7 +121,7 @@ public class NewsControllerTest {
     }
 
     @Test
-    void createNews_ValidationError() {
+    void createNewsValidationError() {
       // Arrange
       doThrow(new IllegalArgumentException("Invalid request data"))
           .when(newsService).createNewsItem(editNewsDto);
@@ -132,7 +136,7 @@ public class NewsControllerTest {
     }
 
     @Test
-    void createNews_Exception() {
+    void createNewsException() {
       // Arrange
       doThrow(new RuntimeException("Database error"))
           .when(newsService).createNewsItem(editNewsDto);
@@ -151,7 +155,7 @@ public class NewsControllerTest {
   class EditNewsTests {
 
     @Test
-    void editNews_Success() {
+    void editNewsSuccess() {
       // Arrange
       Long newsId = 1L;
       doNothing().when(newsService).updateNewsItem(newsId, editNewsDto);
@@ -166,7 +170,7 @@ public class NewsControllerTest {
     }
 
     @Test
-    void editNews_NotFound() {
+    void editNewsNotFound() {
       // Arrange
       Long newsId = 99L;
       doThrow(new IllegalArgumentException("News with given id not found"))
@@ -182,7 +186,7 @@ public class NewsControllerTest {
     }
 
     @Test
-    void editNews_Exception() {
+    void editNewsException() {
       // Arrange
       Long newsId = 1L;
       doThrow(new RuntimeException("Database error"))
@@ -202,7 +206,7 @@ public class NewsControllerTest {
   class DeleteNewsTests {
 
     @Test
-    void deleteNews_Success() {
+    void deleteNewsSuccess() {
       // Arrange
       Long newsId = 1L;
       doNothing().when(newsService).deleteNewsItem(newsId);
@@ -217,7 +221,7 @@ public class NewsControllerTest {
     }
 
     @Test
-    void deleteNews_NotFound() {
+    void deleteNewsNotFound() {
       // Arrange
       Long newsId = 99L;
       doThrow(new IllegalArgumentException("News with given id not found"))
@@ -233,7 +237,7 @@ public class NewsControllerTest {
     }
 
     @Test
-    void deleteNews_Exception() {
+    void deleteNewsException() {
       // Arrange
       Long newsId = 1L;
       doThrow(new RuntimeException("Database error"))

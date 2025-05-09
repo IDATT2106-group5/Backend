@@ -28,8 +28,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Unit tests for the UserController class.
+ */
+
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+class UserControllerTest {
 
   @Mock
   private UserService userService;
@@ -76,7 +80,7 @@ public class UserControllerTest {
   class GetUserTests {
 
     @Test
-    void getUser_Success() {
+    void getUserSuccess() {
       // Arrange
       when(userService.getCurrentUser()).thenReturn(userDto);
 
@@ -90,7 +94,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getUser_IllegalArgumentException() {
+    void getUserIllegalArgumentException() {
       // Arrange
       String errorMessage = "No user logged in";
       when(userService.getCurrentUser()).thenThrow(new IllegalArgumentException(errorMessage));
@@ -105,7 +109,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getUser_UnexpectedException() {
+    void getUserUnexpectedException() {
       // Arrange
       when(userService.getCurrentUser()).thenThrow(new RuntimeException("Database error"));
 
@@ -123,7 +127,7 @@ public class UserControllerTest {
   class GetHouseholdTests {
 
     @Test
-    void getHousehold_Success() {
+    void getHouseholdSuccess() {
       // Arrange
       when(userService.getHousehold()).thenReturn(householdDto);
 
@@ -137,7 +141,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getHousehold_IllegalArgumentException() {
+    void getHouseholdIllegalArgumentException() {
       // Arrange
       String errorMessage = "User has no household";
       when(userService.getHousehold()).thenThrow(new IllegalArgumentException(errorMessage));
@@ -152,7 +156,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getHousehold_UnexpectedException() {
+    void getHouseholdUnexpectedException() {
       // Arrange
       when(userService.getHousehold()).thenThrow(new RuntimeException("Database error"));
 
@@ -170,7 +174,7 @@ public class UserControllerTest {
   class VerifyIfMailExistsTests {
 
     @Test
-    void verifyIfMailExists_Success() {
+    void verifyIfMailExistsSuccess() {
       // Arrange
       String email = "test@example.com";
       String userId = "user-123";
@@ -187,7 +191,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void verifyIfMailExists_IllegalArgumentException() {
+    void verifyIfMailExistsIllegalArgumentException() {
       // Arrange
       String email = "nonexistent@example.com";
       String errorMessage = "No user with this email";
@@ -205,7 +209,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void verifyIfMailExists_UnexpectedException() {
+    void verifyIfMailExistsUnexpectedException() {
       // Arrange
       String email = "test@example.com";
       Map<String, String> request = Map.of("email", email);
@@ -225,7 +229,7 @@ public class UserControllerTest {
   class GetCurrentUserStorageItemsTests {
 
     @Test
-    void getCurrentUserStorageItems_Success() {
+    void getCurrentUserStorageItemsSuccess() {
       // Arrange
       when(userService.getCurrentUser()).thenReturn(userDto);
       when(userService.getHousehold()).thenReturn(householdDto);
@@ -243,7 +247,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getCurrentUserStorageItems_IllegalArgumentException() {
+    void getCurrentUserStorageItemsIllegalArgumentException() {
       // Arrange
       String errorMessage = "User has no household";
       when(userService.getCurrentUser()).thenReturn(userDto);
@@ -261,7 +265,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void getCurrentUserStorageItems_UnexpectedException() {
+    void getCurrentUserStorageItemsUnexpectedException() {
       // Arrange
       when(userService.getCurrentUser()).thenThrow(new RuntimeException("Database error"));
 

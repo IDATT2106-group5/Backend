@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
-public class JwtAuthenticationFilterTest {
+/**
+ * Unit tests for the JwtAuthenticationFilter class.
+ */
+
+class JwtAuthenticationFilterTest {
 
   @InjectMocks
   private JwtAuthenticationFilter jwtAuthenticationFilter;

@@ -81,11 +81,12 @@ public class ItemController {
   }
 
   /**
-   * Gets items by type
+   * Gets items by type.
    *
-   * @param itemType the type of item
-   * @return a list of items of the given type
+   * @param itemType the type of item.
+   * @return a list of items of the given type.
    */
+
   @Operation(summary = "Gets items by type",
       description = "Gets items of a give type")
   @GetMapping("/type/{itemType}")
@@ -101,6 +102,15 @@ public class ItemController {
       return ResponseEntity.status(500).build();
     }
   }
+
+  /**
+   * Gets paginated items.
+   *
+   * @param page   the page number
+   * @param size   the page size
+   * @param search the search term
+   * @return a paginated list of items
+   */
 
   @GetMapping("/paginated")
   public ResponseEntity<?> getPaginatedItems(

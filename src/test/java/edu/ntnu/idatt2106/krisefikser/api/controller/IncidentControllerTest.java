@@ -23,7 +23,7 @@ import org.springframework.http.ResponseEntity;
 /**
  * Unit tests for the IncidentController class.
  */
-public class IncidentControllerTest {
+class IncidentControllerTest {
 
   @Mock
   private IncidentService incidentService;

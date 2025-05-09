@@ -20,7 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class StorageExpiryServiceTest {
+class StorageExpiryServiceTest {
 
   @Mock
   private StorageItemRepository storageRepository;

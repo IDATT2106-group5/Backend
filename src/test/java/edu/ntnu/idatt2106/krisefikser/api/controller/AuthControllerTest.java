@@ -27,7 +27,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 /**
  * Tests for the AuthController class.
  */
-public class AuthControllerTest {
+class AuthControllerTest {
 
   @Mock
   private AuthenticationManager authenticationManager;

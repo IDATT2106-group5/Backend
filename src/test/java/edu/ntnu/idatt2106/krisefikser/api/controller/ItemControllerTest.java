@@ -22,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 /**
  * Unit tests for the ItemController class.
  */
-public class ItemControllerTest {
+class ItemControllerTest {
 
   @Mock
   private ItemService itemService;

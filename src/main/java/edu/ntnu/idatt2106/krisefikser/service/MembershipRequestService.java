@@ -89,7 +89,7 @@ public class MembershipRequestService {
     membershipRequest.setReceiver(receiver);
     membershipRequest.setType(RequestType.INVITATION);
     membershipRequest.setStatus(RequestStatus.PENDING);
-    membershipRequest.setCreated_at(new Timestamp(System.currentTimeMillis()));
+    membershipRequest.setCreatedAt(new Timestamp(System.currentTimeMillis()));
     logger.debug("Created membership request: type={}, status={}",
         membershipRequest.getType(), membershipRequest.getStatus());
 
@@ -141,7 +141,7 @@ public class MembershipRequestService {
     membershipRequest.setReceiver(household.getOwner());
     membershipRequest.setType(RequestType.JOIN_REQUEST);
     membershipRequest.setStatus(RequestStatus.PENDING);
-    membershipRequest.setCreated_at(new Timestamp(System.currentTimeMillis()));
+    membershipRequest.setCreatedAt(new Timestamp(System.currentTimeMillis()));
     logger.debug("Created join request: sender={}, receiver={}, status={}",
         sender.getFullName(), household.getOwner().getFullName(), membershipRequest.getStatus());
 
@@ -312,7 +312,7 @@ public class MembershipRequestService {
                 invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
             invitation.getType(),
             invitation.getStatus(),
-            invitation.getCreated_at()
+            invitation.getCreatedAt()
         )
     ).toList();
 
@@ -356,7 +356,7 @@ public class MembershipRequestService {
                 request.getReceiver().getTlf(), request.getReceiver().getRole()),
             request.getType(),
             request.getStatus(),
-            request.getCreated_at()
+            request.getCreatedAt()
         )
     ).toList();
 
@@ -401,7 +401,7 @@ public class MembershipRequestService {
                 request.getReceiver().getTlf(), request.getReceiver().getRole()),
             request.getType(),
             request.getStatus(),
-            request.getCreated_at()
+            request.getCreatedAt()
         )
     ).toList();
 
@@ -456,7 +456,7 @@ public class MembershipRequestService {
             ),
             invitation.getType(),
             invitation.getStatus(),
-            invitation.getCreated_at()
+            invitation.getCreatedAt()
         )
     ).toList();
 

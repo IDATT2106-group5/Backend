@@ -16,6 +16,10 @@ public class AdminInviteRequest {
   @NotBlank(message = "Full name is required")
   private String fullName;
 
+  /**
+   * Default constructor for AdminInviteRequest.
+   */
+  
   public AdminInviteRequest() {
   }
 

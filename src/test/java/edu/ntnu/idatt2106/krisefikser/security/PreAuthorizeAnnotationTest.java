@@ -24,6 +24,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+/**
+ * Unit tests for the PreAuthorize annotations in the application. This class tests the access
+ * control of various endpoints based on user roles.
+ */
+
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -44,12 +49,17 @@ public class PreAuthorizeAnnotationTest {
   @MockBean
   private IncidentService incidentService;
 
+  /**
+   * Setup method to initialize the MockMvc object before each test.
+   */
+
   @BeforeEach
   public void setup() {
     mockMvc = MockMvcBuilders
         .webAppContextSetup(context)
         .apply(
-            org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity())
+            org.springframework.security.test.web.servlet.setup
+                .SecurityMockMvcConfigurers.springSecurity())
         .build();
   }
 

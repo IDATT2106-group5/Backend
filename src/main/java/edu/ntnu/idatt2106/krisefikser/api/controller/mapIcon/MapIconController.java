@@ -70,7 +70,7 @@ public class MapIconController {
   }
 
   /**
-   * Updates an existing map icon
+   * Updates an existing map icon.
    *
    * @param id      the ID of the map icon to update
    * @param request the updated map icon data

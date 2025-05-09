@@ -23,6 +23,12 @@ public class ItemService {
   private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
   private final ItemRepository itemRepository;
 
+  /**
+   * Constructor for ItemService.
+   *
+   * @param itemRepository the repository for accessing item data
+   */
+  
   public ItemService(ItemRepository itemRepository) {
     this.itemRepository = itemRepository;
     logger.info("ItemService initialized");

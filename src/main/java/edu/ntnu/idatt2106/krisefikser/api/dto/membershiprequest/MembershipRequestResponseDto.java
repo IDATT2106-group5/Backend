@@ -5,6 +5,10 @@ import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestStatus;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
 import java.sql.Timestamp;
 
+/**
+ * Data Transfer Object (DTO) for membership request responses. This class is used to encapsulate
+ * the data sent from the server to the client when a user requests to join a group.
+ */
 public class MembershipRequestResponseDto {
 
   Long id;
@@ -15,6 +19,10 @@ public class MembershipRequestResponseDto {
   RequestType requestType;
   RequestStatus status;
   Timestamp sentAt;
+
+  /**
+   * Default constructor for MembershipRequestResponseDto.
+   */
 
   public MembershipRequestResponseDto(Long id, String householdId, String householdName,
       UserResponseDto sender,

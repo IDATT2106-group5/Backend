@@ -9,9 +9,19 @@ public class TwoFactorVerifyRequest {
   private String email;
   private String otp;
 
+  /**
+   * Instantiates a new TwoFactorVerifyRequest.
+   */
+
   public TwoFactorVerifyRequest() {
   }
 
+  /**
+   * Instantiates a new TwoFactorVerifyRequest with the specified email and OTP.
+   *
+   * @param email The email address of the user.
+   * @param otp   The one-time password (OTP) for verification.
+   */
   public TwoFactorVerifyRequest(String email, String otp) {
     this.email = email;
     this.otp = otp;

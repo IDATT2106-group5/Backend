@@ -162,7 +162,7 @@ public class AuthController {
   }
 
   /**
-   * Validates the reset password token
+   * Validates the reset password token.
    *
    * @param request the request containing the reset password token
    * @return a response entity indicating the result of the operation

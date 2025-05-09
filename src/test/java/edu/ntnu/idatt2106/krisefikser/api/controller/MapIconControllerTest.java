@@ -24,7 +24,7 @@ import org.springframework.http.ResponseEntity;
 /**
  * Unit tests for the MapIconController class.
  */
-public class MapIconControllerTest {
+class MapIconControllerTest {
 
   @Mock
   private MapIconService mapIconService;
