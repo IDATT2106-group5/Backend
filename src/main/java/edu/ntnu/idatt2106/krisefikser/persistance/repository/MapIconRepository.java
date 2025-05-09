@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository for handling map icon related requests.
+ * The interface Map icon repository.
  */
 @Repository
 public interface MapIconRepository extends JpaRepository<MapIcon, Long> {

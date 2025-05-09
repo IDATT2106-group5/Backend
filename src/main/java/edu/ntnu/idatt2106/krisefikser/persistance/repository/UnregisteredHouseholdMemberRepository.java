@@ -2,8 +2,8 @@ package edu.ntnu.idatt2106.krisefikser.persistance.repository;
 
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.UnregisteredHouseholdMember;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +13,21 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UnregisteredHouseholdMemberRepository
     extends JpaRepository<UnregisteredHouseholdMember, Long> {
+
+  /**
+   * Find unregistered household member by id.
+   *
+   * @param id the id of the unregistered member
+   * @return the unregistered member
+   */
   Optional<UnregisteredHouseholdMember> findById(Long id);
 
-  List<UnregisteredHouseholdMember> findUnregisteredHouseholdMembersByHousehold(Household household);
+  /**
+   * Find unregistered household members by household.
+   *
+   * @param household the household
+   * @return the list of unregistered members
+   */
+  List<UnregisteredHouseholdMember> findUnregisteredHouseholdMembersByHousehold(
+      Household household);
 }

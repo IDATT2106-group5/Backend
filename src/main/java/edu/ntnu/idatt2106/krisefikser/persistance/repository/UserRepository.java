@@ -60,22 +60,44 @@ public interface UserRepository extends JpaRepository<User, String> {
    */
   Optional<User> findByResetPasswordToken(String token);
 
+  /**
+   * Find users by a given household.
+   *
+   * @param household the given household
+   * @return the list of users associated with the household
+   */
   List<User> getUsersByHousehold(Household household);
 
-  Object findUsersByHousehold(Household household);
-
+  /**
+   * Find users by a given household id.
+   *
+   * @param householdId the given household id
+   * @return the list of users associated with the household
+   */
   List<User> getUsersByHouseholdId(String householdId);
 
-  Optional<User> getUserByEmail(String email);
-
+  /**
+   * Find a user by their id.
+   *
+   * @param userId the user id
+   * @return an Optional containing the User if found
+   */
   Optional<User> getUsersById(String userId);
 
+  /**
+   * Find users within a certain radius of a given latitude and longitude.
+   *
+   * @param latitude  the latitude
+   * @param longitude the longitude
+   * @param radius    the radius in kilometers
+   * @return a list of users within the specified radius
+   */
   @Query(value = "SELECT u.* FROM user u WHERE " +
-         "(6371 * acos(cos(radians(:latitude)) * cos(radians(u.latitude)) * " +
-         "cos(radians(u.longitude) - radians(:longitude)) + " +
-         "sin(radians(:latitude)) * sin(radians(u.latitude)))) <= :radius",
-         nativeQuery = true)
+      "(6371 * acos(cos(radians(:latitude)) * cos(radians(u.latitude)) * " +
+      "cos(radians(u.longitude) - radians(:longitude)) + " +
+      "sin(radians(:latitude)) * sin(radians(u.latitude)))) <= :radius",
+      nativeQuery = true)
   List<User> findUsersWithinRadius(@Param("latitude") double latitude,
-                                   @Param("longitude") double longitude,
-                                   @Param("radius") double radius);
+      @Param("longitude") double longitude,
+      @Param("radius") double radius);
 }

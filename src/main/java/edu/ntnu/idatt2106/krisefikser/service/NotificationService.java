@@ -141,7 +141,7 @@ public class NotificationService {
     String email = authentication.getName();
 
     try {
-      User user = userRepository.getUserByEmail(email)
+      User user = userRepository.findByEmail(email)
           .orElseThrow(() -> {
             logger.warn("User not found with email: {}", email);
             return new IllegalArgumentException("User not found");

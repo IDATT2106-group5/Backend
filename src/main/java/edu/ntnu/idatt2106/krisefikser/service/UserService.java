@@ -49,7 +49,7 @@ public class UserService {
     String email = authentication.getName();
     logger.debug("Authenticated email: {}", email);
 
-    User user = userRepository.getUserByEmail(email)
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
           logger.error("No user logged in with email={}", email);
           return new IllegalArgumentException("No user logged in");
@@ -75,7 +75,7 @@ public class UserService {
    */
   public String checkIfMailExists(String email) {
     logger.info("checkIfMailExists() called for email={}", email);
-    User user = userRepository.getUserByEmail(email)
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
           logger.error("No user found with email={}", email);
           return new IllegalArgumentException("No user with this email");
@@ -93,7 +93,7 @@ public class UserService {
     logger.info("getHousehold() called for current user");
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
-    Household household = userRepository.getUserByEmail(email)
+    Household household = userRepository.findByEmail(email)
         .orElseThrow(() -> {
           logger.error("No user logged in with email={}", email);
           return new IllegalArgumentException("No user logged in");
