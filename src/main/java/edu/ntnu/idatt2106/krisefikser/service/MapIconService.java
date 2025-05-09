@@ -158,24 +158,13 @@ public class MapIconService {
    * @param radiusKm the radius in kilometers
    * @return true if within radius, false otherwise
    */
-  private boolean isWithinRadius(double lat1, double lon1, double lat2, double lon2,
+  private boolean isWithinRadius(double lat1, double lon1,
+      double lat2, double lon2,
       double radiusKm) {
-    logger.trace("Checking if point ({}, {}) is within {}km of ({}, {})",
-        lat2, lon2, radiusKm, lat1, lon1);
-
-    final int earthRadiusKm = 6371;
-    double dlat = Math.toRadians(lat2 - lat1);
-    double dlon = Math.toRadians(lon2 - lon1);
-    double a = Math.sin(dlat / 2) * Math.sin(dlat / 2)
-        + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-        * Math.sin(dlon / 2) * Math.sin(dlon / 2);
-    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    double distance = earthRadiusKm * c;
-
-    boolean isWithin = distance <= radiusKm;
-    logger.trace("Distance calculated: {}km, within radius: {}", distance, isWithin);
-    return isWithin;
+    double distance = calculateDistance(lat1, lon1, lat2, lon2);
+    return distance <= radiusKm;
   }
+
 
   /**
    * Checks if a map icon matches the search query.
@@ -202,6 +191,31 @@ public class MapIconService {
     logger.trace("Icon {} {} query '{}'", icon.getId(), matches ? "matches" : "does not match",
         query);
     return matches;
+  }
+
+  /**
+   * Calculates the distance between two geographical points using the Haversine formula.
+   *
+   * @param lat1 the latitude of the first point
+   * @param lon1 the longitude of the first point
+   * @param lat2 the latitude of the second point
+   * @param lon2 the longitude of the second point
+   * @return the distance in kilometers
+   */
+  public double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    logger.trace("Calculating distance between ({}, {}) and ({}, {})", lat1, lon1, lat2, lon2);
+
+    final int earthRadiusKm = 6371;
+    double dlat = Math.toRadians(lat2 - lat1);
+    double dlon = Math.toRadians(lon2 - lon1);
+    double a = Math.sin(dlat / 2) * Math.sin(dlat / 2)
+        + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+        * Math.sin(dlon / 2) * Math.sin(dlon / 2);
+    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    double distance = earthRadiusKm * c;
+
+    logger.trace("Distance calculated: {}km", distance);
+    return distance;
   }
 
   /**
@@ -266,30 +280,5 @@ public class MapIconService {
       logger.info("No suitable map icons found with coordinates");
       return null;
     }
-  }
-
-  /**
-   * Calculates the distance between two geographical points using the Haversine formula.
-   *
-   * @param lat1 the latitude of the first point
-   * @param lon1 the longitude of the first point
-   * @param lat2 the latitude of the second point
-   * @param lon2 the longitude of the second point
-   * @return the distance in kilometers
-   */
-  public double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
-    logger.trace("Calculating distance between ({}, {}) and ({}, {})", lat1, lon1, lat2, lon2);
-
-    final int earthRadiusKm = 6371;
-    double dlat = Math.toRadians(lat2 - lat1);
-    double dlon = Math.toRadians(lon2 - lon1);
-    double a = Math.sin(dlat / 2) * Math.sin(dlat / 2)
-        + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-        * Math.sin(dlon / 2) * Math.sin(dlon / 2);
-    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    double distance = earthRadiusKm * c;
-
-    logger.trace("Distance calculated: {}km", distance);
-    return distance;
   }
 }
