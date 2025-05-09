@@ -151,12 +151,14 @@ public class UserService {
    * @param position the position
    */
   public void updatePosition(PositionDto position) {
-    logger.info("updatePosition() called for userId={}, lat={}, lon={}",
-        position.getUserId(), position.getLatitude(), position.getLongitude());
+    logger.info("updatePosition() called for current user, lat={}, lon={}",
+        position.getLatitude(), position.getLongitude());
 
-    User user = userRepository.getUsersById(position.getUserId())
+    String email = extractUserFromToken(position.getToken());
+
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
-          logger.error("No user found with id={}", position.getUserId());
+          logger.error("No user found with email={}", email);
           return new IllegalArgumentException("No user found");
         });
 
@@ -165,8 +167,45 @@ public class UserService {
     userRepository.save(user);
     logger.info("Saved new position for userId={}", user.getId());
 
-    notificationService.sendHouseholdPositionUpdate(user.getHousehold().getId(), position);
+    notificationService.sendHouseholdPositionUpdate(user.getId(), user.getHousehold().getId(),
+        position);
     logger.info("Sent household position update notification for householdId={}",
         user.getHousehold().getId());
+  }
+
+  /**
+   * Extracts the user ID from the token.
+   *
+   * @param token
+   * @return the user ID
+   */
+  private String extractUserFromToken(String token) {
+    logger.info("extractUserFromToken() called with token={}", token);
+    try {
+      if (token == null || token.isEmpty()) {
+        logger.error("Token is null or empty");
+        throw new IllegalArgumentException("Invalid token");
+      }
+
+      // Extract parts of JWT token
+      String[] parts = token.split("\\.");
+      if (parts.length != 3) {
+        logger.error("Invalid JWT token format");
+        throw new IllegalArgumentException("Invalid JWT format");
+      }
+
+      // Decode payload (middle part of JWT)
+      String payload = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
+
+      // Parse JSON payload
+      org.json.JSONObject jsonPayload = new org.json.JSONObject(payload);
+      String subject = jsonPayload.getString("sub");
+
+      logger.debug("Successfully extracted userId={} from token", subject);
+      return subject;
+    } catch (Exception e) {
+      logger.error("Error extracting user from token: {}", e.getMessage(), e);
+      throw new IllegalArgumentException("Failed to extract user from token", e);
+    }
   }
 }
