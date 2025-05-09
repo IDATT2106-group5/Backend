@@ -20,4 +20,10 @@ public class EditMemberDto {
   public String getNewFullName() {
     return newFullName;
   }
+
+  public void setMemberId(long l) {
+  }
+
+  public void setNewFullName(String janeDoe) {
+  }
 }
