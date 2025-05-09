@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -511,12 +512,15 @@ class AuthServiceTest {
   @Nested
   class InitiatePasswordResetTests {
 
+    private final String email = "user@example.com";
+    private final String adminEmail = "admin@example.com";
+
     @Test
     void initiatePasswordReset_shouldGenerateTokenAndSendEmail_whenUserExists() {
       // Arrange
-      String email = "reset@example.com";
       User user = new User();
       user.setEmail(email);
+      user.setRole(Role.USER);
 
       when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
@@ -524,17 +528,20 @@ class AuthServiceTest {
       authService.initiatePasswordReset(email);
 
       // Assert
-      assertNotNull(user.getResetPasswordToken(), "Token should be set");
-      assertNotNull(user.getResetPasswordTokenExpiration(), "Expiration should be set");
+      ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+      verify(userRepository).save(userCaptor.capture());
 
-      verify(userRepository).save(user);
-      verify(emailService).sendPasswordResetEmail(email, user.getResetPasswordToken());
+      User savedUser = userCaptor.getValue();
+      assertNotNull(savedUser.getResetPasswordToken(), "Reset token should be generated");
+      assertNotNull(savedUser.getResetPasswordTokenExpiration(), "Token expiration should be set");
+
+      verify(emailService).sendPasswordResetEmail(eq(email), anyString());
+      verify(userRepository).findByEmail(email);
     }
 
     @Test
-    void initiatePasswordReset_shouldThrowException_whenUserNotFound() {
+    void initiatePasswordReset_shouldThrowException_whenUserDoesNotExist() {
       // Arrange
-      String email = "nonexistent@example.com";
       when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
 
       // Act & Assert
@@ -545,7 +552,183 @@ class AuthServiceTest {
       verify(userRepository).findByEmail(email);
       verifyNoInteractions(emailService);
     }
+
+    @Test
+    void initiatePasswordReset_shouldThrowException_whenUserIsAdmin() {
+      // Arrange
+      User adminUser = new User();
+      adminUser.setEmail(adminEmail);
+      adminUser.setRole(Role.ADMIN);
+
+      when(userRepository.findByEmail(adminEmail)).thenReturn(Optional.of(adminUser));
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.initiatePasswordReset(adminEmail));
+
+      assertEquals("Admin brukere må resette passord via link fra superadmin",
+          exception.getMessage());
+      verify(userRepository).findByEmail(adminEmail);
+      verifyNoInteractions(emailService);
+    }
+
+    @Test
+    void initiatePasswordReset_shouldSetTokenExpirationToOneHour() {
+      // Arrange
+      User user = new User();
+      user.setEmail(email);
+      user.setRole(Role.USER);
+
+      when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
+      // Act
+      authService.initiatePasswordReset(email);
+
+      // Assert
+      ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+      verify(userRepository).save(userCaptor.capture());
+
+      User savedUser = userCaptor.getValue();
+      Date expiration = savedUser.getResetPasswordTokenExpiration();
+
+      long differenceInMillis = expiration.getTime() - System.currentTimeMillis();
+      // Allow a small margin for test execution time
+      assertTrue(differenceInMillis > 59 * 60 * 1000 && differenceInMillis <= 60 * 60 * 1000,
+          "Token expiration should be set to approximately 1 hour in the future");
+    }
   }
+
+  @Nested
+  class InitiateAdminPasswordResetTests {
+
+    private final String adminEmail = "admin@example.com";
+    private final String userEmail = "user@example.com";
+
+    @Test
+    void initiateAdminPasswordReset_shouldGenerateTokenAndSendEmail_whenAdminExists() {
+      // Arrange
+      User adminUser = new User();
+      adminUser.setEmail(adminEmail);
+      adminUser.setRole(Role.ADMIN);
+
+      when(userRepository.findByEmail(adminEmail)).thenReturn(Optional.of(adminUser));
+
+      // Act
+      authService.initiateAdminPasswordReset(adminEmail);
+
+      // Assert
+      ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+      verify(userRepository).save(userCaptor.capture());
+
+      User savedUser = userCaptor.getValue();
+      assertNotNull(savedUser.getResetPasswordToken(), "Reset token should be generated");
+      assertNotNull(savedUser.getResetPasswordTokenExpiration(), "Token expiration should be set");
+
+      verify(emailService).sendPasswordResetEmail(eq(adminEmail), anyString());
+      verify(userRepository).findByEmail(adminEmail);
+    }
+
+    @Test
+    void initiateAdminPasswordReset_shouldAlsoWorkForSuperadmin() {
+      // Arrange
+      User superAdminUser = new User();
+      superAdminUser.setEmail(adminEmail);
+      superAdminUser.setRole(Role.SUPERADMIN);
+
+      when(userRepository.findByEmail(adminEmail)).thenReturn(Optional.of(superAdminUser));
+
+      // Act
+      authService.initiateAdminPasswordReset(adminEmail);
+
+      // Assert
+      ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+      verify(userRepository).save(userCaptor.capture());
+
+      User savedUser = userCaptor.getValue();
+      assertNotNull(savedUser.getResetPasswordToken(), "Reset token should be generated");
+
+      verify(emailService).sendPasswordResetEmail(eq(adminEmail), anyString());
+    }
+
+    @Test
+    void initiateAdminPasswordReset_shouldThrowException_whenUserDoesNotExist() {
+      // Arrange
+      when(userRepository.findByEmail(adminEmail)).thenReturn(Optional.empty());
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.initiateAdminPasswordReset(adminEmail));
+
+      assertEquals("No user registered with that email.", exception.getMessage());
+      verify(userRepository).findByEmail(adminEmail);
+      verifyNoInteractions(emailService);
+    }
+
+    @Test
+    void initiateAdminPasswordReset_shouldThrowException_whenUserIsNotAdmin() {
+      // Arrange
+      User regularUser = new User();
+      regularUser.setEmail(userEmail);
+      regularUser.setRole(Role.USER);
+
+      when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(regularUser));
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+          () -> authService.initiateAdminPasswordReset(userEmail));
+
+      assertEquals("Only admin users can be reset using this method.", exception.getMessage());
+      verify(userRepository).findByEmail(userEmail);
+      verifyNoInteractions(emailService);
+    }
+
+    @Test
+    void initiateAdminPasswordReset_shouldSetTokenExpirationToOneHour() {
+      // Arrange
+      User adminUser = new User();
+      adminUser.setEmail(adminEmail);
+      adminUser.setRole(Role.ADMIN);
+
+      when(userRepository.findByEmail(adminEmail)).thenReturn(Optional.of(adminUser));
+
+      // Act
+      authService.initiateAdminPasswordReset(adminEmail);
+
+      // Assert
+      ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+      verify(userRepository).save(userCaptor.capture());
+
+      User savedUser = userCaptor.getValue();
+      Date expiration = savedUser.getResetPasswordTokenExpiration();
+
+      long differenceInMillis = expiration.getTime() - System.currentTimeMillis();
+      // Allow a small margin for test execution time
+      assertTrue(differenceInMillis > 59 * 60 * 1000 && differenceInMillis <= 60 * 60 * 1000,
+          "Token expiration should be set to approximately 1 hour in the future");
+    }
+
+    @Test
+    void initiateAdminPasswordReset_shouldHandleEmailSendingExceptions() {
+      // Arrange
+      User adminUser = new User();
+      adminUser.setEmail(adminEmail);
+      adminUser.setRole(Role.ADMIN);
+
+      when(userRepository.findByEmail(adminEmail)).thenReturn(Optional.of(adminUser));
+
+      // Fix: Use doThrow().when() syntax for void methods
+      doThrow(new RuntimeException("Email service error"))
+          .when(emailService).sendPasswordResetEmail(eq(adminEmail), anyString());
+
+      // Act - should not throw exception even if email sending fails
+      authService.initiateAdminPasswordReset(adminEmail);
+
+      // Assert
+      verify(userRepository).save(any(User.class));
+      verify(emailService).sendPasswordResetEmail(eq(adminEmail), anyString());
+    }
+  }
+
 
   /**
    * Tests for the password reset token validation.
