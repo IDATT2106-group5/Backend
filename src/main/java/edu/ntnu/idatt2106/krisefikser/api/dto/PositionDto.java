@@ -5,10 +5,6 @@ package edu.ntnu.idatt2106.krisefikser.api.dto;
  */
 public class PositionDto {
   /**
-   * The User id.
-   */
-  String userId;
-  /**
    * The Longitude.
    */
   String longitude;
@@ -16,18 +12,22 @@ public class PositionDto {
    * The Latitude.
    */
   String latitude;
+  /**
+   * The user token
+   */
+  String token;
 
   /**
    * Instantiates a new Position dto.
    *
-   * @param userId    the user id
+   * @param token     the token
    * @param longitude the longitude
    * @param latitude  the latitude
    */
-  public PositionDto(String userId, String longitude, String latitude) {
-    this.userId = userId;
+  public PositionDto(String token, String longitude, String latitude) {
     this.longitude = longitude;
     this.latitude = latitude;
+    this.token = token;
   }
 
   /**
@@ -37,21 +37,21 @@ public class PositionDto {
   }
 
   /**
-   * Gets user id.
+   * Gets token.
    *
-   * @return the user id
+   * @return the token
    */
-  public String getUserId() {
-    return userId;
+  public String getToken() {
+    return token;
   }
 
   /**
-   * Sets user id.
+   * Sets token.
    *
-   * @param userId the user id
+   * @param token the token
    */
-  public void setUserId(String userId) {
-    this.userId = userId;
+  public void setToken(String token) {
+    this.token = token;
   }
 
   /**
