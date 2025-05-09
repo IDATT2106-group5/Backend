@@ -16,6 +16,7 @@ import edu.ntnu.idatt2106.krisefikser.persistance.entity.UnregisteredHouseholdMe
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.MembershipRequestRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UnregisteredHouseholdMemberRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service class for managing household-related operations. This service handles the creation,
@@ -55,6 +57,11 @@ public class HouseholdService {
   private final NotificationService notificationService;
 
   /**
+   * Repository for membership request entity operations.
+   */
+  private final MembershipRequestRepository membershipRequestRepository;
+
+  /**
    * Repository for user entity operations.
    */
   private final UserRepository userRepository;
@@ -71,14 +78,16 @@ public class HouseholdService {
    * @param notificationService                   the notification service
    * @param userRepository                        Repository for user operations.
    * @param unregisteredHouseholdMemberRepository Repository for unregistered household member
-   *
+   *                                              <p>
    *                                              operations.
    */
   public HouseholdService(HouseholdRepository householdRepository,
-      NotificationService notificationService, UserRepository userRepository,
+      NotificationService notificationService,
+      MembershipRequestRepository membershipRequestRepository, UserRepository userRepository,
       UnregisteredHouseholdMemberRepository unregisteredHouseholdMemberRepository) {
     this.householdRepository = householdRepository;
     this.notificationService = notificationService;
+    this.membershipRequestRepository = membershipRequestRepository;
     this.userRepository = userRepository;
     this.unregisteredHouseholdMemberRepository = unregisteredHouseholdMemberRepository;
     logger.info("HouseholdService initialized");
@@ -326,8 +335,7 @@ public class HouseholdService {
    * @param request The DTO containing the full name of the unregistered member and the ID of the
    *                household to which the member should be added.
    * @throws IllegalArgumentException if the unregistered member already exists in the specified
-   *                                                               household or if the household is
-   *                                  not found.
+   *                                  household or if the household is not found.
    */
   public void addUnregisteredMemberToHousehold(
       UnregisteredMemberHouseholdAssignmentRequestDto request) {
@@ -659,6 +667,7 @@ public class HouseholdService {
    * @throws IllegalArgumentException if the household is not found or if the user is not the
    *                                  owner.
    */
+  @Transactional
   public void deleteHousehold() {
     logger.info("Deleting household");
 
@@ -685,6 +694,9 @@ public class HouseholdService {
           household.getId());
       throw new IllegalArgumentException("Only the owner can delete the household");
     }
+
+    membershipRequestRepository.deleteAllByHouseholdId(household.getId());
+    logger.debug("Deleted membership requests for household {}", household.getId());
 
     // Moving all registered users from the household
     List<User> users = userRepository.getUsersByHousehold(household);
