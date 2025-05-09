@@ -8,10 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.user.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
-import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.user.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.security.CustomUserDetails;
+import edu.ntnu.idatt2106.krisefikser.service.user.CustomUserDetailsService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

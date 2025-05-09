@@ -6,10 +6,10 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import edu.ntnu.idatt2106.krisefikser.api.controller.mapIcon.MapIconController;
-import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.mapicon.MapIconRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.mapicon.MapIconResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.MapIconType;
-import edu.ntnu.idatt2106.krisefikser.service.MapIconService;
+import edu.ntnu.idatt2106.krisefikser.service.mapicon.MapIconService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;

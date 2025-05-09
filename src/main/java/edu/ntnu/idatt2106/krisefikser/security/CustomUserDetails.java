@@ -1,6 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.security;
 
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.user.User;
 import java.util.Collection;
 import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;

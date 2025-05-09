@@ -11,9 +11,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import edu.ntnu.idatt2106.krisefikser.api.controller.news.NewsController;
-import edu.ntnu.idatt2106.krisefikser.api.dto.EditNewsDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.News;
-import edu.ntnu.idatt2106.krisefikser.service.NewsService;
+import edu.ntnu.idatt2106.krisefikser.api.dto.news.EditNewsDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.news.News;
+import edu.ntnu.idatt2106.krisefikser.service.news.NewsService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

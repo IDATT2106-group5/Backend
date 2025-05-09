@@ -20,7 +20,7 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestStatus;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
-import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
+import edu.ntnu.idatt2106.krisefikser.service.membershiprequests.MembershipRequestService;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;

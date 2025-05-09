@@ -1,7 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller.notification;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
-import edu.ntnu.idatt2106.krisefikser.service.NotificationService;
+import edu.ntnu.idatt2106.krisefikser.service.notification.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;

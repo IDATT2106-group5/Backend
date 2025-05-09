@@ -7,12 +7,12 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import edu.ntnu.idatt2106.krisefikser.api.controller.auth.AuthController;
-import edu.ntnu.idatt2106.krisefikser.api.dto.PasswordResetRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.auth.PasswordResetRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
 import edu.ntnu.idatt2106.krisefikser.security.JwtTokenProvider;
-import edu.ntnu.idatt2106.krisefikser.service.AuthService;
+import edu.ntnu.idatt2106.krisefikser.service.auth.AuthService;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

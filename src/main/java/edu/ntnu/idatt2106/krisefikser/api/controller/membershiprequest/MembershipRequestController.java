@@ -3,7 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.api.controller.membershiprequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipInviteDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.RequestOperationDto;
-import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
+import edu.ntnu.idatt2106.krisefikser.service.membershiprequests.MembershipRequestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;

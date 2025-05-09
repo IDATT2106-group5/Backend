@@ -5,9 +5,9 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import edu.ntnu.idatt2106.krisefikser.api.controller.incident.ScenarioController;
-import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioResponseDto;
-import edu.ntnu.idatt2106.krisefikser.service.ScenarioService;
+import edu.ntnu.idatt2106.krisefikser.api.dto.incident.ScenarioRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.incident.ScenarioResponseDto;
+import edu.ntnu.idatt2106.krisefikser.service.incident.ScenarioService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;

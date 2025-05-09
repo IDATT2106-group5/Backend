@@ -9,10 +9,11 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioResponseDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.Scenario;
-import edu.ntnu.idatt2106.krisefikser.persistance.repository.ScenarioRepository;
+import edu.ntnu.idatt2106.krisefikser.api.dto.incident.ScenarioRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.incident.ScenarioResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.incident.Scenario;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.incident.ScenarioRepository;
+import edu.ntnu.idatt2106.krisefikser.service.incident.ScenarioService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;

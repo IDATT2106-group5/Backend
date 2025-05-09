@@ -12,9 +12,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.user.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
-import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.user.UserRepository;
+import edu.ntnu.idatt2106.krisefikser.service.admin.AdminInvitationService;
+import edu.ntnu.idatt2106.krisefikser.service.auth.EmailService;
 import java.util.Calendar;
 import java.util.Optional;
 import java.util.UUID;

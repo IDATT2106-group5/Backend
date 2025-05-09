@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import edu.ntnu.idatt2106.krisefikser.api.controller.household.HouseholdController;
-import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.position.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
@@ -22,7 +22,7 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMe
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
-import edu.ntnu.idatt2106.krisefikser.service.HouseholdService;
+import edu.ntnu.idatt2106.krisefikser.service.household.HouseholdService;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

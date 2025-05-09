@@ -9,6 +9,8 @@ import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 
+import edu.ntnu.idatt2106.krisefikser.service.auth.EmailService;
+import edu.ntnu.idatt2106.krisefikser.service.auth.TwoFactorService;
 import java.lang.reflect.Field;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;

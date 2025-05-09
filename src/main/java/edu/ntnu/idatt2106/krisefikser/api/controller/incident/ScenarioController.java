@@ -1,8 +1,8 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller.incident;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioResponseDto;
-import edu.ntnu.idatt2106.krisefikser.service.ScenarioService;
+import edu.ntnu.idatt2106.krisefikser.api.dto.incident.ScenarioRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.incident.ScenarioResponseDto;
+import edu.ntnu.idatt2106.krisefikser.service.incident.ScenarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

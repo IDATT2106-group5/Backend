@@ -1,10 +1,10 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller.user;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.StorageItemResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.storage.StorageItemResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
-import edu.ntnu.idatt2106.krisefikser.service.StorageService;
-import edu.ntnu.idatt2106.krisefikser.service.UserService;
+import edu.ntnu.idatt2106.krisefikser.service.storage.StorageService;
+import edu.ntnu.idatt2106.krisefikser.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;

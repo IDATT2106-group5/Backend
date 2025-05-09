@@ -1,7 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller.item;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.ItemResponseDto;
-import edu.ntnu.idatt2106.krisefikser.service.ItemService;
+import edu.ntnu.idatt2106.krisefikser.api.dto.item.ItemResponseDto;
+import edu.ntnu.idatt2106.krisefikser.service.item.ItemService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.HashMap;

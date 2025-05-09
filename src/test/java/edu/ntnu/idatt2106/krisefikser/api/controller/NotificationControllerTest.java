@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import edu.ntnu.idatt2106.krisefikser.api.controller.notification.NotificationController;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.NotificationType;
-import edu.ntnu.idatt2106.krisefikser.service.NotificationService;
+import edu.ntnu.idatt2106.krisefikser.service.notification.NotificationService;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

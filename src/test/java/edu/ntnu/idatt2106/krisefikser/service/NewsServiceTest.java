@@ -6,9 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.EditNewsDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.News;
-import edu.ntnu.idatt2106.krisefikser.persistance.repository.NewsRepository;
+import edu.ntnu.idatt2106.krisefikser.api.dto.news.EditNewsDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.news.News;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.news.NewsRepository;
+import edu.ntnu.idatt2106.krisefikser.service.news.NewsService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

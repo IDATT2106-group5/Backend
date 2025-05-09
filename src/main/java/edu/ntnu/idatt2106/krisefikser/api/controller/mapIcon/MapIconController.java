@@ -1,9 +1,9 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller.mapIcon;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.mapicon.MapIconRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.mapicon.MapIconResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.MapIconType;
-import edu.ntnu.idatt2106.krisefikser.service.MapIconService;
+import edu.ntnu.idatt2106.krisefikser.service.mapicon.MapIconService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
