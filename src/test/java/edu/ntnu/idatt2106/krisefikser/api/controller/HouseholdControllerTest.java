@@ -15,6 +15,7 @@ import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.RemoveUnregisteredMemberRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
@@ -472,6 +473,164 @@ public class HouseholdControllerTest {
     // Then
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     assertEquals("Internal server error", response.getBody());
+  }
+
+  @Test
+  void removeUserFromHousehold_UnexpectedException_ReturnsInternalServerError() {
+    // Arrange
+    UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
+    when(request.getUserId()).thenReturn("user-123");
+    doThrow(new RuntimeException("Database error"))
+        .when(householdService).removeUserFromHousehold("user-123");
+
+    // Act
+    ResponseEntity<String> response = householdController.removeUserFromHousehold(request);
+
+    // Assert
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    assertEquals("Internal server error", response.getBody());
+    verify(householdService, times(1)).removeUserFromHousehold("user-123");
+  }
+
+  /**
+   * Tests the positive scenario where an unregistered member is successfully removed from a
+   * household.
+   */
+  @Test
+  void removeUnregisteredMemberFromHousehold_ValidMemberId_ReturnsOk() {
+    // Arrange
+    RemoveUnregisteredMemberRequestDto request = mock(RemoveUnregisteredMemberRequestDto.class);
+    when(request.getMemberId()).thenReturn(1L);
+    doNothing().when(householdService).removeUnregisteredMemberFromHousehold(1L);
+
+    // Act
+    ResponseEntity<String> response = householdController.removeUnregisteredMemberFromHousehold(
+        request);
+
+    // Assert
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("Unregistered member removed from household successfully", response.getBody());
+    verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(1L);
+  }
+
+  /**
+   * Tests the scenario where validation fails during unregistered member removal from a household.
+   */
+  @Test
+  void removeUnregisteredMemberFromHousehold_ValidationException_ReturnsBadRequest() {
+    // Arrange
+    RemoveUnregisteredMemberRequestDto request = mock(RemoveUnregisteredMemberRequestDto.class);
+    when(request.getMemberId()).thenReturn(-1L);
+    String errorMessage = "Invalid member ID";
+    doThrow(new IllegalArgumentException(errorMessage))
+        .when(householdService).removeUnregisteredMemberFromHousehold(-1L);
+
+    // Act
+    ResponseEntity<String> response = householdController.removeUnregisteredMemberFromHousehold(
+        request);
+
+    // Assert
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(errorMessage, response.getBody());
+    verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(-1L);
+  }
+
+  /**
+   * Tests the scenario where an unexpected exception occurs during unregistered member removal.
+   */
+  @Test
+  void removeUnregisteredMemberFromHousehold_UnexpectedException_ReturnsInternalServerError() {
+    // Arrange
+    RemoveUnregisteredMemberRequestDto request = mock(RemoveUnregisteredMemberRequestDto.class);
+    when(request.getMemberId()).thenReturn(1L);
+    doThrow(new RuntimeException("Database error"))
+        .when(householdService).removeUnregisteredMemberFromHousehold(1L);
+
+    // Act
+    ResponseEntity<String> response = householdController.removeUnregisteredMemberFromHousehold(
+        request);
+
+    // Assert
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    assertEquals("Internal server error", response.getBody());
+    verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(1L);
+  }
+
+  /**
+   * Tests the scenario where a null member ID is provided.
+   */
+  @Test
+  void removeUnregisteredMemberFromHousehold_NullMemberId_ReturnsInternalServerError() {
+    // Arrange
+    RemoveUnregisteredMemberRequestDto request = mock(RemoveUnregisteredMemberRequestDto.class);
+    when(request.getMemberId()).thenReturn(null);
+    doThrow(new RuntimeException("Database error"))
+        .when(householdService).removeUnregisteredMemberFromHousehold(null);
+
+    // Act
+    ResponseEntity<String> response = householdController.removeUnregisteredMemberFromHousehold(
+        request);
+
+    // Assert
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    assertEquals("Internal server error", response.getBody());
+    verify(householdService, times(1)).removeUnregisteredMemberFromHousehold(null);
+  }
+
+  /**
+   * Tests the scenario where household details are successfully retrieved.
+   */
+  @Test
+  void getHouseholdDetails_ValidHouseholdId_ReturnsDetails() {
+    // Arrange
+    HouseholdResponseDto dummyHousehold = mock(HouseholdResponseDto.class);
+    Map<String, Object> details = Map.of("household", dummyHousehold);
+    when(householdService.getHouseholdDetails()).thenReturn(details);
+
+    // Act
+    ResponseEntity<?> response = householdController.getHouseholdDetails();
+
+    // Assert
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(details, response.getBody());
+    verify(householdService, times(1)).getHouseholdDetails();
+  }
+
+  /**
+   * Tests the scenario where an invalid household ID leads to a bad request.
+   */
+  @Test
+  void getHouseholdDetails_InvalidHouseholdId_ReturnsBadRequest() {
+    // Arrange
+    String errorMessage = "Invalid household ID";
+    when(householdService.getHouseholdDetails())
+        .thenThrow(new IllegalArgumentException(errorMessage));
+
+    // Act
+    ResponseEntity<?> response = householdController.getHouseholdDetails();
+
+    // Assert
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals(Map.of("error", errorMessage), response.getBody());
+    verify(householdService, times(1)).getHouseholdDetails();
+  }
+
+  /**
+   * Tests the scenario where an unexpected exception occurs during household details retrieval.
+   */
+  @Test
+  void getHouseholdDetails_ServiceThrowsUnexpectedException_ReturnsInternalServerError() {
+    // Arrange
+    when(householdService.getHouseholdDetails())
+        .thenThrow(new RuntimeException("Unexpected error"));
+
+    // Act
+    ResponseEntity<?> response = householdController.getHouseholdDetails();
+
+    // Assert
+    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+    assertEquals(Map.of("error", "Internal server error"), response.getBody());
+    verify(householdService, times(1)).getHouseholdDetails();
   }
 
   /**
