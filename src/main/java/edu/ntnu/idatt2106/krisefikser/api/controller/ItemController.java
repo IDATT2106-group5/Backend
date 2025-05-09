@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class ItemController {
 
+  private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
   private final ItemService itemService;
 
   /**
@@ -45,8 +48,14 @@ public class ItemController {
       description = "Gets all items from the database")
   @GetMapping
   public ResponseEntity<List<ItemResponseDto>> getAllItems() {
-    List<ItemResponseDto> items = itemService.getAllItems();
-    return ResponseEntity.ok(items);
+    try {
+      List<ItemResponseDto> items = itemService.getAllItems();
+      logger.info("Fetched all items");
+      return ResponseEntity.ok(items);
+    } catch (Exception e) {
+      logger.error("Error fetching items: {}", e.getMessage());
+      return ResponseEntity.status(500).build();
+    }
   }
 
   /**
@@ -59,8 +68,16 @@ public class ItemController {
       description = "Gets an item by a given id")
   @GetMapping("/{itemId}")
   public ResponseEntity<ItemResponseDto> getItemById(@PathVariable Long itemId) {
-    ItemResponseDto item = itemService.getItemById(itemId);
-    return ResponseEntity.ok(item);
+    try {
+      ItemResponseDto item = itemService.getItemById(itemId);
+      return ResponseEntity.ok(item);
+    } catch (IllegalArgumentException e) {
+      logger.warn("Error fetching item {}: {}", itemId, e.getMessage());
+      return ResponseEntity.notFound().build();
+    } catch (Exception e) {
+      logger.error("Error fetching item {}: {}", itemId, e.getMessage());
+      return ResponseEntity.status(500).build();
+    }
   }
 
   /**
@@ -73,8 +90,16 @@ public class ItemController {
       description = "Gets items of a give type")
   @GetMapping("/type/{itemType}")
   public ResponseEntity<List<ItemResponseDto>> getItemsByType(@PathVariable String itemType) {
-    List<ItemResponseDto> items = itemService.getItemsByType(itemType);
-    return ResponseEntity.ok(items);
+    try {
+      List<ItemResponseDto> items = itemService.getItemsByType(itemType);
+      return ResponseEntity.ok(items);
+    } catch (IllegalArgumentException e) {
+      logger.warn("Error fetching items of type {}: {}", itemType, e.getMessage());
+      return ResponseEntity.badRequest().build();
+    } catch (Exception e) {
+      logger.error("Error fetching items of type {}: {}", itemType, e.getMessage());
+      return ResponseEntity.status(500).build();
+    }
   }
 
   @GetMapping("/paginated")
