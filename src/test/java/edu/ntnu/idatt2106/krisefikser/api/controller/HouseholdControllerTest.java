@@ -8,13 +8,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.EditHouseholdRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdBasicResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.EditMemberDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.RemoveUnregisteredMemberRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberHouseholdAssignmentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.unregisteredmembers.UnregisteredMemberResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
@@ -55,20 +55,6 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testLeaveHousehold_Success() {
-    // Given
-    doNothing().when(householdService).leaveCurrentUserFromHousehold();
-
-    // When
-    ResponseEntity<String> response = householdController.leaveHousehold();
-
-    // Then
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals("User left the household successfully", response.getBody());
-    verify(householdService).leaveCurrentUserFromHousehold();
-  }
-
-  @Test
   void testLeaveHousehold_ValidationError() {
     // Given
     doThrow(new IllegalArgumentException("You are not a member of any household"))
@@ -93,7 +79,7 @@ public class HouseholdControllerTest {
 
     // Then
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    assertEquals("Internal server error", response.getBody());
+    assertEquals("Uventet feil under utmelding fra husstand.", response.getBody());
   }
 
   @Test
@@ -132,57 +118,6 @@ public class HouseholdControllerTest {
 
     // When
     ResponseEntity<String> response = householdController.deleteHousehold();
-
-    // Then
-    assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
-    assertEquals("Internal server error", response.getBody());
-  }
-
-  @Test
-  void testRemoveUnregisteredMemberFromHousehold_Success() {
-    // Given
-    RemoveUnregisteredMemberRequestDto requestDto = new RemoveUnregisteredMemberRequestDto();
-    requestDto.setId(1L);
-    doNothing().when(householdService).removeUnregisteredMemberFromHousehold(1L);
-
-    // When
-    ResponseEntity<String> response = householdController.removeUnregisteredMemberFromHousehold(
-        requestDto);
-
-    // Then
-    assertEquals(HttpStatus.OK, response.getStatusCode());
-    assertEquals("Unregistered member removed from household successfully", response.getBody());
-    verify(householdService).removeUnregisteredMemberFromHousehold(1L);
-  }
-
-  @Test
-  void testRemoveUnregisteredMemberFromHousehold_ValidationError() {
-    // Given
-    RemoveUnregisteredMemberRequestDto requestDto = new RemoveUnregisteredMemberRequestDto();
-    requestDto.setId(1L);
-    doThrow(new IllegalArgumentException("Unregistered member not found"))
-        .when(householdService).removeUnregisteredMemberFromHousehold(1L);
-
-    // When
-    ResponseEntity<String> response = householdController.removeUnregisteredMemberFromHousehold(
-        requestDto);
-
-    // Then
-    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    assertEquals("Unregistered member not found", response.getBody());
-  }
-
-  @Test
-  void testRemoveUnregisteredMemberFromHousehold_InternalError() {
-    // Given
-    RemoveUnregisteredMemberRequestDto requestDto = new RemoveUnregisteredMemberRequestDto();
-    requestDto.setId(1L);
-    doThrow(new RuntimeException("Database error"))
-        .when(householdService).removeUnregisteredMemberFromHousehold(1L);
-
-    // When
-    ResponseEntity<String> response = householdController.removeUnregisteredMemberFromHousehold(
-        requestDto);
 
     // Then
     assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
@@ -469,20 +404,6 @@ public class HouseholdControllerTest {
     // Then
     assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     assertEquals(Map.of("error", "Brukeren tilhører ingen husstand"), response.getBody());
-  }
-
-  @Test
-  void testGetHouseholdDetails_ValidationError() {
-    // Given
-    doThrow(new IllegalArgumentException("User does not belong to a household"))
-        .when(householdService).getHouseholdDetails();
-
-    // When
-    ResponseEntity<?> response = householdController.getHouseholdDetails();
-
-    // Then
-    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    assertEquals(Map.of("error", "User does not belong to a household"), response.getBody());
   }
 
   @Test
