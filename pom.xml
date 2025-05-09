@@ -29,30 +29,35 @@
         </configuration>
         <groupId>org.springframework.boot</groupId>
       </plugin>
-       <plugin>
-        <groupId>org.jacoco</groupId>
+      <plugin>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.11</version>
         <configuration>
+          <append>true</append>
+          <output>file</output>
           <skip>${skipTests}</skip>
-            <output>file</output>
-            <append>true</append>
         </configuration>
         <executions>
-            <execution>
-                <id>jacoco-initialize</id>
-                <goals>
-                    <goal>prepare-agent</goal>
-                </goals>
-            </execution>
-            <execution>
-                <id>jacoco-site</id>
-                <phase>verify</phase>
-                <goals>
-                    <goal>report</goal>
-                </goals>
-            </execution>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+            <id>jacoco-initialize</id>
+          </execution>
+          <execution>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <id>jacoco-site</id>
+            <phase>verify</phase>
+          </execution>
         </executions>
+        <groupId>org.jacoco</groupId>
+        <version>0.8.11</version>
+      </plugin>
+      <plugin>
+        <artifactId>dependency-check-maven</artifactId>
+        <groupId>org.owasp</groupId>
+        <version>12.1.0</version>
       </plugin>
     </plugins>
   </build>
@@ -71,9 +76,9 @@
       <groupId>org.springframework.boot</groupId>
     </dependency>
     <dependency>
-      <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-ui</artifactId>
-      <version>1.6.15</version>
+      <groupId>org.springdoc</groupId>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <artifactId>spring-boot-starter-security</artifactId>
@@ -131,16 +136,15 @@
       <groupId>org.springframework.boot</groupId>
     </dependency>
     <dependency>
-    <groupId>org.hibernate.validator</groupId>
-    <artifactId>hibernate-validator</artifactId>
-    <version>8.0.0.Final</version>
+      <artifactId>hibernate-validator</artifactId>
+      <groupId>org.hibernate.validator</groupId>
+      <version>8.0.0.Final</version>
     </dependency>
     <dependency>
-        <groupId>org.glassfish</groupId>
-        <artifactId>jakarta.el</artifactId>
-        <version>4.0.2</version>
+      <artifactId>jakarta.el</artifactId>
+      <groupId>org.glassfish</groupId>
+      <version>4.0.2</version>
     </dependency>
-
   </dependencies>
   <description>krisefikser</description>
   <developers>
@@ -156,7 +160,7 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <groupId>org.springframework.boot</groupId>
     <relativePath/>
-    <version>3.4.4</version> <!-- lookup parent from repository -->
+    <version>3.4.5</version> <!-- lookup parent from repository -->
   </parent>
   <properties>
     <java.version>17</java.version>
