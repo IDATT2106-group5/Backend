@@ -1,12 +1,10 @@
 package edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest;
 
 public class MembershipInviteDto {
-  private String householdId;
   private String email;
 
-  public MembershipInviteDto(String email, String householdId) {
+  public MembershipInviteDto(String email) {
     this.email = email;
-    this.householdId = householdId;
   }
 
   public String getEmail() {
@@ -17,11 +15,4 @@ public class MembershipInviteDto {
     this.email = email;
   }
 
-  public String getHouseholdId() {
-    return householdId;
-  }
-
-  public void setHouseholdId(String householdId) {
-    this.householdId = householdId;
-  }
 }

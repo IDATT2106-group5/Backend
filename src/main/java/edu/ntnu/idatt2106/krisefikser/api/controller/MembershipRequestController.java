@@ -43,18 +43,16 @@ public class MembershipRequestController {
   /**
    * Gets all active invitations for a given user.
    *
-   * @param request the request containing the user ID
    * @return a response entity with the list of active invitations
    */
   @Operation(summary = "Get active membership requests",
       description = "Retrieves all active membership requests for a given user")
   @PostMapping("/invitations/received")
-  public ResponseEntity<?> getActiveInvitations(
-      @RequestBody GetUserInfoRequestDto request) {
+  public ResponseEntity<?> getActiveInvitations() {
     try {
       List<MembershipRequestResponseDto> member =
-          membershipRequestService.getReceivedInvitationsByUser(request.getUserId());
-      LOGGER.info("Retrieved received invitations for user: {}", request.getUserId());
+          membershipRequestService.getReceivedInvitationsByUser();
+      LOGGER.info("Retrieved received invitations for user");
       return ResponseEntity.ok(member);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving received invitations: {}", e.getMessage());
@@ -68,17 +66,15 @@ public class MembershipRequestController {
   /**
    * Gets all active join requests sent to a household.
    *
-   * @param request the request containing the household ID
    * @return a response entity with the list of active join requests
    */
   @Operation(summary = "Gets all active join requests sent to a household",
       description = "Retrieves all active join requests sent to a household")
   @PostMapping("/join-requests/received")
-  public ResponseEntity<?> getActiveJoinRequests(
-      @RequestBody Map<String, String> request) {
+  public ResponseEntity<?> getActiveJoinRequests() {
     try {
       List<MembershipRequestResponseDto> requests =
-          membershipRequestService.getReceivedJoinRequestsByHousehold(request.get("householdId"));
+          membershipRequestService.getReceivedJoinRequestsByHousehold();
       return ResponseEntity.ok(requests);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving join requests: {}", e.getMessage());
@@ -92,18 +88,15 @@ public class MembershipRequestController {
   /**
    * Gets all accepted join requests sent to a household.
    *
-   * @param request the request containing the household ID
    * @return a response entity with the list of accepted join requests
    */
   @Operation(summary = "Gets all accepted join requests sent to a household",
       description = "Retrieves all accepted join requests sent to a household")
   @PostMapping("/join-requests/received/accepted")
-  public ResponseEntity<?> getActiveAcceptedJoinRequests(
-      @RequestBody Map<String, String> request) {
+  public ResponseEntity<?> getActiveAcceptedJoinRequests() {
     try {
       List<MembershipRequestResponseDto> requests =
-          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold(
-              request.get("householdId"));
+          membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold();
       return ResponseEntity.ok(requests);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving join requests: {}", e.getMessage());
@@ -117,18 +110,16 @@ public class MembershipRequestController {
   /**
    * Gets all active invitations for a given user.
    *
-   * @param request the request containing the user ID
    * @return a response entity with the list of active invitations
    */
   @Operation(summary = "Get active invitations",
       description = "Retrieves all active invitations sent to a given user")
   @PostMapping("/invitations/sent")
-  public ResponseEntity<?> getActiveRequests(
-      @RequestBody GetUserInfoRequestDto request) {
+  public ResponseEntity<?> getActiveRequests() {
     try {
       List<MembershipRequestResponseDto> member =
-          membershipRequestService.getReceivedInvitationsByUser(request.getUserId());
-      LOGGER.info("Retrieved sent membership invitations for user: {}", request.getUserId());
+          membershipRequestService.getReceivedInvitationsByUser();
+      LOGGER.info("Retrieved sent membership invitations for user");
       return ResponseEntity.ok(member);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving sent invitations: {}", e.getMessage());
@@ -151,7 +142,7 @@ public class MembershipRequestController {
   public ResponseEntity<Map<String, String>> sendInvitation(
       @RequestBody MembershipInviteDto request) {
     try {
-      membershipRequestService.sendInvitation(request.getEmail(), request.getHouseholdId());
+      membershipRequestService.sendInvitation(request.getEmail());
       LOGGER.info("Invitation sent successfully to {}", request.getEmail());
       return ResponseEntity.ok(Map.of("Message", "Invitation sent successfully"));
     } catch (IllegalArgumentException e) {
@@ -167,18 +158,16 @@ public class MembershipRequestController {
   /**
    * Gets all invitations sent by a household.
    *
-   * @param request the request containing the household ID
    * @return a response entity with the list of invitations
    */
   @Operation(summary = "Get all invitations sent by a household",
       description = "Returns all membership invitations sent from a household to users")
   @PostMapping("/invitations/sent/by-household")
-  public ResponseEntity<?> getInvitationsSentByHousehold(@RequestBody MembershipInviteDto request) {
+  public ResponseEntity<?> getInvitationsSentByHousehold() {
     try {
-      String householdId = request.getHouseholdId();
       List<MembershipRequestResponseDto> invitations =
-          membershipRequestService.getInvitationsSentByHousehold(householdId);
-      LOGGER.info("Retrieved sent invitations for household: {}", householdId);
+          membershipRequestService.getInvitationsSentByHousehold();
+      LOGGER.info("Retrieved sent invitations for household");
       return ResponseEntity.ok(invitations);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error retrieving sent invitations: {}", e.getMessage());
@@ -198,9 +187,9 @@ public class MembershipRequestController {
   @Operation(summary = "Send a join request",
       description = "Sends a join request to a household for a given user")
   @PostMapping("/send-join-request")
-  public ResponseEntity<String> sendJoinRequest(@RequestBody MembershipRequestDto request) {
+  public ResponseEntity<String> sendJoinRequest(@RequestBody Map<String, String> request) {
     try {
-      membershipRequestService.sendJoinRequest(request);
+      membershipRequestService.sendJoinRequest(request.get("householdId"));
       LOGGER.info("Join request sent successfully");
       return ResponseEntity.ok("Join request sent successfully");
     } catch (IllegalArgumentException e) {

@@ -47,16 +47,13 @@ public class StorageController {
   /**
    * Get all storage items for a given household.
    *
-   * @param householdId the id of the household
    * @return a list of storage items
    */
   @Operation(summary = "Gets a households storage items",
       description = "Gets all storage items for a household with a given id")
-  @GetMapping("/household/{householdId}")
-  public ResponseEntity<List<StorageItemResponseDto>> getStorageItemsByHousehold(
-      @PathVariable String householdId) {
-    List<StorageItemResponseDto> storageItems = storageService.getStorageItemsByHousehold(
-        householdId);
+  @GetMapping("/household")
+  public ResponseEntity<List<StorageItemResponseDto>> getStorageItemsByHousehold() {
+    List<StorageItemResponseDto> storageItems = storageService.getStorageItemsByHousehold();
     return ResponseEntity.ok(storageItems);
   }
 
@@ -69,29 +66,25 @@ public class StorageController {
    */
   @Operation(summary = "Gets storage items by type for a household",
       description = "Gets all storage items of a given type for a given household")
-  @GetMapping("/household/{householdId}/type/{itemType}")
+  @GetMapping("/household/type/{itemType}")
   public ResponseEntity<List<StorageItem>> getStorageItemsByHouseholdAndType(
-      @PathVariable String householdId,
       @PathVariable ItemType itemType) {
-    List<StorageItem> storageItems = storageService.getStorageItemsByHouseholdAndType(householdId,
-        itemType);
+    List<StorageItem> storageItems = storageService.getStorageItemsByHouseholdAndType(itemType);
     return ResponseEntity.ok(storageItems);
   }
 
   /**
    * Get all storage items that are expiring before a given date.
    *
-   * @param householdId the id of the household
    * @param before      the date to check for expiration
    * @return a list of expiring storage items
    */
   @Operation(summary = "Gets expiring items for a household",
       description = "Gets a household's storage items that are expiring before a given date")
-  @GetMapping("/household/{householdId}/expiring")
+  @GetMapping("/household/expiring")
   public ResponseEntity<List<StorageItem>> getExpiringItems(
-      @PathVariable String householdId,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime before) {
-    List<StorageItem> expiringItems = storageService.getExpiringItems(householdId, before);
+    List<StorageItem> expiringItems = storageService.getExpiringItems(before);
     return ResponseEntity.ok(expiringItems);
   }
 
@@ -105,14 +98,12 @@ public class StorageController {
    */
   @Operation(summary = "Adds an item to the storage",
       description = "Adds an item to the storage of a household with a given id")
-  @PostMapping("/household/{householdId}/item/{itemId}")
+  @PostMapping("/household/item/{itemId}")
   public ResponseEntity<StorageItem> addItemToStorage(
-      @PathVariable String householdId,
       @PathVariable Long itemId,
       @RequestBody Map<String, Object> request) {
 
-    LOGGER.info("Adding item to storage: householdId={}, itemId={}, request={}",
-        householdId, itemId, request);
+    LOGGER.info("Adding item to storage itemId={}, request={}", itemId, request);
 
     String unit = (String) request.get("unit");
     Integer amount = Integer.valueOf(request.get("amount").toString());
@@ -122,8 +113,7 @@ public class StorageController {
       expirationDate = LocalDateTime.parse(request.get("expirationDate").toString());
     }
 
-    StorageItem storageItem = storageService.addItemToStorage(
-        householdId, itemId, unit, amount, expirationDate);
+    StorageItem storageItem = storageService.addItemToStorage(itemId, unit, amount, expirationDate);
 
     return ResponseEntity.ok(storageItem);
   }

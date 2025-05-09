@@ -1,6 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.repository;
 
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -31,4 +32,6 @@ public interface HouseholdRepository extends JpaRepository<Household, String> {
 
 
   boolean existsByName(String householdName);
+
+  Household findByOwner(User owner);
 }

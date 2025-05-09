@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -40,12 +42,14 @@ public class MembershipRequestService {
    * @param membershipRequestRepository the membership request repository
    * @param householdRepository         the household repository
    * @param userRepository              the user repository
+   * @param notificationService         the notification service
+   * @param householdService            the household service
    */
   public MembershipRequestService(MembershipRequestRepository membershipRequestRepository,
-      HouseholdRepository householdRepository,
-      UserRepository userRepository,
-      NotificationService notificationService,
-      HouseholdService householdService) {
+                                  HouseholdRepository householdRepository,
+                                  UserRepository userRepository,
+                                  NotificationService notificationService,
+                                  HouseholdService householdService) {
     this.membershipRequestRepository = membershipRequestRepository;
     this.householdRepository = householdRepository;
     this.userRepository = userRepository;
@@ -58,9 +62,18 @@ public class MembershipRequestService {
    * Send an invitation to a user to join a household.
    *
    * @param email       the email
-   * @param householdId the household id
    */
-  public void sendInvitation(String email, String householdId) {
+  public void sendInvitation(String email) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String currentUserEmail = authentication.getName();
+    User currentUser = userRepository.findByEmail(currentUserEmail)
+        .orElseThrow(() -> {
+          logger.warn("Current user not found with email: {}", currentUserEmail);
+          return new IllegalArgumentException("Current user not found");
+        });
+    Household household = currentUser.getHousehold();
+    String householdId = household.getId();
+
     logger.info("Sending invitation to user with email: {} for household: {}", email, householdId);
 
     logger.debug("Looking up user by email: {}", email);
@@ -70,14 +83,6 @@ public class MembershipRequestService {
           return new IllegalArgumentException("User with email not found: " + email);
         });
     logger.debug("Found user: id={}", receiver.getId());
-
-    logger.debug("Looking up household with ID: {}", householdId);
-    Household household = householdRepository.findById(householdId)
-        .orElseThrow(() -> {
-          logger.warn("Household not found with ID: {}", householdId);
-          return new IllegalArgumentException("Household not found with ID: " + householdId);
-        });
-    logger.debug("Found household: {}", household.getName());
 
     MembershipRequest membershipRequest = new MembershipRequest();
     membershipRequest.setHousehold(household);
@@ -110,30 +115,27 @@ public class MembershipRequestService {
 
   /**
    * Send a request to join a household.
-   *
-   * @param request the request
    */
-  public void sendJoinRequest(MembershipRequestDto request) {
-    logger.info("Processing join request for household: {} from user: {}",
-        request.getHouseholdId(), request.getUserId());
-
-    logger.debug("Looking up user with ID: {}", request.getUserId());
-    User sender = userRepository.findById(request.getUserId())
+  public void sendJoinRequest(String householdId) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    User sender = userRepository.findByEmail(email)
         .orElseThrow(() -> {
-          logger.warn("User not found with ID: {}", request.getUserId());
+          logger.warn("User not found with email: {}", email);
           return new IllegalArgumentException("User not found");
         });
-    logger.debug("Found user: {}", sender.getFullName());
 
-    logger.debug("Looking up household with ID: {}", request.getHouseholdId());
-    Household household = householdRepository.findById(request.getHouseholdId())
+    logger.info("Processing join request for household: {} from user: {}",
+        householdId, sender.getFullName());
+
+    logger.debug("Looking up household with ID: {}", householdId);
+    Household household = householdRepository.findById(householdId)
         .orElseThrow(() -> {
-          logger.warn("Household not found with ID: {}", request.getHouseholdId());
+          logger.warn("Household not found with ID: {}", householdId);
           return new IllegalArgumentException("Household not found");
         });
     logger.debug("Found household: {}", household.getName());
 
-    // Create and save the membership request
     MembershipRequest membershipRequest = new MembershipRequest();
     membershipRequest.setHousehold(household);
     membershipRequest.setSender(sender);
@@ -191,7 +193,6 @@ public class MembershipRequestService {
 
     UserHouseholdAssignmentRequestDto assignment = new UserHouseholdAssignmentRequestDto();
     assignment.setUserId(request.getSender().getId());
-    assignment.setHouseholdId(request.getHousehold().getId());
     logger.debug("Created assignment: userId={}, householdId={}",
         request.getSender().getId(), request.getHousehold().getId());
 
@@ -278,73 +279,22 @@ public class MembershipRequestService {
   }
 
   /**
-   * Get sent invitations by user.
-   *
-   * @param userId the user id
-   * @return the active invitations by user
-   */
-  public List<MembershipRequestResponseDto> getSentInvitationsByUser(String userId) {
-    logger.info("Getting sent invitations for user with ID: {}", userId);
-
-    // Check if the user exists
-    if (!userRepository.existsById(userId)) {
-      logger.warn("User not found with ID: {}", userId);
-      throw new IllegalArgumentException("User not found");
-    }
-    logger.debug("User exists with ID: {}", userId);
-
-    // Get the user
-    User user = userRepository.findById(userId).orElse(null);
-    logger.debug("Retrieved user: {}", user.getFullName());
-
-    // Get the active requests for the user
-    List<MembershipRequest> invitations =
-        membershipRequestRepository.findAllBySenderAndTypeAndStatus(
-            user, RequestType.INVITATION, RequestStatus.PENDING);
-    logger.debug("Found {} pending invitations sent by user", invitations.size());
-
-    List<MembershipRequestResponseDto> result = invitations.stream().map(invitation ->
-        new MembershipRequestResponseDto(
-            invitation.getId(),
-            invitation.getHousehold().getId(),
-            invitation.getHousehold().getName(),
-            new UserResponseDto(invitation.getSender().getId(), invitation.getSender().getEmail(),
-                invitation.getSender().getFullName(), invitation.getSender().getTlf(),
-                invitation.getSender().getRole()),
-            new UserResponseDto(invitation.getReceiver().getId(),
-                invitation.getReceiver().getEmail(), invitation.getReceiver().getFullName(),
-                invitation.getReceiver().getTlf(), invitation.getReceiver().getRole()),
-            invitation.getType(),
-            invitation.getStatus(),
-            invitation.getCreated_at()
-        )
-    ).toList();
-
-    logger.info("Returning {} sent invitations for user {}", result.size(), userId);
-    return result;
-  }
-
-  /**
    * Get received invitations by user.
    *
-   * @param userId the user id
    * @return the active invitations by user
    */
-  public List<MembershipRequestResponseDto> getReceivedInvitationsByUser(String userId) {
-    logger.info("Getting received invitations for user with ID: {}", userId);
+  public List<MembershipRequestResponseDto> getReceivedInvitationsByUser() {
+    logger.info("Getting received invitations for user with ID");
 
-    // Check if the user exists
-    if (!userRepository.existsById(userId)) {
-      logger.warn("User not found with ID: {}", userId);
-      throw new IllegalArgumentException("User not found");
-    }
-    logger.debug("User exists with ID: {}", userId);
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
 
-    // Get the user
-    User user = userRepository.findById(userId).orElse(null);
-    logger.debug("Retrieved user: {}", user.getFullName());
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("User not found with email: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
 
-    // Get the active requests for the user
     List<MembershipRequest> invitations =
         membershipRequestRepository.findAllByReceiverAndTypeAndStatus(
             user, RequestType.INVITATION, RequestStatus.PENDING);
@@ -367,23 +317,31 @@ public class MembershipRequestService {
         )
     ).toList();
 
-    logger.info("Returning {} received invitations for user {}", result.size(), userId);
+    logger.info("Returning {} received invitations for user {}", result.size(), user.getFullName());
     return result;
   }
 
   /**
    * Get active join requests by householdID.
    *
-   * @param householdId the household id
    * @return the active join requests by user
    */
-  public List<MembershipRequestResponseDto> getReceivedJoinRequestsByHousehold(String householdId) {
-    logger.info("Getting received join requests for household with ID: {}", householdId);
+  public List<MembershipRequestResponseDto> getReceivedJoinRequestsByHousehold() {
+    logger.info("Getting received join requests for household with ID");
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("User not found with email: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
+    Household household = user.getHousehold();
 
     List<MembershipRequest> requests =
         membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(
-            householdId, RequestType.JOIN_REQUEST, RequestStatus.PENDING);
-    logger.debug("Found {} pending join requests for household {}", requests.size(), householdId);
+            household.getId(), RequestType.JOIN_REQUEST, RequestStatus.PENDING);
+    logger.debug("Found {} pending join requests for household {}", requests.size(), household.getId());
 
     List<MembershipRequestResponseDto> result = requests.stream().map(request ->
         new MembershipRequestResponseDto(
@@ -402,18 +360,27 @@ public class MembershipRequestService {
         )
     ).toList();
 
-    logger.info("Returning {} received join requests for household {}", result.size(), householdId);
+    logger.info("Returning {} received join requests for household {}", result.size(), household.getId());
     return result;
   }
 
   /**
    * Gets accepted received join requests by a household.
    *
-   * @param householdId the household id
    * @return the accepted received join requests by household
    */
-  public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold(
-      String householdId) {
+  public List<MembershipRequestResponseDto> getAcceptedReceivedJoinRequestsByHousehold() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("User not found with email: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
+    Household household = user.getHousehold();
+    String householdId = household.getId();
+
+
     logger.info("Getting accepted join requests for household with ID: {}", householdId);
 
     List<MembershipRequest> requests =
@@ -445,17 +412,20 @@ public class MembershipRequestService {
   /**
    * Get invitations sent by a household, regardless of status (e.g., PENDING, ACCEPTED).
    *
-   * @param householdId the ID of the household
    * @return list of membership invitations sent from the household
    */
-  public List<MembershipRequestResponseDto> getInvitationsSentByHousehold(String householdId) {
-    logger.info("Getting invitations sent by household with ID: {}", householdId);
+  public List<MembershipRequestResponseDto> getInvitationsSentByHousehold() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> {
+          logger.warn("User not found with email: {}", email);
+          return new IllegalArgumentException("User not found");
+        });
+    Household household = user.getHousehold();
+    String householdId = household.getId();
 
-    if (!householdRepository.existsById(householdId)) {
-      logger.warn("Household not found with ID: {}", householdId);
-      throw new IllegalArgumentException("Household not found");
-    }
-    logger.debug("Household exists with ID: {}", householdId);
+    logger.info("Getting invitations sent by household with ID: {}", householdId);
 
     List<RequestStatus> statuses = List.of(RequestStatus.PENDING, RequestStatus.ACCEPTED);
     logger.debug("Looking up invitations with statuses: {}", statuses);

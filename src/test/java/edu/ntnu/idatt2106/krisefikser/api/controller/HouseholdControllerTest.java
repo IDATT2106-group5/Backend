@@ -2,7 +2,6 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -61,7 +60,6 @@ public class HouseholdControllerTest {
       CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
       when(request.getName()).thenReturn("TestHousehold");
       when(request.getAddress()).thenReturn("TestAddress");
-      when(request.getOwnerId()).thenReturn("1L");
 
       doNothing().when(householdService).createHousehold(any(CreateHouseholdRequestDto.class));
 
@@ -203,7 +201,6 @@ public class HouseholdControllerTest {
       UnregisteredMemberHouseholdAssignmentRequestDto request =
           mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
       when(request.getFullName()).thenReturn("John Doe");
-      when(request.getHouseholdId()).thenReturn("1L");
 
       doNothing().when(householdService).addUnregisteredMemberToHousehold(
           any(UnregisteredMemberHouseholdAssignmentRequestDto.class));
@@ -252,7 +249,6 @@ public class HouseholdControllerTest {
       UnregisteredMemberHouseholdAssignmentRequestDto request =
           mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
       when(request.getFullName()).thenReturn("John Doe");
-      when(request.getHouseholdId()).thenReturn("1L");
 
       doThrow(new RuntimeException("Database error"))
           .when(householdService).addUnregisteredMemberToHousehold(
@@ -303,6 +299,7 @@ public class HouseholdControllerTest {
 
       // Assert
     }
+
     /**
      * Tests the scenario where an unexpected exception occurs during user removal from a household.
      */
@@ -373,12 +370,9 @@ public class HouseholdControllerTest {
     @Test
     void getHouseholdDetails_ValidHouseholdId_ReturnsDetails() {
       // Arrange
-      String householdId = "1L";
       Map<String, Object> details =
           Map.of("name", "Test Household", "members", List.of("John Doe"));
-      when(householdService.getHouseholdDetails(householdId)).thenReturn(details);
-
-      // Act
+      when(householdService.getHouseholdDetails()).thenReturn(details);
     }
 
     @Test
@@ -386,7 +380,7 @@ public class HouseholdControllerTest {
       // Arrange
       String householdId = "-1L";
       String errorMessage = "Invalid household ID";
-      when(householdService.getHouseholdDetails(householdId)).thenThrow(
+      when(householdService.getHouseholdDetails()).thenThrow(
           new IllegalArgumentException(errorMessage));
 
     }
@@ -395,7 +389,7 @@ public class HouseholdControllerTest {
     void getHouseholdDetails_ServiceThrowsUnexpectedException_ReturnsInternalServerError() {
       // Arrange
       String householdId = "1L";
-      when(householdService.getHouseholdDetails(householdId)).thenThrow(
+      when(householdService.getHouseholdDetails()).thenThrow(
           new RuntimeException("Unexpected error"));
 
       // Act
@@ -416,7 +410,6 @@ public class HouseholdControllerTest {
       // Arrange
       EditMemberDto request = mock(EditMemberDto.class);
       when(request.getNewFullName()).thenReturn("John Doe");
-      when(request.getHouseholdId()).thenReturn(1L);
 
       doNothing().when(householdService)
           .editUnregisteredMemberInHousehold(any(EditMemberDto.class));
@@ -462,7 +455,6 @@ public class HouseholdControllerTest {
       // Arrange
       EditMemberDto request = mock(EditMemberDto.class);
       when(request.getNewFullName()).thenReturn("John Doe");
-      when(request.getHouseholdId()).thenReturn(1L);
 
       doThrow(new RuntimeException("Database error"))
           .when(householdService).editUnregisteredMemberInHousehold(any(EditMemberDto.class));

@@ -13,15 +13,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UnregisteredHouseholdMemberRepository
     extends JpaRepository<UnregisteredHouseholdMember, Long> {
-
-  /**
-   * Find a unregistered member by its name and what household it .
-   *
-   * @param fullName the name to search for
-   * @return an Optional containing the UnregisteredMember if found
-   */
-  Optional<UnregisteredHouseholdMember> findByFullNameAndHouseholdId(String fullName,
-                                                                     String householdId);
   Optional<UnregisteredHouseholdMember> findById(Long id);
 
   List<UnregisteredHouseholdMember> findUnregisteredHouseholdMembersByHousehold(Household household);
