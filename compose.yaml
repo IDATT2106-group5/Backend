@@ -1,10 +1,27 @@
 services:
-  mysql:
-    image: 'mysql:latest'
-    environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+  backend:
+    build:
+      context: .
     ports:
-      - '3306'
+      - '8080:8080'
+    environment:
+      # Database configuration
+      - "SPRING_DATASOURCE_URL=${MYSQL_DATABASE_URL:-jdbc:mysql://localhost:3306/krisefikser}"
+      - "SPRING_DATASOURCE_USERNAME=${MYSQL_USERNAME:-root}"
+      - "SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD:-password}"
+      
+      # JWT configuration
+      - "JWT_SECRET=${JWT_SECRET:-default-dev-secret-key}"
+      - "JWT_EXPIRATION_MS=${JWT_EXPIRATION_MS:-86400000}"
+      
+      # Email configuration
+      - "SPRING_MAIL_HOST=${SPRING_MAIL_HOST:-smtp.gmail.com}"
+      - "SPRING_MAIL_PORT=${SPRING_MAIL_PORT:-587}"
+      - "SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}"
+      - "SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}"
+      - "SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH:-true}"
+      - "SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE:-true}"
+      
+      # CAPTCHA configuration
+      - "HCAPTCHA_SECRET=${HCAPTCHA_SECRET}"
+    restart: unless-stopped
