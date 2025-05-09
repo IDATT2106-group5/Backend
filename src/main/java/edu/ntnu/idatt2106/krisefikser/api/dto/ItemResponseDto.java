@@ -10,6 +10,9 @@ public class ItemResponseDto {
   private int caloricAmount;
   private ItemType itemType;
 
+  public ItemResponseDto() {
+  }
+
   public ItemResponseDto(Long id, String name, int caloricAmount, ItemType itemType) {
     this.id = id;
     this.name = name;
