@@ -15,14 +15,47 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface MembershipRequestRepository extends JpaRepository<MembershipRequest, Long> {
 
+  /**
+   * Updates the status of a MembershipRequest by its ID.
+   *
+   * @param id     the id of the MembershipRequest
+   * @param status the new status to set
+   */
   @Transactional
   @Modifying
   @Query("UPDATE MembershipRequest m SET m.status = :status WHERE m.id = :id")
   void updateStatusById(Long id, RequestStatus status);
 
-  List<MembershipRequest> findAllByReceiverAndTypeAndStatus(User receiver, RequestType type, RequestStatus status);
-  List<MembershipRequest> findAllBySenderAndTypeAndStatus(User receiver, RequestType type, RequestStatus status);
-  List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatus(String householdId, RequestType type, RequestStatus status);
+  /**
+   * Finds all MembershipRequests by the given receiver, type, and status.
+   *
+   * @param receiver the receiver of the request
+   * @param type     the type of the request
+   * @param status   the status of the request
+   * @return a list of MembershipRequests matching the criteria
+   */
+  List<MembershipRequest> findAllByReceiverAndTypeAndStatus(User receiver, RequestType type,
+      RequestStatus status);
+
+  /**
+   * Finds all MembershipRequests by the given household, type, and status.
+   *
+   * @param householdId the ID of the household
+   * @param type        the type of the request
+   * @param status      the status of the request
+   * @return a list of MembershipRequests matching the criteria
+   */
+  List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatus(
+      String householdId, RequestType type, RequestStatus status);
+
+  /**
+   * Finds all MembershipRequests by the given household, type, and list of statuses.
+   *
+   * @param householdId the ID of the household
+   * @param type        the type of the request
+   * @param statuses    the list of statuses of the request
+   * @return a list of MembershipRequests matching the criteria
+   */
   List<MembershipRequest> findAllByHouseholdIdAndTypeAndStatusIn(
       String householdId, RequestType type, List<RequestStatus> statuses
   );

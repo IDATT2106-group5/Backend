@@ -1,7 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.persistance.repository;
 
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 public interface HouseholdRepository extends JpaRepository<Household, String> {
+
   /**
    * Update the number of members in a household.
    *
@@ -26,12 +26,11 @@ public interface HouseholdRepository extends JpaRepository<Household, String> {
   @Query("UPDATE Household h SET h.numberOfMembers = :numberOfMembers WHERE h.id = :id")
   void updateNumberOfMembers(@Param("id") String id, @Param("numberOfMembers") int numberOfMembers);
 
+  /**
+   * Find a household by its name.
+   *
+   * @param name the name of the household
+   * @return an Optional containing the Household if found
+   */
   Optional<Household> findByName(String name);
-
-  Optional<Household> getHouseholdById(String id);
-
-
-  boolean existsByName(String householdName);
-
-  Household findByOwner(User owner);
 }

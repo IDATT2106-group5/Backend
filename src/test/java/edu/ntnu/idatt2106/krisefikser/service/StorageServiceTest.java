@@ -183,7 +183,7 @@ class StorageServiceTest {
       item.setId(itemId);
 
       // Mock user repository to return our user with household
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
       when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
       when(storageItemRepository.save(any(StorageItem.class)))
           .thenAnswer(invocation -> invocation.getArgument(0));
@@ -213,21 +213,21 @@ class StorageServiceTest {
     @Test
     void addItemToStorage_shouldThrowException_whenNoUserLoggedIn() {
       // Arrange
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.empty());
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.empty());
 
       // Act & Assert
       IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
           storageService.addItemToStorage(itemId, "liters", 5, LocalDateTime.now()));
 
       assertEquals("No user logged in", exception.getMessage());
-      verify(userRepository).getUserByEmail("user@example.com");
+      verify(userRepository).findByEmail("user@example.com");
       verifyNoInteractions(storageItemRepository);
     }
 
     @Test
     void addItemToStorage_shouldThrowException_whenItemNotFound() {
       // Arrange
-      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
+      when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
       when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
 
       // Act & Assert
@@ -235,7 +235,7 @@ class StorageServiceTest {
           storageService.addItemToStorage(itemId, "liters", 5, LocalDateTime.now()));
 
       assertEquals("Item not found", exception.getMessage());
-      verify(userRepository).getUserByEmail("user@example.com");
+      verify(userRepository).findByEmail("user@example.com");
       verify(itemRepository).findById(itemId);
       verifyNoInteractions(storageItemRepository);
     }

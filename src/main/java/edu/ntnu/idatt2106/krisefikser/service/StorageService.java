@@ -43,8 +43,8 @@ public class StorageService {
    * @param itemRepository        The repository for item operations.
    */
   public StorageService(StorageItemRepository storageItemRepository,
-                        HouseholdRepository householdRepository,
-                        ItemRepository itemRepository, UserRepository userRepository) {
+      HouseholdRepository householdRepository,
+      ItemRepository itemRepository, UserRepository userRepository) {
     this.storageItemRepository = storageItemRepository;
     this.householdRepository = householdRepository;
     this.itemRepository = itemRepository;
@@ -61,7 +61,7 @@ public class StorageService {
     logger.info("Fetching storage items for current household");
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
-    User user = userRepository.getUserByEmail(email)
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new IllegalArgumentException("No user logged in"));
     Household household = user.getHousehold();
     List<StorageItemResponseDto> items = storageItemRepository
@@ -91,7 +91,7 @@ public class StorageService {
   /**
    * Get storage items for a specific household filtered by item type.
    *
-   * @param itemType    The type of items to filter by.
+   * @param itemType The type of items to filter by.
    * @return A list of StorageItem entities.
    */
   public List<StorageItem> getStorageItemsByHouseholdAndType(ItemType itemType) {
@@ -99,7 +99,7 @@ public class StorageService {
         itemType);
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
-    Household household = userRepository.getUserByEmail(email)
+    Household household = userRepository.findByEmail(email)
         .orElseThrow(() -> new IllegalArgumentException("No user logged in"))
         .getHousehold();
 
@@ -121,10 +121,9 @@ public class StorageService {
     logger.info("Fetching items expiring before {}", before);
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
-    User user = userRepository.getUserByEmail(email)
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new IllegalArgumentException("No user logged in"));
     Household household = user.getHousehold();
-
 
     List<StorageItem> items = storageItemRepository.findByHouseholdIdAndExpirationDateBefore(
         household.getId(), before);
@@ -158,8 +157,8 @@ public class StorageService {
    */
   @Transactional
   public StorageItem addItemToStorage(Long itemId,
-                                      String unit, Integer amount,
-                                      LocalDateTime expirationDate) {
+      String unit, Integer amount,
+      LocalDateTime expirationDate) {
     logger.info(
         "Adding item to storage: itemId={}, amount={}, unit={}, expiration={}",
         itemId, amount, unit, expirationDate);
@@ -167,7 +166,7 @@ public class StorageService {
     // Get the currently authenticated user
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
-    User user = userRepository.getUserByEmail(email)
+    User user = userRepository.findByEmail(email)
         .orElseThrow(() -> new IllegalArgumentException("No user logged in"));
     Household household = user.getHousehold();
 
@@ -213,7 +212,7 @@ public class StorageService {
    */
   @Transactional
   public StorageItem updateStorageItem(Long storageItemId, String unit, Integer amount,
-                                       LocalDateTime expirationDate) {
+      LocalDateTime expirationDate) {
     logger.info("Updating storage item id={} with unit={}, amount={}, expiration={}",
         storageItemId, unit, amount, expirationDate);
 
