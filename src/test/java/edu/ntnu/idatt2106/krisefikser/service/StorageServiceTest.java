@@ -3,9 +3,9 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -13,15 +13,15 @@ import static org.mockito.Mockito.when;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
-import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
-import edu.ntnu.idatt2106.krisefikser.persistance.repository.HouseholdRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.ItemRepository;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.StorageItemRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,6 +29,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 class StorageServiceTest {
 
@@ -38,9 +41,9 @@ class StorageServiceTest {
   @Mock
   private StorageItemRepository storageItemRepository;
   @Mock
-  private HouseholdRepository householdRepository;
-  @Mock
   private ItemRepository itemRepository;
+  @Mock
+  private UserRepository userRepository;
   @InjectMocks
   private StorageService storageService;
 
@@ -141,6 +144,34 @@ class StorageServiceTest {
   @Nested
   class AddItemToStorageTests {
 
+    private Authentication authentication;
+    private SecurityContext securityContext;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+      // Create and set up security context mock
+      authentication = mock(Authentication.class);
+      securityContext = mock(SecurityContext.class);
+      SecurityContextHolder.setContext(securityContext);
+
+      // Create user with household
+      user = new User();
+      Household household = new Household();
+      household.setId(householdId);
+      user.setHousehold(household);
+
+      // Set up mock behaviors
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("user@example.com");
+    }
+
+    @AfterEach
+    void tearDown() {
+      // Clear security context after each test
+      SecurityContextHolder.clearContext();
+    }
+
     @Test
     void addItemToStorage_shouldCreateAndSaveStorageItem() {
       // Arrange
@@ -148,24 +179,21 @@ class StorageServiceTest {
       Integer amount = 5;
       LocalDateTime expirationDate = LocalDateTime.now().plusDays(7);
 
-      Household household = new Household();
-      household.setId(householdId);
-
       Item item = new Item();
       item.setId(itemId);
 
-      when(householdRepository.findById(householdId)).thenReturn(Optional.of(household));
+      // Mock user repository to return our user with household
+      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
       when(itemRepository.findById(itemId)).thenReturn(Optional.of(item));
-      when(storageItemRepository.save(any(StorageItem.class))).thenAnswer(
-          invocation -> invocation.getArgument(0));
+      when(storageItemRepository.save(any(StorageItem.class)))
+          .thenAnswer(invocation -> invocation.getArgument(0));
 
       // Act
-      StorageItem result = storageService.addItemToStorage(itemId, unit, amount,
-          expirationDate);
+      StorageItem result = storageService.addItemToStorage(itemId, unit, amount, expirationDate);
 
       // Assert
       assertNotNull(result);
-      assertEquals(household, result.getHousehold());
+      assertEquals(user.getHousehold(), result.getHousehold());
       assertEquals(item, result.getItem());
       assertEquals(unit, result.getUnit());
       assertEquals(amount, result.getAmount());
@@ -175,7 +203,7 @@ class StorageServiceTest {
       verify(storageItemRepository).save(captor.capture());
 
       StorageItem capturedItem = captor.getValue();
-      assertEquals(household, capturedItem.getHousehold());
+      assertEquals(user.getHousehold(), capturedItem.getHousehold());
       assertEquals(item, capturedItem.getItem());
       assertEquals(unit, capturedItem.getUnit());
       assertEquals(amount, capturedItem.getAmount());
@@ -183,26 +211,23 @@ class StorageServiceTest {
     }
 
     @Test
-    void addItemToStorage_shouldThrowException_whenHouseholdNotFound() {
+    void addItemToStorage_shouldThrowException_whenNoUserLoggedIn() {
       // Arrange
-      when(householdRepository.findById(householdId)).thenReturn(Optional.empty());
+      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.empty());
 
       // Act & Assert
       IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
           storageService.addItemToStorage(itemId, "liters", 5, LocalDateTime.now()));
 
-      assertEquals("Household not found", exception.getMessage());
-      verify(householdRepository).findById(householdId);
+      assertEquals("No user logged in", exception.getMessage());
+      verify(userRepository).getUserByEmail("user@example.com");
       verifyNoInteractions(storageItemRepository);
     }
 
     @Test
     void addItemToStorage_shouldThrowException_whenItemNotFound() {
       // Arrange
-      Household household = new Household();
-      household.setId(householdId);
-
-      when(householdRepository.findById(householdId)).thenReturn(Optional.of(household));
+      when(userRepository.getUserByEmail("user@example.com")).thenReturn(Optional.of(user));
       when(itemRepository.findById(itemId)).thenReturn(Optional.empty());
 
       // Act & Assert
@@ -210,7 +235,7 @@ class StorageServiceTest {
           storageService.addItemToStorage(itemId, "liters", 5, LocalDateTime.now()));
 
       assertEquals("Item not found", exception.getMessage());
-      verify(householdRepository).findById(householdId);
+      verify(userRepository).getUserByEmail("user@example.com");
       verify(itemRepository).findById(itemId);
       verifyNoInteractions(storageItemRepository);
     }
