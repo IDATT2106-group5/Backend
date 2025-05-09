@@ -38,9 +38,9 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Run OWASP Dependency Check
-        run: |
-          mvn "org.owasp:dependency-check-maven:check" \
-            "-Ddependency-check.nvd.api.key=${{ secrets.OWASP_API_KEY }}"
+        env:
+          NVD_API_KEY: ${{ secrets.OWASP_API_KEY }}
+        run: mvn org.owasp:dependency-check-maven:check -DnvdApiKeyEnvironmentVariable=NVD_API_KEY
 
       - name: Upload OWASP Dependency Check Report
         uses: actions/upload-artifact@v4
