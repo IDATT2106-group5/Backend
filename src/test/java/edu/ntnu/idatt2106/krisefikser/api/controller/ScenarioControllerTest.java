@@ -3,6 +3,8 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+
+import edu.ntnu.idatt2106.krisefikser.api.controller.incident.ScenarioController;
 import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioResponseDto;
 import edu.ntnu.idatt2106.krisefikser.service.ScenarioService;

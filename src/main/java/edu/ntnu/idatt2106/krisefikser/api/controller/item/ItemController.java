@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.controller;
+package edu.ntnu.idatt2106.krisefikser.api.controller.item;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.ItemResponseDto;
 import edu.ntnu.idatt2106.krisefikser.service.ItemService;

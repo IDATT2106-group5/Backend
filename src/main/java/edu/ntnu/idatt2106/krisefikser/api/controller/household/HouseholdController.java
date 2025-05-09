@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.controller;
+package edu.ntnu.idatt2106.krisefikser.api.controller.household;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.PositionResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.CreateHouseholdRequestDto;

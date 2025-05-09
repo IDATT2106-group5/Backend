@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.controller;
+package edu.ntnu.idatt2106.krisefikser.api.controller.mapIcon;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconResponseDto;

@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.controller;
+package edu.ntnu.idatt2106.krisefikser.api.controller.incident;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.ScenarioResponseDto;

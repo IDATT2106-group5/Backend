@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import edu.ntnu.idatt2106.krisefikser.api.controller.user.UserController;
 import edu.ntnu.idatt2106.krisefikser.api.dto.ItemResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.StorageItemResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.household.HouseholdResponseDto;

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+
+import edu.ntnu.idatt2106.krisefikser.api.controller.mapIcon.MapIconController;
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.MapIconType;

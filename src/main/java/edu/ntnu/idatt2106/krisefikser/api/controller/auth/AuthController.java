@@ -1,4 +1,4 @@
-package edu.ntnu.idatt2106.krisefikser.api.controller;
+package edu.ntnu.idatt2106.krisefikser.api.controller.auth;
 
 import edu.ntnu.idatt2106.krisefikser.api.dto.PasswordResetRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+
+import edu.ntnu.idatt2106.krisefikser.api.controller.auth.AuthController;
 import edu.ntnu.idatt2106.krisefikser.api.dto.PasswordResetRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
