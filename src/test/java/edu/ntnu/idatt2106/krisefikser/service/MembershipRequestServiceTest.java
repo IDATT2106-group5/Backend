@@ -11,6 +11,7 @@ import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
@@ -124,7 +125,7 @@ class MembershipRequestServiceTest {
     testInvitation.setReceiver(testUser);
     testInvitation.setType(RequestType.INVITATION);
     testInvitation.setStatus(RequestStatus.PENDING);
-    testInvitation.setCreated_at(Timestamp.from(Instant.now()));
+    testInvitation.setCreatedAt(Timestamp.from(Instant.now()));
 
     // Setup test join request
     testJoinRequest = new MembershipRequest();
@@ -134,7 +135,7 @@ class MembershipRequestServiceTest {
     testJoinRequest.setReceiver(householdOwner);
     testJoinRequest.setType(RequestType.JOIN_REQUEST);
     testJoinRequest.setStatus(RequestStatus.PENDING);
-    testJoinRequest.setCreated_at(Timestamp.from(Instant.now()));
+    testJoinRequest.setCreatedAt(Timestamp.from(Instant.now()));
   }
 
   @Test
@@ -157,7 +158,7 @@ class MembershipRequestServiceTest {
     assertEquals(testUser, capturedRequest.getReceiver());
     assertEquals(RequestType.INVITATION, capturedRequest.getType());
     assertEquals(RequestStatus.PENDING, capturedRequest.getStatus());
-    assertNotNull(capturedRequest.getCreated_at());
+    assertNotNull(capturedRequest.getCreatedAt());
 
     verify(notificationService).saveNotification(notificationDtoCaptor.capture());
     NotificationDto capturedNotification = notificationDtoCaptor.getValue();
@@ -212,7 +213,7 @@ class MembershipRequestServiceTest {
     assertEquals(householdOwner, capturedRequest.getReceiver());
     assertEquals(RequestType.JOIN_REQUEST, capturedRequest.getType());
     assertEquals(RequestStatus.PENDING, capturedRequest.getStatus());
-    assertNotNull(capturedRequest.getCreated_at());
+    assertNotNull(capturedRequest.getCreatedAt());
 
     verify(notificationService).saveNotification(notificationDtoCaptor.capture());
     NotificationDto capturedNotification = notificationDtoCaptor.getValue();
@@ -359,7 +360,8 @@ class MembershipRequestServiceTest {
         .thenReturn(List.of(testInvitation));
 
     // Act
-    List<MembershipRequestResponseDto> result = membershipRequestService.getReceivedInvitationsByUser();
+    List<MembershipRequestResponseDto> result
+        = membershipRequestService.getReceivedInvitationsByUser();
 
     // Assert
     assertEquals(1, result.size());
@@ -381,7 +383,8 @@ class MembershipRequestServiceTest {
         .thenReturn(List.of(testJoinRequest));
 
     // Act
-    List<MembershipRequestResponseDto> result = membershipRequestService.getReceivedJoinRequestsByHousehold();
+    List<MembershipRequestResponseDto> result
+        = membershipRequestService.getReceivedJoinRequestsByHousehold();
 
     // Assert
     assertEquals(1, result.size());
@@ -407,7 +410,7 @@ class MembershipRequestServiceTest {
     acceptedRequest.setReceiver(householdOwner);
     acceptedRequest.setType(RequestType.JOIN_REQUEST);
     acceptedRequest.setStatus(RequestStatus.ACCEPTED);
-    acceptedRequest.setCreated_at(Timestamp.from(Instant.now()));
+    acceptedRequest.setCreatedAt(Timestamp.from(Instant.now()));
 
     List<MembershipRequest> acceptedRequests = List.of(acceptedRequest);
     when(membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(
@@ -415,7 +418,8 @@ class MembershipRequestServiceTest {
         .thenReturn(acceptedRequests);
 
     // Act
-    List<MembershipRequestResponseDto> result = membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold();
+    List<MembershipRequestResponseDto> result
+        = membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold();
 
     // Assert
     assertEquals(1, result.size());
@@ -434,7 +438,8 @@ class MembershipRequestServiceTest {
         .thenReturn(List.of(testInvitation));
 
     // Act
-    List<MembershipRequestResponseDto> result = membershipRequestService.getInvitationsSentByHousehold();
+    List<MembershipRequestResponseDto> result
+        = membershipRequestService.getInvitationsSentByHousehold();
 
     // Assert
     assertEquals(1, result.size());

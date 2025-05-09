@@ -39,7 +39,7 @@ import org.springframework.http.ResponseEntity;
  * Unit tests for the HouseholdController class. This class contains nested test classes for testing
  * various endpoints of the HouseholdController.
  */
-public class HouseholdControllerTest {
+class HouseholdControllerTest {
 
   @Mock
   private HouseholdService householdService;
@@ -56,7 +56,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testLeaveHousehold_ValidationError() {
+  void testLeaveHouseholdValidationError() {
     // Given
     doThrow(new IllegalArgumentException("You are not a member of any household"))
         .when(householdService).leaveCurrentUserFromHousehold();
@@ -70,7 +70,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testLeaveHousehold_InternalError() {
+  void testLeaveHouseholdInternalError() {
     // Given
     doThrow(new RuntimeException("Database error"))
         .when(householdService).leaveCurrentUserFromHousehold();
@@ -84,7 +84,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testDeleteHousehold_Success() {
+  void testDeleteHouseholdSuccess() {
     // Given
     doNothing().when(householdService).deleteHousehold();
 
@@ -98,7 +98,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testDeleteHousehold_ValidationError() {
+  void testDeleteHouseholdValidationError() {
     // Given
     doThrow(new IllegalArgumentException("Only the owner can delete the household"))
         .when(householdService).deleteHousehold();
@@ -112,7 +112,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testDeleteHousehold_InternalError() {
+  void testDeleteHouseholdInternalError() {
     // Given
     doThrow(new RuntimeException("Database error"))
         .when(householdService).deleteHousehold();
@@ -126,7 +126,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testEditHousehold_Success() {
+  void testEditHouseholdSuccess() {
     // Given
     EditHouseholdRequestDto requestDto = new EditHouseholdRequestDto();
     requestDto.setName("New Name");
@@ -143,7 +143,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testEditHousehold_ValidationError() {
+  void testEditHouseholdValidationError() {
     // Given
     EditHouseholdRequestDto requestDto = new EditHouseholdRequestDto();
     requestDto.setName("New Name");
@@ -159,7 +159,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testEditHousehold_InternalError() {
+  void testEditHouseholdInternalError() {
     // Given
     EditHouseholdRequestDto requestDto = new EditHouseholdRequestDto();
     requestDto.setName("New Name");
@@ -175,7 +175,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testRemoveUserFromHousehold_Success() {
+  void testRemoveUserFromHouseholdSuccess() {
     // Given
     UserHouseholdAssignmentRequestDto requestDto = new UserHouseholdAssignmentRequestDto();
     requestDto.setUserId("user123");
@@ -191,7 +191,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testRemoveUserFromHousehold_ValidationError() {
+  void testRemoveUserFromHouseholdValidationError() {
     // Given
     UserHouseholdAssignmentRequestDto requestDto = new UserHouseholdAssignmentRequestDto();
     requestDto.setUserId("user123");
@@ -207,7 +207,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testRemoveUserFromHousehold_InternalError() {
+  void testRemoveUserFromHouseholdInternalError() {
     // Given
     UserHouseholdAssignmentRequestDto requestDto = new UserHouseholdAssignmentRequestDto();
     requestDto.setUserId("user123");
@@ -223,7 +223,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testGetHouseholdPositions_Success() {
+  void testGetHouseholdPositionsSuccess() {
     // Given
     List<PositionResponseDto> positions = Arrays.asList(
         new PositionResponseDto("user123", "John Doe", "10.123", "60.123"),
@@ -241,7 +241,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testGetHouseholdPositions_ValidationError() {
+  void testGetHouseholdPositionsValidationError() {
     // Given
     doThrow(new IllegalArgumentException("User does not belong to a household"))
         .when(householdService).getHouseholdPositions();
@@ -255,7 +255,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testGetHouseholdPositions_InternalError() {
+  void testGetHouseholdPositionsInternalError() {
     // Given
     doThrow(new RuntimeException("Database error"))
         .when(householdService).getHouseholdPositions();
@@ -269,7 +269,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testChangeHouseholdOwner_Success() {
+  void testChangeHouseholdOwnerSuccess() {
     // Given
     UserHouseholdAssignmentRequestDto requestDto = new UserHouseholdAssignmentRequestDto();
     requestDto.setUserId("user123");
@@ -286,7 +286,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testChangeHouseholdOwner_ValidationError() {
+  void testChangeHouseholdOwnerValidationError() {
     // Given
     UserHouseholdAssignmentRequestDto requestDto = new UserHouseholdAssignmentRequestDto();
     requestDto.setUserId("user123");
@@ -302,7 +302,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testChangeHouseholdOwner_InternalError() {
+  void testChangeHouseholdOwnerInternalError() {
     // Given
     UserHouseholdAssignmentRequestDto requestDto = new UserHouseholdAssignmentRequestDto();
     requestDto.setUserId("user123");
@@ -318,7 +318,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testSearchHouseholdById_Success() {
+  void testSearchHouseholdByIdSuccess() {
     // Given
     Map<String, String> request = Map.of("householdId", "house123");
     HouseholdBasicResponseDto responseDto = new HouseholdBasicResponseDto("house123",
@@ -335,7 +335,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testSearchHouseholdById_ValidationError() {
+  void testSearchHouseholdByIdValidationError() {
     // Given
     Map<String, String> request = Map.of("householdId", "house123");
     doThrow(new IllegalArgumentException("Household not found"))
@@ -350,7 +350,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testSearchHouseholdById_InternalError() {
+  void testSearchHouseholdByIdInternalError() {
     // Given
     Map<String, String> request = Map.of("householdId", "house123");
     doThrow(new RuntimeException("Database error"))
@@ -365,7 +365,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testGetHouseholdDetails_Success() {
+  void testGetHouseholdDetailsSuccess() {
     // Given
     Map<String, Object> details = new HashMap<>();
     HouseholdResponseDto householdResponseDto = new HouseholdResponseDto(
@@ -395,7 +395,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testGetHouseholdDetails_UserHasNoHousehold() {
+  void testGetHouseholdDetailsUserHasNoHousehold() {
     // Given
     when(householdService.getHouseholdDetails()).thenReturn(new HashMap<>());
 
@@ -408,7 +408,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testGetHouseholdDetails_InternalError() {
+  void testGetHouseholdDetailsInternalError() {
     // Given
     doThrow(new RuntimeException("Database error"))
         .when(householdService).getHouseholdDetails();
@@ -422,7 +422,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testEditUnregisteredMemberInHousehold_Success() {
+  void testEditUnregisteredMemberInHouseholdSuccess() {
     // Given
     EditMemberDto requestDto = new EditMemberDto();
     requestDto.setMemberId(1L);
@@ -440,7 +440,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testEditUnregisteredMemberInHousehold_ValidationError() {
+  void testEditUnregisteredMemberInHouseholdValidationError() {
     // Given
     EditMemberDto requestDto = new EditMemberDto();
     requestDto.setMemberId(1L);
@@ -458,7 +458,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void testEditUnregisteredMemberInHousehold_InternalError() {
+  void testEditUnregisteredMemberInHouseholdInternalError() {
     // Given
     EditMemberDto requestDto = new EditMemberDto();
     requestDto.setMemberId(1L);
@@ -476,7 +476,7 @@ public class HouseholdControllerTest {
   }
 
   @Test
-  void removeUserFromHousehold_UnexpectedException_ReturnsInternalServerError() {
+  void removeUserFromHouseholdUnexpectedExceptionReturnsInternalServerError() {
     // Arrange
     UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
     when(request.getUserId()).thenReturn("user-123");
@@ -497,7 +497,7 @@ public class HouseholdControllerTest {
    * household.
    */
   @Test
-  void removeUnregisteredMemberFromHousehold_ValidMemberId_ReturnsOk() {
+  void removeUnregisteredMemberFromHouseholdValidMemberIdReturnsOk() {
     // Arrange
     RemoveUnregisteredMemberRequestDto request = mock(RemoveUnregisteredMemberRequestDto.class);
     when(request.getMemberId()).thenReturn(1L);
@@ -517,7 +517,7 @@ public class HouseholdControllerTest {
    * Tests the scenario where validation fails during unregistered member removal from a household.
    */
   @Test
-  void removeUnregisteredMemberFromHousehold_ValidationException_ReturnsBadRequest() {
+  void removeUnregisteredMemberFromHouseholdValidationExceptionReturnsBadRequest() {
     // Arrange
     RemoveUnregisteredMemberRequestDto request = mock(RemoveUnregisteredMemberRequestDto.class);
     when(request.getMemberId()).thenReturn(-1L);
@@ -539,7 +539,7 @@ public class HouseholdControllerTest {
    * Tests the scenario where an unexpected exception occurs during unregistered member removal.
    */
   @Test
-  void removeUnregisteredMemberFromHousehold_UnexpectedException_ReturnsInternalServerError() {
+  void removeUnregisteredMemberFromHouseholdUnexpectedExceptionReturnsInternalServerError() {
     // Arrange
     RemoveUnregisteredMemberRequestDto request = mock(RemoveUnregisteredMemberRequestDto.class);
     when(request.getMemberId()).thenReturn(1L);
@@ -560,7 +560,7 @@ public class HouseholdControllerTest {
    * Tests the scenario where a null member ID is provided.
    */
   @Test
-  void removeUnregisteredMemberFromHousehold_NullMemberId_ReturnsInternalServerError() {
+  void removeUnregisteredMemberFromHouseholdNullMemberIdReturnsInternalServerError() {
     // Arrange
     RemoveUnregisteredMemberRequestDto request = mock(RemoveUnregisteredMemberRequestDto.class);
     when(request.getMemberId()).thenReturn(null);
@@ -581,7 +581,7 @@ public class HouseholdControllerTest {
    * Tests the scenario where household details are successfully retrieved.
    */
   @Test
-  void getHouseholdDetails_ValidHouseholdId_ReturnsDetails() {
+  void getHouseholdDetailsValidHouseholdIdReturnsDetails() {
     // Arrange
     HouseholdResponseDto dummyHousehold = mock(HouseholdResponseDto.class);
     Map<String, Object> details = Map.of("household", dummyHousehold);
@@ -600,7 +600,7 @@ public class HouseholdControllerTest {
    * Tests the scenario where an invalid household ID leads to a bad request.
    */
   @Test
-  void getHouseholdDetails_InvalidHouseholdId_ReturnsBadRequest() {
+  void getHouseholdDetailsInvalidHouseholdIdReturnsBadRequest() {
     // Arrange
     String errorMessage = "Invalid household ID";
     when(householdService.getHouseholdDetails())
@@ -619,7 +619,7 @@ public class HouseholdControllerTest {
    * Tests the scenario where an unexpected exception occurs during household details retrieval.
    */
   @Test
-  void getHouseholdDetails_ServiceThrowsUnexpectedException_ReturnsInternalServerError() {
+  void getHouseholdDetailsServiceThrowsUnexpectedExceptionReturnsInternalServerError() {
     // Arrange
     when(householdService.getHouseholdDetails())
         .thenThrow(new RuntimeException("Unexpected error"));
@@ -643,7 +643,7 @@ public class HouseholdControllerTest {
      * Tests the positive scenario where a household is successfully created.
      */
     @Test
-    void createHousehold_ValidRequest_ReturnsOk() {
+    void createHouseholdValidRequestReturnsOk() {
       // Arrange
       CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
       when(request.getName()).thenReturn("TestHousehold");
@@ -664,7 +664,7 @@ public class HouseholdControllerTest {
      * Tests the scenario where validation fails during household creation.
      */
     @Test
-    void createHousehold_ValidationException_ReturnsBadRequest() {
+    void createHouseholdValidationExceptionReturnsBadRequest() {
       // Arrange
       CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
       when(request.getName()).thenReturn("TestHousehold");
@@ -686,7 +686,7 @@ public class HouseholdControllerTest {
      * Tests the scenario where an unexpected exception occurs during household creation.
      */
     @Test
-    void createHousehold_UnexpectedException_ReturnsInternalServerError() {
+    void createHouseholdUnexpectedExceptionReturnsInternalServerError() {
       // Arrange
       CreateHouseholdRequestDto request = mock(CreateHouseholdRequestDto.class);
       when(request.getName()).thenReturn("TestHousehold");
@@ -714,7 +714,7 @@ public class HouseholdControllerTest {
      * Tests the positive scenario where a user is successfully added to a household.
      */
     @Test
-    void addUserToHousehold_ValidRequest_ReturnsOk() {
+    void addUserToHouseholdValidRequestReturnsOk() {
       // Arrange
       UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
       when(request.getHouseholdId()).thenReturn("1L");
@@ -735,7 +735,7 @@ public class HouseholdControllerTest {
      * Tests the scenario where validation fails during user addition to a household.
      */
     @Test
-    void addUserToHousehold_ValidationException_ReturnsBadRequest() {
+    void addUserToHouseholdValidationExceptionReturnsBadRequest() {
       // Arrange
       UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
 
@@ -756,7 +756,7 @@ public class HouseholdControllerTest {
      * Tests the scenario where an unexpected exception occurs during user addition to a household.
      */
     @Test
-    void addUserToHousehold_UnexpectedException_ReturnsInternalServerError() {
+    void addUserToHouseholdUnexpectedExceptionReturnsInternalServerError() {
       // Arrange
       UserHouseholdAssignmentRequestDto request = mock(UserHouseholdAssignmentRequestDto.class);
       when(request.getHouseholdId()).thenReturn("1L");
@@ -785,7 +785,7 @@ public class HouseholdControllerTest {
      * household.
      */
     @Test
-    void addUnregisteredMemberToHousehold_ValidRequest_ReturnsOk() {
+    void addUnregisteredMemberToHouseholdValidRequestReturnsOk() {
       // Arrange
       UnregisteredMemberHouseholdAssignmentRequestDto request =
           mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
@@ -809,7 +809,7 @@ public class HouseholdControllerTest {
      * household.
      */
     @Test
-    void addUnregisteredMemberToHousehold_ValidationException_ReturnsBadRequest() {
+    void addUnregisteredMemberToHouseholdValidationExceptionReturnsBadRequest() {
       // Arrange
       UnregisteredMemberHouseholdAssignmentRequestDto request =
           mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
@@ -834,7 +834,7 @@ public class HouseholdControllerTest {
      * Tests the scenario where an unexpected exception occurs during unregistered member addition.
      */
     @Test
-    void addUnregisteredMemberToHousehold_UnexpectedException_ReturnsInternalServerError() {
+    void addUnregisteredMemberToHouseholdUnexpectedExceptionReturnsInternalServerError() {
       // Arrange
       UnregisteredMemberHouseholdAssignmentRequestDto request =
           mock(UnregisteredMemberHouseholdAssignmentRequestDto.class);
@@ -856,139 +856,6 @@ public class HouseholdControllerTest {
   }
 
   /**
-   * Nested test class for testing the removeUserFromHousehold endpoint.
-   */
-  @Nested
-  class RemoveUserFromHouseholdTests {
-
-    /**
-     * Tests the positive scenario where a user is successfully removed from a household.
-     */
-    @Test
-    void removeUserFromHousehold_ValidRequest_ReturnsOk() {
-      // Arrange
-      String email = "user@example.com";
-
-      // Act
-
-      // Assert
-    }
-
-    /**
-     * Tests the scenario where validation fails during user removal from a household.
-     */
-    @Test
-    void removeUserFromHousehold_ValidationException_ReturnsBadRequest() {
-      // Arrange
-      String email = "";
-
-      String errorMessage = "Email is required";
-
-      // Act
-
-      // Assert
-    }
-
-    /**
-     * Tests the scenario where an unexpected exception occurs during user removal from a
-     * household.
-     */
-    @Test
-    void removeUserFromHousehold_UnexpectedException_ReturnsInternalServerError() {
-      // Arrange
-      String email = "user@example.com";
-
-    }
-  }
-
-  /**
-   * Nested test class for testing the removeUnregisteredMemberFromHousehold endpoint.
-   */
-  @Nested
-  class RemoveUnregisteredMemberFromHouseholdTests {
-
-    /**
-     * Tests the positive scenario where an unregistered member is successfully removed from a
-     * household.
-     */
-    @Test
-    void removeUnregisteredMemberFromHousehold_ValidMemberId_ReturnsOk() {
-    }
-
-    /**
-     * Tests the scenario where validation fails during unregistered member removal from a
-     * household.
-     */
-    @Test
-    void removeUnregisteredMemberFromHousehold_ValidationException_ReturnsBadRequest() {
-      // Arrange
-      Long memberId = -1L;
-      String errorMessage = "Invalid member ID";
-      doThrow(new IllegalArgumentException(errorMessage))
-          .when(householdService).removeUnregisteredMemberFromHousehold(memberId);
-
-      // Act
-
-      // Assert
-    }
-
-    /**
-     * Tests the scenario where an unexpected exception occurs during unregistered member removal.
-     */
-    @Test
-    void removeUnregisteredMemberFromHousehold_UnexpectedException_ReturnsInternalServerError() {
-      // Arrange
-      Long memberId = 1L;
-      doThrow(new RuntimeException("Database error"))
-          .when(householdService).removeUnregisteredMemberFromHousehold(memberId);
-
-      // Act
-
-      // Assert
-    }
-
-    /**
-     * Tests the scenario where a null member ID is provided.
-     */
-    @Test
-    void removeUnregisteredMemberFromHousehold_NullMemberId_ReturnsBadRequest() {
-      // Arrange
-    }
-  }
-
-  @Nested
-  class GetHouseholdDetailsTests {
-
-    @Test
-    void getHouseholdDetails_ValidHouseholdId_ReturnsDetails() {
-      // Arrange
-      Map<String, Object> details =
-          Map.of("name", "Test Household", "members", List.of("John Doe"));
-      when(householdService.getHouseholdDetails()).thenReturn(details);
-    }
-
-    @Test
-    void getHouseholdDetails_InvalidHouseholdId_ReturnsBadRequest() {
-      // Arrange
-      String householdId = "-1L";
-      String errorMessage = "Invalid household ID";
-      when(householdService.getHouseholdDetails()).thenThrow(
-          new IllegalArgumentException(errorMessage));
-
-    }
-
-    @Test
-    void getHouseholdDetails_ServiceThrowsUnexpectedException_ReturnsInternalServerError() {
-      // Arrange
-      String householdId = "1L";
-      when(householdService.getHouseholdDetails()).thenThrow(
-          new RuntimeException("Unexpected error"));
-
-      // Act
-    }
-  }
-
-  /**
    * Nested test class for testing the editUnregisteredMemberInHousehold endpoint.
    */
   @Nested
@@ -999,7 +866,7 @@ public class HouseholdControllerTest {
      * household.
      */
     @Test
-    void editUnregisteredMemberInHousehold_ValidRequest_ReturnsOk() {
+    void editUnregisteredMemberInHouseholdValidRequestReturnsOk() {
       // Arrange
       EditMemberDto request = mock(EditMemberDto.class);
       when(request.getNewFullName()).thenReturn("John Doe");
@@ -1021,7 +888,7 @@ public class HouseholdControllerTest {
      * Tests the scenario where validation fails during unregistered member edit.
      */
     @Test
-    void editUnregisteredMemberInHousehold_ValidationException_ReturnsBadRequest() {
+    void editUnregisteredMemberInHouseholdValidationExceptionReturnsBadRequest() {
       // Arrange
       EditMemberDto request = mock(EditMemberDto.class);
       when(request.getNewFullName()).thenReturn("John Doe");
@@ -1044,7 +911,7 @@ public class HouseholdControllerTest {
      * Tests the scenario where an unexpected exception occurs during unregistered member edit.
      */
     @Test
-    void editUnregisteredMemberInHousehold_UnexpectedException_ReturnsInternalServerError() {
+    void editUnregisteredMemberInHouseholdUnexpectedExceptionReturnsInternalServerError() {
       // Arrange
       EditMemberDto request = mock(EditMemberDto.class);
       when(request.getNewFullName()).thenReturn("John Doe");

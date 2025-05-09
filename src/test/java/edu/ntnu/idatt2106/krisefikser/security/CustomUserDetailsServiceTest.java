@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
 import edu.ntnu.idatt2106.krisefikser.service.CustomUserDetailsService;
@@ -19,7 +20,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-public class CustomUserDetailsServiceTest {
+/**
+ * Unit tests for the CustomUserDetailsService class.
+ */
+
+class CustomUserDetailsServiceTest {
 
   @Mock
   private UserRepository userRepository;

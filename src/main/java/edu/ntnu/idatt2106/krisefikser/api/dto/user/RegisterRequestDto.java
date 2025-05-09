@@ -12,7 +12,7 @@ public class RegisterRequestDto {
   private String password;
   private String tlf;
   @JsonProperty("hCaptchaToken")
-  private String hCaptchaToken;
+  private String hcaptchatoken;
 
   /**
    * Default constructor for RegisterRequestDto.
@@ -31,21 +31,21 @@ public class RegisterRequestDto {
   }
 
   /**
-   * Gets a hCaptchaToken
+   * Gets a hCaptchaToken.
    *
-   * @return hCaptchaToken
+   * @return hCaptchaToken.
    */
-  public String getHCaptchaToken() {
-    return hCaptchaToken;
+  public String gethCaptchaToken() {
+    return hcaptchatoken;
   }
 
   /**
-   * Sets a hCaptchaToken
+   * Sets a hCaptchaToken.
    *
-   * @param hCaptchaToken the hCaptchaToken
+   * @param hcaptchatoken the hCaptchaToken.
    */
-  public void setHCaptchaToken(String hCaptchaToken) {
-    this.hCaptchaToken = hCaptchaToken;
+  public void sethCaptchaToken(String hcaptchatoken) {
+    this.hcaptchatoken = hcaptchatoken;
   }
 
   /**

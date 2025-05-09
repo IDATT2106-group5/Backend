@@ -16,6 +16,12 @@ public class CustomUserDetails implements UserDetails {
 
   private final User user;
 
+  /**
+   * Constructor for CustomUserDetails.
+   *
+   * @param user the User entity.
+   */
+
   public CustomUserDetails(User user) {
     this.user = user;
   }

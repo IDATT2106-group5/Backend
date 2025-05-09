@@ -168,7 +168,6 @@ class NotificationServiceTest {
   @Test
   void saveHouseholdNotification_shouldSaveNotificationForAllHouseholdMembers() {
     // Arrange
-    NotificationDto notification = testNotificationDto;
     String householdId = "household-123";
 
     User user1 = new User();
@@ -180,6 +179,7 @@ class NotificationServiceTest {
     when(userRepository.getUsersByHouseholdId(householdId)).thenReturn(householdUsers);
 
     // Act
+    NotificationDto notification = testNotificationDto;
     notificationService.saveHouseholdNotification(notification, householdId);
 
     // Assert

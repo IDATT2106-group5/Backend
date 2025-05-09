@@ -11,6 +11,7 @@ import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
@@ -71,15 +72,13 @@ class AdminInvitationServiceTest {
   @Test
   void validateAdminSetupToken_shouldReturnTrue_whenTokenIsValid() {
     // Arrange
-    String token = UUID.randomUUID().toString();
     User adminUser = new User();
     adminUser.setRole(Role.ADMIN);
     adminUser.setConfirmed(false);
-
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
     adminUser.setTokenExpiry(calendar.getTime());
-
+    String token = UUID.randomUUID().toString();
     when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.of(adminUser));
 
     // Act
@@ -104,15 +103,13 @@ class AdminInvitationServiceTest {
   @Test
   void validateAdminSetupToken_shouldReturnFalse_whenUserIsNotAdmin() {
     // Arrange
-    String token = UUID.randomUUID().toString();
     User user = new User();
     user.setRole(Role.USER);
     user.setConfirmed(false);
-
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
     user.setTokenExpiry(calendar.getTime());
-
+    String token = UUID.randomUUID().toString();
     when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.of(user));
 
     // Act
@@ -125,15 +122,13 @@ class AdminInvitationServiceTest {
   @Test
   void validateAdminSetupToken_shouldReturnFalse_whenUserIsAlreadyConfirmed() {
     // Arrange
-    String token = UUID.randomUUID().toString();
     User adminUser = new User();
     adminUser.setRole(Role.ADMIN);
     adminUser.setConfirmed(true);
-
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
     adminUser.setTokenExpiry(calendar.getTime());
-
+    String token = UUID.randomUUID().toString();
     when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.of(adminUser));
 
     // Act
@@ -146,15 +141,13 @@ class AdminInvitationServiceTest {
   @Test
   void validateAdminSetupToken_shouldReturnFalse_whenTokenIsExpired() {
     // Arrange
-    String token = UUID.randomUUID().toString();
     User adminUser = new User();
     adminUser.setRole(Role.ADMIN);
     adminUser.setConfirmed(false);
-
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, -1);
     adminUser.setTokenExpiry(calendar.getTime());
-
+    String token = UUID.randomUUID().toString();
     when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.of(adminUser));
 
     // Act
@@ -168,8 +161,6 @@ class AdminInvitationServiceTest {
   void completeAdminSetup_shouldUpdateUser_whenTokenAndPasswordAreValid() {
     // Arrange
     String token = UUID.randomUUID().toString();
-    String password = "ValidP@ss1";
-    String encodedPassword = "encodedPassword";
 
     User adminUser = new User();
     adminUser.setRole(Role.ADMIN);
@@ -179,8 +170,9 @@ class AdminInvitationServiceTest {
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
     adminUser.setTokenExpiry(calendar.getTime());
-
+    String password = "ValidP@ss1";
     when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.of(adminUser));
+    String encodedPassword = "encodedPassword";
     when(passwordEncoder.encode(password)).thenReturn(encodedPassword);
 
     // Act
@@ -227,18 +219,14 @@ class AdminInvitationServiceTest {
   @Test
   void completeAdminSetup_shouldThrowException_whenPasswordIsTooShort() {
     // Arrange
-    String token = UUID.randomUUID().toString();
-    String invalidPassword = "Short1!";
-
     User adminUser = new User();
     adminUser.setRole(Role.ADMIN);
-
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
     adminUser.setTokenExpiry(calendar.getTime());
-
+    String token = UUID.randomUUID().toString();
     when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.of(adminUser));
-
+    String invalidPassword = "Short1!";
     // Act & Assert
     Exception exception = assertThrows(IllegalArgumentException.class, () ->
         adminInvitationService.completeAdminSetup(token, invalidPassword));
@@ -249,16 +237,13 @@ class AdminInvitationServiceTest {
   @Test
   void completeAdminSetup_shouldThrowException_whenPasswordMissingRequiredCharacters() {
     // Arrange
-    String token = UUID.randomUUID().toString();
-    String invalidPassword = "passwordnouppercasenumbers";
-
     User adminUser = new User();
     adminUser.setRole(Role.ADMIN);
-
     Calendar calendar = Calendar.getInstance();
     calendar.add(Calendar.HOUR, 1);
     adminUser.setTokenExpiry(calendar.getTime());
-
+    String token = UUID.randomUUID().toString();
+    String invalidPassword = "passwordnouppercasenumbers";
     when(userRepository.findByConfirmationToken(token)).thenReturn(Optional.of(adminUser));
 
     // Act & Assert

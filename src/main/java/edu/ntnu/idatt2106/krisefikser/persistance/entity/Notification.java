@@ -47,7 +47,12 @@ public class Notification {
 
   @Column(name = "message")
   private String message;
-
+  /**
+   * The timestamp of the notification.
+   */
+  @Column(name = "timestamp", nullable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private LocalDateTime timestamp;
 
   public String getMessage() {
     return message;
@@ -65,12 +70,6 @@ public class Notification {
   public void setIsRead(Boolean isRead) {
     this.isRead = isRead;
   }
-
-  /**
-   * The timestamp of the notification.
-   */
-  @Column(name = "timestamp", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-  private LocalDateTime timestamp;
 
   /**
    * Gets timestamp.

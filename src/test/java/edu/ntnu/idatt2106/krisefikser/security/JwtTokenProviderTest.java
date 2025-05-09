@@ -1,5 +1,13 @@
 package edu.ntnu.idatt2106.krisefikser.security;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -8,12 +16,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
+/**
+ * Unit tests for the JwtTokenProvider class.
+ */
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-
-public class JwtTokenProviderTest {
+class JwtTokenProviderTest {
 
   @InjectMocks
   private JwtTokenProvider tokenProvider;
@@ -27,7 +34,8 @@ public class JwtTokenProviderTest {
   @BeforeEach
   void setUp() {
     MockitoAnnotations.openMocks(this);
-    ReflectionTestUtils.setField(tokenProvider, "jwtSecret", "testSecret123456789012345678901234567890");
+    ReflectionTestUtils.setField(tokenProvider, "jwtSecret",
+        "testSecret123456789012345678901234567890");
     ReflectionTestUtils.setField(tokenProvider, "jwtExpirationMs", 3600000L);
     tokenProvider.init();
   }

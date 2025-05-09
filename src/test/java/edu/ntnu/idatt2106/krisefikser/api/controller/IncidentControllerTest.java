@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentResponseDto;
 import edu.ntnu.idatt2106.krisefikser.service.IncidentService;
@@ -21,7 +22,7 @@ import org.springframework.http.ResponseEntity;
 /**
  * Unit tests for the IncidentController class.
  */
-public class IncidentControllerTest {
+class IncidentControllerTest {
 
   @Mock
   private IncidentService incidentService;

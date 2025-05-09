@@ -6,8 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 /**
@@ -25,32 +23,32 @@ public class News {
   private Long id;
 
   /**
-   * The title of the news story
+   * The title of the news story.
    */
   @Column(name = "title")
   private String title;
 
   /**
-   * The url of the news story
+   * The url of the news story.
    */
   @Column(name = "url")
   private String url;
 
   /**
-   * The content of the news story
+   * The content of the news story.
    */
 
   @Column(name = "content")
   private String content;
 
   /**
-   * The source of the news story
+   * The source of the news story.
    */
   @Column(name = "source")
   private String source;
 
   /**
-   * The time the news story was created
+   * The time the news story was created.
    */
   @Column(name = "created_at")
   private LocalDateTime createdAt;

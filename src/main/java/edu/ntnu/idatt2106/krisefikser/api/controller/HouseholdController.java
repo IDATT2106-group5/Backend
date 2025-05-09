@@ -172,7 +172,8 @@ public class HouseholdController {
    *
    * @return A response entity indicating the result of the operation.
    */
-  @Operation(summary = "Deletes a household", description = "Deletes the household with the given ID")
+  @Operation(summary = "Deletes a household",
+      description = "Deletes the household with the given ID")
   @PostMapping("/delete")
   public ResponseEntity<String> deleteHousehold() {
     try {

@@ -65,7 +65,6 @@ class StorageServiceTest {
 
     @BeforeEach
     void setUp() {
-      Authentication authentication = mock(Authentication.class);
       SecurityContext securityContext = mock(SecurityContext.class);
       SecurityContextHolder.setContext(securityContext);
 
@@ -74,6 +73,7 @@ class StorageServiceTest {
       household.setId(householdId);
       user.setHousehold(household);
 
+      Authentication authentication = mock(Authentication.class);
       when(securityContext.getAuthentication()).thenReturn(authentication);
       when(authentication.getName()).thenReturn("user@example.com");
     }
@@ -89,7 +89,6 @@ class StorageServiceTest {
 
     @BeforeEach
     void setUp() {
-      Authentication authentication = mock(Authentication.class);
       SecurityContext securityContext = mock(SecurityContext.class);
       SecurityContextHolder.setContext(securityContext);
 
@@ -98,6 +97,7 @@ class StorageServiceTest {
       household.setId(householdId);
       user.setHousehold(household);
 
+      Authentication authentication = mock(Authentication.class);
       when(securityContext.getAuthentication()).thenReturn(authentication);
       when(authentication.getName()).thenReturn("user@example.com");
     }
@@ -142,7 +142,6 @@ class StorageServiceTest {
     @BeforeEach
     void setUp() {
       // Create and set up security context mock
-      Authentication authentication = mock(Authentication.class);
       SecurityContext securityContext = mock(SecurityContext.class);
       SecurityContextHolder.setContext(securityContext);
 
@@ -153,6 +152,7 @@ class StorageServiceTest {
       user.setHousehold(household);
 
       // Set up mock behaviors
+      Authentication authentication = mock(Authentication.class);
       when(securityContext.getAuthentication()).thenReturn(authentication);
       when(authentication.getName()).thenReturn("user@example.com");
     }
@@ -165,11 +165,6 @@ class StorageServiceTest {
 
     @Test
     void addItemToStorage_shouldCreateAndSaveStorageItem() {
-      // Arrange
-      String unit = "liters";
-      Integer amount = 5;
-      LocalDateTime expirationDate = LocalDateTime.now().plusDays(7);
-
       Item item = new Item();
       item.setId(itemId);
 
@@ -180,6 +175,9 @@ class StorageServiceTest {
           .thenAnswer(invocation -> invocation.getArgument(0));
 
       // Act
+      String unit = "liters";
+      Integer amount = 5;
+      LocalDateTime expirationDate = LocalDateTime.now().plusDays(7);
       StorageItem result = storageService.addItemToStorage(itemId, unit, amount, expirationDate);
 
       // Assert
@@ -250,11 +248,6 @@ class StorageServiceTest {
 
     @Test
     void updateStorageItem_shouldUpdateAndReturnItem() {
-      // Arrange
-      String newUnit = "kilograms";
-      Integer newAmount = 10;
-      LocalDateTime newExpirationDate = LocalDateTime.now().plusDays(14);
-
       StorageItem existingItem = new StorageItem();
       existingItem.setId(storageItemId);
       existingItem.setUnit("grams");
@@ -266,6 +259,9 @@ class StorageServiceTest {
           invocation -> invocation.getArgument(0));
 
       // Act
+      String newUnit = "kilograms";
+      Integer newAmount = 10;
+      LocalDateTime newExpirationDate = LocalDateTime.now().plusDays(14);
       StorageItem result = storageService.updateStorageItem(storageItemId, newUnit, newAmount,
           newExpirationDate);
 
@@ -287,7 +283,6 @@ class StorageServiceTest {
     @Test
     void updateStorageItem_shouldUpdateOnlyProvidedFields() {
       // Arrange
-      String newUnit = "kilograms";
 
       StorageItem existingItem = new StorageItem();
       existingItem.setId(storageItemId);
@@ -301,6 +296,7 @@ class StorageServiceTest {
           invocation -> invocation.getArgument(0));
 
       // Act
+      String newUnit = "kilograms";
       StorageItem result = storageService.updateStorageItem(storageItemId, newUnit, null,
           null);
 
@@ -340,7 +336,6 @@ class StorageServiceTest {
     @Test
     void updateItemAmount_shouldUpdateAndReturnItem() {
       // Arrange
-      Integer newAmount = 10;
       StorageItem existingItem = new StorageItem();
       existingItem.setId(storageItemId);
       existingItem.setAmount(5);
@@ -350,6 +345,7 @@ class StorageServiceTest {
           invocation -> invocation.getArgument(0));
 
       // Act
+      Integer newAmount = 10;
       StorageItem result = storageService.updateItemAmount(storageItemId, newAmount);
 
       // Assert

@@ -23,6 +23,12 @@ public class MapIconService {
   private static final Logger logger = LoggerFactory.getLogger(MapIconService.class);
   private final MapIconRepository mapIconRepository;
 
+  /**
+   * Constructor for MapIconService.
+   *
+   * @param mapIconRepository the repository for accessing map icon data
+   */
+  
   public MapIconService(MapIconRepository mapIconRepository) {
     this.mapIconRepository = mapIconRepository;
     logger.info("MapIconService initialized");

@@ -3,6 +3,7 @@ package edu.ntnu.idatt2106.krisefikser.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.ItemResponseDto;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
@@ -22,7 +23,7 @@ import org.springframework.data.domain.PageRequest;
 /**
  * Unit tests for the ItemService class.
  */
-public class ItemServiceTest {
+class ItemServiceTest {
 
   @Mock
   private ItemRepository itemRepository;

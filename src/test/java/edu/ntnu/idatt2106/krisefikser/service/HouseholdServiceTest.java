@@ -156,10 +156,10 @@ class HouseholdServiceTest {
 
       // Verify
       verify(householdRepository).save(argThat(household ->
-          household.getId() != null &&
-              household.getId().length() == 8 &&
-              household.getName().equals("Test Household") &&
-              household.getAddress().equals("Test Address")
+          household.getId() != null
+              && household.getId().length() == 8
+              && household.getName().equals("Test Household")
+              && household.getAddress().equals("Test Address")
       ));
     }
 
@@ -188,10 +188,10 @@ class HouseholdServiceTest {
 
       // Verify
       verify(notificationService).saveNotification(argThat(notification ->
-          notification.getMessage().equals("Household created successfully") &&
-              notification.getType() == NotificationType.HOUSEHOLD &&
-              notification.getRecipientId().equals("user123") &&
-              !notification.isRead()
+          notification.getMessage().equals("Household created successfully")
+              && notification.getType() == NotificationType.HOUSEHOLD
+              && notification.getRecipientId().equals("user123")
+              && !notification.isRead()
       ));
 
       verify(notificationService).sendPrivateNotification(eq("user123"),
@@ -521,7 +521,7 @@ class HouseholdServiceTest {
   }
 
   @Nested
-  class addUnregisteredMemberToHouseholdTests {
+  class AddUnregisteredMemberToHouseholdTests {
 
     @Test
     void shouldAddUnregisteredMemberToHouseholdSuccessfully() {
@@ -550,8 +550,8 @@ class HouseholdServiceTest {
       householdService.addUnregisteredMemberToHousehold(request);
 
       verify(unregisteredHouseholdMemberRepository).save(argThat(member ->
-          member.getFullName().equals("John Doe") &&
-              member.getHousehold().getId().equals("household123")
+          member.getFullName().equals("John Doe")
+              && member.getHousehold().getId().equals("household123")
       ));
       verify(householdRepository).updateNumberOfMembers("household123", 2);
     }
@@ -604,7 +604,7 @@ class HouseholdServiceTest {
   }
 
   @Nested
-  class removeUnregisteredMemberFromHouseholdTests {
+  class RemoveUnregisteredMemberFromHouseholdTests {
 
     @Test
     void shouldRemoveUnregisteredMemberSuccessfully() {
@@ -686,7 +686,7 @@ class HouseholdServiceTest {
   }
 
   @Nested
-  class changeHouseholdOwnerTests {
+  class ChangeHouseholdOwnerTests {
 
     @Test
     void shouldChangeHouseholdOwnerSuccessfully() {
@@ -878,8 +878,8 @@ class HouseholdServiceTest {
       householdService.editHousehold(request);
 
       verify(householdRepository).save(argThat(h ->
-          h.getName().equals("Updated Household Name") &&
-              h.getAddress().equals("Updated Address")
+          h.getName().equals("Updated Household Name")
+              && h.getAddress().equals("Updated Address")
       ));
       verify(notificationService).saveNotification(any(NotificationDto.class));
       verify(notificationService).sendPrivateNotification(eq("user123"),
@@ -1097,7 +1097,7 @@ class HouseholdServiceTest {
   }
 
   @Nested
-  class getHouseholdTests {
+  class GetHouseholdTests {
 
     @Test
     void getHouseholdReturnsHouseholdSuccessfully() {
@@ -1183,10 +1183,6 @@ class HouseholdServiceTest {
       unregisteredMember2.setFullName("Unregistered 2");
       unregisteredMember2.setHousehold(household);
 
-      List<User> users = Arrays.asList(owner, currentUser, anotherUser);
-      List<UnregisteredHouseholdMember> unregisteredMembers =
-          Arrays.asList(unregisteredMember1, unregisteredMember2);
-
       // Mock security context
       Authentication authentication = mock(Authentication.class);
       SecurityContext securityContext = mock(SecurityContext.class);
@@ -1196,7 +1192,10 @@ class HouseholdServiceTest {
 
       // Mock repository responses
       when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(currentUser));
+      List<User> users = Arrays.asList(owner, currentUser, anotherUser);
       when(userRepository.getUsersByHousehold(household)).thenReturn(users);
+      List<UnregisteredHouseholdMember> unregisteredMembers =
+          Arrays.asList(unregisteredMember1, unregisteredMember2);
       when(unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(
           household))
           .thenReturn(unregisteredMembers);
@@ -1305,9 +1304,6 @@ class HouseholdServiceTest {
       currentUser.setRole(Role.USER);
       currentUser.setHousehold(household);
 
-      List<User> users = Collections.singletonList(currentUser);
-      List<UnregisteredHouseholdMember> unregisteredMembers = Collections.emptyList();
-
       // Mock security context
       Authentication authentication = mock(Authentication.class);
       SecurityContext securityContext = mock(SecurityContext.class);
@@ -1317,7 +1313,9 @@ class HouseholdServiceTest {
 
       // Mock repository responses
       when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(currentUser));
+      List<User> users = Collections.singletonList(currentUser);
       when(userRepository.getUsersByHousehold(household)).thenReturn(users);
+      List<UnregisteredHouseholdMember> unregisteredMembers = Collections.emptyList();
       when(unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(
           household))
           .thenReturn(unregisteredMembers);
@@ -1358,11 +1356,6 @@ class HouseholdServiceTest {
       currentUser.setRole(Role.USER);
       currentUser.setHousehold(household);
 
-      // Only the current user in the household
-      List<User> users = Collections.singletonList(currentUser);
-      // No unregistered members
-      List<UnregisteredHouseholdMember> unregisteredMembers = Collections.emptyList();
-
       // Mock security context
       Authentication authentication = mock(Authentication.class);
       SecurityContext securityContext = mock(SecurityContext.class);
@@ -1372,7 +1365,9 @@ class HouseholdServiceTest {
 
       // Mock repository responses
       when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(currentUser));
+      List<User> users = Collections.singletonList(currentUser);
       when(userRepository.getUsersByHousehold(household)).thenReturn(users);
+      List<UnregisteredHouseholdMember> unregisteredMembers = Collections.emptyList();
       when(unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(
           household))
           .thenReturn(unregisteredMembers);

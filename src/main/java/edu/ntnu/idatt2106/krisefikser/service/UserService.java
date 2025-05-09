@@ -176,7 +176,7 @@ public class UserService {
   /**
    * Extracts the user ID from the token.
    *
-   * @param token
+   * @param token the JWT token.
    * @return the user ID
    */
   private String extractUserFromToken(String token) {

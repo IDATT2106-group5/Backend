@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.User;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
 import edu.ntnu.idatt2106.krisefikser.persistance.repository.UserRepository;
@@ -23,8 +24,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 class CustomUserDetailsServiceTest {
 
-  private final String TEST_EMAIL = "test@example.com";
-  private final String TEST_PASSWORD = "password123";
+  private final String testEmail = "test@example.com";
+  private final String testPassword = "password123";
   @Mock
   private UserRepository userRepository;
   @InjectMocks
@@ -37,8 +38,8 @@ class CustomUserDetailsServiceTest {
 
     testUser = new User();
     testUser.setId("1L");
-    testUser.setEmail(TEST_EMAIL);
-    testUser.setPassword(TEST_PASSWORD);
+    testUser.setEmail(testEmail);
+    testUser.setPassword(testPassword);
     testUser.setFullName("Test User");
     testUser.setRole(Role.USER);
     testUser.setConfirmed(true);
@@ -47,15 +48,15 @@ class CustomUserDetailsServiceTest {
   @Test
   void loadUserByUsername_shouldReturnUserDetails_whenUserExists() {
     // Arrange
-    when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(testUser));
+    when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(testUser));
 
     // Act
-    UserDetails userDetails = userDetailsService.loadUserByUsername(TEST_EMAIL);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(testEmail);
 
     // Assert
     assertNotNull(userDetails);
-    assertEquals(TEST_EMAIL, userDetails.getUsername());
-    assertEquals(TEST_PASSWORD, userDetails.getPassword());
+    assertEquals(testEmail, userDetails.getUsername());
+    assertEquals(testPassword, userDetails.getPassword());
     assertTrue(userDetails.isEnabled());
     assertTrue(userDetails.isAccountNonExpired());
     assertTrue(userDetails.isAccountNonLocked());
@@ -73,10 +74,10 @@ class CustomUserDetailsServiceTest {
   @Test
   void loadUserByUsername_shouldReturnCorrectAuthorities_forUserRole() {
     // Arrange
-    when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(testUser));
+    when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(testUser));
 
     // Act
-    UserDetails userDetails = userDetailsService.loadUserByUsername(TEST_EMAIL);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(testEmail);
 
     // Assert
     assertEquals(1, userDetails.getAuthorities().size());
@@ -89,10 +90,10 @@ class CustomUserDetailsServiceTest {
   void loadUserByUsername_shouldReturnCorrectAuthorities_forAdminRole() {
     // Arrange
     testUser.setRole(Role.ADMIN);
-    when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(testUser));
+    when(userRepository.findByEmail(testEmail)).thenReturn(Optional.of(testUser));
 
     // Act
-    UserDetails userDetails = userDetailsService.loadUserByUsername(TEST_EMAIL);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(testEmail);
 
     // Assert
     assertEquals(1, userDetails.getAuthorities().size());

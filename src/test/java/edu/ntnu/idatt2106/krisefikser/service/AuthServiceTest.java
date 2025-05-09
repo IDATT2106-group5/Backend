@@ -14,6 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.RegisterRequestDto;
@@ -148,7 +149,7 @@ class AuthServiceTest {
       // Arrange
       RegisterRequestDto request = new RegisterRequestDto("Test User", "test@example.com",
           "Password123!", "12345678");
-      request.setHCaptchaToken("validToken");
+      request.sethCaptchaToken("validToken");
 
       when(userRepository.existsByEmail(anyString())).thenReturn(false);
       when(captchaService.verifyToken(anyString())).thenReturn(true);
@@ -176,7 +177,7 @@ class AuthServiceTest {
       // Arrange
       RegisterRequestDto request = new RegisterRequestDto("Test User", "test@example.com",
           "Password123!", "12345678");
-      request.setHCaptchaToken("invalidToken");
+      request.sethCaptchaToken("invalidToken");
 
       when(captchaService.verifyToken("invalidToken")).thenReturn(false);
 
@@ -195,7 +196,7 @@ class AuthServiceTest {
       // Arrange
       RegisterRequestDto request = new RegisterRequestDto("Test User", "existing@example.com",
           "Password123!", "12345678");
-      request.setHCaptchaToken("validToken");
+      request.sethCaptchaToken("validToken");
 
       when(captchaService.verifyToken(anyString())).thenReturn(true);
       when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
@@ -220,7 +221,6 @@ class AuthServiceTest {
       String email = "test@example.com";
       String password = "password";
       String encodedPassword = "encodedPassword";
-      String jwtToken = "test.jwt.token";
 
       User user = new User();
       user.setEmail(email);
@@ -234,6 +234,7 @@ class AuthServiceTest {
       when(passwordEncoder.matches(password, encodedPassword)).thenReturn(true);
       when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
           .thenReturn(authentication);
+      String jwtToken = "test.jwt.token";
       when(tokenProvider.generateToken(authentication)).thenReturn(jwtToken);
 
       // Act
@@ -418,15 +419,15 @@ class AuthServiceTest {
     void verify2Fa_shouldReturnToken_whenOtpValid() {
       // Arrange
       String email = "admin@example.com";
-      String otpCode = "123456";
-      String jwtToken = "test.jwt.token";
 
       User user = new User();
       user.setEmail(email);
       user.setRole(Role.ADMIN);
 
+      String otpCode = "123456";
       when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
       when(twoFactorService.verifyOtp(email, otpCode)).thenReturn(true);
+      String jwtToken = "test.jwt.token";
       when(tokenProvider.generateToken(any(Authentication.class))).thenReturn(jwtToken);
 
       // Act
@@ -459,13 +460,12 @@ class AuthServiceTest {
   }
 
   @Nested
-  class Verify2FATests {
+  class Verify2FaTests {
 
     @Test
     void verify2Fa_shouldThrowException_whenUserNotAdmin() {
       // Arrange
       String email = "user@example.com";
-      String otpCode = "123456";
 
       User user = new User();
       user.setEmail(email);
@@ -474,6 +474,7 @@ class AuthServiceTest {
       when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
       // Act & Assert
+      String otpCode = "123456";
       IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
           () -> authService.verify2Fa(email, otpCode));
 
@@ -486,12 +487,12 @@ class AuthServiceTest {
     void verify2Fa_shouldThrowException_whenOtpInvalid() {
       // Arrange
       String email = "admin@example.com";
-      String otpCode = "invalid";
 
       User user = new User();
       user.setEmail(email);
       user.setRole(Role.ADMIN);
 
+      String otpCode = "invalid";
       when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
       when(twoFactorService.verifyOtp(email, otpCode)).thenReturn(false);
 
@@ -796,15 +797,15 @@ class AuthServiceTest {
     void resetPassword_shouldUpdatePasswordAndClearToken_whenValidToken() {
       // Arrange
       String token = UUID.randomUUID().toString();
-      String newPassword = "newSecurePassword123!";
-      String encodedPassword = "encodedPassword123!";
 
       User user = new User();
       user.setEmail("test@example.com");
       user.setResetPasswordToken(token);
       user.setResetPasswordTokenExpiration(Date.from(Instant.now().plus(1, ChronoUnit.HOURS)));
 
+      String newPassword = "newSecurePassword123!";
       when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.of(user));
+      String encodedPassword = "encodedPassword123!";
       when(passwordEncoder.encode(newPassword)).thenReturn(encodedPassword);
 
       // Act
@@ -836,7 +837,6 @@ class AuthServiceTest {
     void resetPassword_shouldThrowException_whenTokenIsExpired() {
       // Arrange
       String token = UUID.randomUUID().toString();
-      String newPassword = "newPassword!";
       User user = new User();
       user.setEmail("expired@example.com");
       user.setResetPasswordToken(token);
@@ -845,6 +845,7 @@ class AuthServiceTest {
       when(userRepository.findByResetPasswordToken(token)).thenReturn(Optional.of(user));
 
       // Act & Assert
+      String newPassword = "newPassword!";
       IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
           () -> authService.resetPassword(token, newPassword));
 
