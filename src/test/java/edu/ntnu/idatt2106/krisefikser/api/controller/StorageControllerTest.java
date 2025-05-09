@@ -14,13 +14,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import edu.ntnu.idatt2106.krisefikser.api.dto.ItemResponseDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.StorageItemResponseDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
+import edu.ntnu.idatt2106.krisefikser.api.controller.storage.StorageController;
+import edu.ntnu.idatt2106.krisefikser.api.dto.item.ItemResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.storage.StorageItemResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.household.Household;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.item.Item;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.storage.StorageItem;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
-import edu.ntnu.idatt2106.krisefikser.service.StorageService;
+import edu.ntnu.idatt2106.krisefikser.service.storage.StorageService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

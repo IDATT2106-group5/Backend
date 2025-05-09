@@ -12,11 +12,12 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconRequestDto;
-import edu.ntnu.idatt2106.krisefikser.api.dto.MapIconResponseDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.MapIcon;
+import edu.ntnu.idatt2106.krisefikser.api.dto.mapicon.MapIconRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.mapicon.MapIconResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.mapicon.MapIcon;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.MapIconType;
-import edu.ntnu.idatt2106.krisefikser.persistance.repository.MapIconRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.mapicon.MapIconRepository;
+import edu.ntnu.idatt2106.krisefikser.service.mapicon.MapIconService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

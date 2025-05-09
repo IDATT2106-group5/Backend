@@ -1,7 +1,7 @@
 package edu.ntnu.idatt2106.krisefikser.api.controller.websocket;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.PositionDto;
-import edu.ntnu.idatt2106.krisefikser.service.UserService;
+import edu.ntnu.idatt2106.krisefikser.api.dto.position.PositionDto;
+import edu.ntnu.idatt2106.krisefikser.service.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.messaging.handler.annotation.MessageMapping;

@@ -5,11 +5,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.ntnu.idatt2106.krisefikser.api.dto.IncidentRequestDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.incident.IncidentRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminSetupRequest;
-import edu.ntnu.idatt2106.krisefikser.service.AdminInvitationService;
-import edu.ntnu.idatt2106.krisefikser.service.IncidentService;
+import edu.ntnu.idatt2106.krisefikser.service.admin.AdminInvitationService;
+import edu.ntnu.idatt2106.krisefikser.service.incident.IncidentService;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

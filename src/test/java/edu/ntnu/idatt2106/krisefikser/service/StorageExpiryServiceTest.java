@@ -8,8 +8,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
-import edu.ntnu.idatt2106.krisefikser.persistance.repository.StorageItemRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.storage.StorageItem;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.item.Item;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.storage.StorageItemRepository;
+import edu.ntnu.idatt2106.krisefikser.service.notification.NotificationService;
+import edu.ntnu.idatt2106.krisefikser.service.storage.StorageExpiryService;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -42,8 +45,8 @@ class StorageExpiryServiceTest {
     @Test
     void sendsNotificationsForExpiringItems() {
       StorageItem item = mock(StorageItem.class);
-      edu.ntnu.idatt2106.krisefikser.persistance.entity.Item mockItem =
-          mock(edu.ntnu.idatt2106.krisefikser.persistance.entity.Item.class);
+      Item mockItem =
+          mock(Item.class);
       when(item.getItem()).thenReturn(mockItem);
       when(mockItem.getName()).thenReturn("Test Item");
 
@@ -69,8 +72,8 @@ class StorageExpiryServiceTest {
     void logsErrorWhenNotificationFails() {
       // Create and configure mocks
       StorageItem item = mock(StorageItem.class);
-      edu.ntnu.idatt2106.krisefikser.persistance.entity.Item mockItem =
-          mock(edu.ntnu.idatt2106.krisefikser.persistance.entity.Item.class);
+      Item mockItem =
+          mock(Item.class);
       when(item.getItem()).thenReturn(mockItem);
       when(mockItem.getName()).thenReturn("Test Item");
 

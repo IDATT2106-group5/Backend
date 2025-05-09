@@ -3,8 +3,9 @@ package edu.ntnu.idatt2106.krisefikser.api.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.ItemResponseDto;
-import edu.ntnu.idatt2106.krisefikser.service.ItemService;
+import edu.ntnu.idatt2106.krisefikser.api.controller.item.ItemController;
+import edu.ntnu.idatt2106.krisefikser.api.dto.item.ItemResponseDto;
+import edu.ntnu.idatt2106.krisefikser.service.item.ItemService;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;

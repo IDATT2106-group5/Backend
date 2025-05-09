@@ -1,6 +1,6 @@
 package edu.ntnu.idatt2106.krisefikser.security;
 
-import edu.ntnu.idatt2106.krisefikser.service.CustomUserDetailsService;
+import edu.ntnu.idatt2106.krisefikser.service.user.CustomUserDetailsService;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

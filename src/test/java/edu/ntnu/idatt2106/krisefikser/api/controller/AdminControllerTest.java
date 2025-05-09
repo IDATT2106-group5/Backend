@@ -11,16 +11,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.ntnu.idatt2106.krisefikser.api.controller.admin.AdminController;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.LoginResponse;
 import edu.ntnu.idatt2106.krisefikser.api.dto.auth.TwoFactorVerifyRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminInviteRequest;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.admin.AdminSetupRequest;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
-import edu.ntnu.idatt2106.krisefikser.service.AdminInvitationService;
-import edu.ntnu.idatt2106.krisefikser.service.AuthService;
-import edu.ntnu.idatt2106.krisefikser.service.TwoFactorService;
-import edu.ntnu.idatt2106.krisefikser.service.UserService;
+import edu.ntnu.idatt2106.krisefikser.service.admin.AdminInvitationService;
+import edu.ntnu.idatt2106.krisefikser.service.auth.AuthService;
+import edu.ntnu.idatt2106.krisefikser.service.auth.TwoFactorService;
+import edu.ntnu.idatt2106.krisefikser.service.user.UserService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

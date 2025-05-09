@@ -4,10 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.ItemResponseDto;
-import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
+import edu.ntnu.idatt2106.krisefikser.api.dto.item.ItemResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.entity.item.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.enums.ItemType;
-import edu.ntnu.idatt2106.krisefikser.persistance.repository.ItemRepository;
+import edu.ntnu.idatt2106.krisefikser.persistance.repository.item.ItemRepository;
+import edu.ntnu.idatt2106.krisefikser.service.item.ItemService;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
