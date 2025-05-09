@@ -268,4 +268,231 @@ public class MapIconServiceTest {
           "Distance should be approximately 1.4-1.6 km, but was " + distance);
     }
   }
+
+  /**
+   * Test cases for the getMapIcons method with query parameter.
+   */
+  @Nested
+  class MatchesQueryTests {
+
+    @Test
+    void getMapIcons_shouldReturnAll_whenQueryIsNull() {
+      // Arrange
+      MapIcon icon = createIcon("Hospital", "123 Main St", "555-1234");
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      // Mock the public calculateDistance method instead
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+      org.mockito.Mockito.doReturn(5.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble());
+
+      // Act
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, null);
+
+      // Assert
+      assertEquals(1, result.size());
+      assertEquals(icon.getId(), result.get(0).getId());
+      verify(mapIconRepository).findAll();
+    }
+
+    private MapIcon createIcon(String description, String address, String contactInfo) {
+      MapIcon icon = new MapIcon();
+      icon.setId(1L);
+      icon.setType(MapIconType.HOSPITAL);
+      icon.setDescription(description);
+      icon.setAddress(address);
+      icon.setContactInfo(contactInfo);
+      icon.setLatitude(0.0);
+      icon.setLongitude(0.0);
+      return icon;
+    }
+
+    @Test
+    void getMapIcons_shouldReturnAll_whenQueryIsEmpty() {
+      // Same approach as above but with empty string
+      MapIcon icon = createIcon("Hospital", "123 Main St", "555-1234");
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+      org.mockito.Mockito.doReturn(5.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble());
+
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, "");
+
+      assertEquals(1, result.size());
+      assertEquals(icon.getId(), result.get(0).getId());
+      verify(mapIconRepository).findAll();
+    }
+
+    @Test
+    void getMapIcons_shouldMatchDescription() {
+      // Arrange
+      MapIcon icon = createIcon("Emergency Hospital", null, null);
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+      org.mockito.Mockito.doReturn(5.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble());
+
+      // Act
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, "emergency");
+
+      // Assert
+      assertEquals(1, result.size());
+      assertEquals(icon.getId(), result.get(0).getId());
+      verify(mapIconRepository).findAll();
+    }
+
+    @Test
+    void getMapIcons_shouldMatchAddress() {
+      // Arrange
+      MapIcon icon = createIcon(null, "123 Main Street", null);
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+      org.mockito.Mockito.doReturn(5.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble());
+
+      // Act
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, "main");
+
+      // Assert
+      assertEquals(1, result.size());
+      assertEquals(icon.getId(), result.get(0).getId());
+      verify(mapIconRepository).findAll();
+    }
+
+    @Test
+    void getMapIcons_shouldMatchContactInfo() {
+      // Arrange
+      MapIcon icon = createIcon(null, null, "email@example.com");
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+      org.mockito.Mockito.doReturn(5.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble());
+
+      // Act
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, "email");
+
+      // Assert
+      assertEquals(1, result.size());
+      assertEquals(icon.getId(), result.get(0).getId());
+      verify(mapIconRepository).findAll();
+    }
+
+    @Test
+    void getMapIcons_shouldNotMatch_whenNoneOfTheFieldsMatch() {
+      // Arrange
+      MapIcon icon = createIcon("Hospital", "123 Main St", "555-1234");
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+      org.mockito.Mockito.doReturn(5.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble());
+
+      // Act
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, "pharmacy");
+
+      // Assert
+      assertEquals(0, result.size());
+      verify(mapIconRepository).findAll();
+    }
+
+    @Test
+    void getMapIcons_shouldHandleAllNullFields() {
+      // Arrange
+      MapIcon icon = createIcon(null, null, null);
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+      org.mockito.Mockito.doReturn(5.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble());
+
+      // Act
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, "hospital");
+
+      // Assert
+      assertEquals(0, result.size());
+      verify(mapIconRepository).findAll();
+    }
+
+    @Test
+    void getMapIcons_shouldHandleCaseSensitivity() {
+      // Arrange
+      MapIcon icon = createIcon("Emergency HOSPITAL", null, null);
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+      org.mockito.Mockito.doReturn(5.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble(),
+          org.mockito.ArgumentMatchers.anyDouble());
+
+      // Act
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, "hospital");
+
+      // Assert
+      assertEquals(1, result.size());
+      assertEquals(icon.getId(), result.get(0).getId());
+      verify(mapIconRepository).findAll();
+    }
+
+    @Test
+    void getMapIcons_shouldFilterByRadius() {
+      // Arrange
+      MapIcon icon = createIcon("Hospital", "123 Main St", "555-1234");
+      List<MapIcon> icons = List.of(icon);
+      when(mapIconRepository.findAll()).thenReturn(icons);
+
+      // Create a spy that properly intercepts the isWithinRadius method call
+      MapIconService spyService = org.mockito.Mockito.spy(mapIconService);
+
+      // Use PowerMockito to mock the private method
+      // Since we can't do that directly, we mock calculateDistance with a large value
+      // The key is to make sure we're mocking all possible calls to calculateDistance
+      org.mockito.Mockito.doReturn(20.0).when(spyService).calculateDistance(
+          org.mockito.ArgumentMatchers.eq(0.0),
+          org.mockito.ArgumentMatchers.eq(0.0),
+          org.mockito.ArgumentMatchers.eq(0.0),
+          org.mockito.ArgumentMatchers.eq(0.0));
+
+      // Act
+      List<MapIconResponseDto> result = spyService.getMapIcons(0.0, 0.0, 10.0, null);
+
+      // Assert
+      assertEquals(0, result.size());
+      verify(mapIconRepository).findAll();
+    }
+  }
 }

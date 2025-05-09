@@ -235,6 +235,11 @@ public class HouseholdController {
       return ResponseEntity.ok(details);
     } catch (IllegalArgumentException e) {
       LOGGER.warn("Validation error during household member retrieval: {}", e.getMessage());
+      if ("User does not belong to a household".equals(e.getMessage())) {
+        return ResponseEntity
+            .status(404)
+            .body(Map.of("error", e.getMessage()));
+      }
       return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     } catch (Exception e) {
       LOGGER.error("Unexpected error during household member retrieval: {}", e.getMessage(), e);

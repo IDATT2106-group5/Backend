@@ -414,17 +414,16 @@ public class HouseholdService {
   }
 
   /**
-   * Gets the members of a household by household id.
+   * Gets the details of the current user's household.
    *
    * @return A map containing household details, registered users, and unregistered members.
+   * @throws IllegalArgumentException if the user is not found or does not belong to a household
    */
   public Map<String, Object> getHouseholdDetails() {
     logger.info("Getting household details for current user");
 
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     String email = authentication.getName();
-
-    Map<String, Object> resultMap = new HashMap<>();
 
     User user = userRepository.findByEmail(email)
         .orElseThrow(() -> {
@@ -439,23 +438,45 @@ public class HouseholdService {
       throw new IllegalArgumentException("User does not belong to a household");
     }
 
+    Map<String, Object> resultMap = new HashMap<>();
+
+    // Create owner DTO only if owner exists
+    UserResponseDto ownerDto = null;
+    if (household.getOwner() != null) {
+      User owner = household.getOwner();
+      ownerDto = new UserResponseDto(
+          owner.getId(),
+          owner.getEmail(),
+          owner.getFullName(),
+          owner.getTlf(),
+          owner.getRole()
+      );
+    }
+
     resultMap.put("household",
-        new HouseholdResponseDto(household.getId(), household.getName(), household.getAddress(),
-            new UserResponseDto(household.getOwner().getId(), household.getOwner().getEmail(),
-                household.getOwner().getFullName(), household.getOwner().getTlf(),
-                household.getOwner().getRole()
-            )));
+        new HouseholdResponseDto(
+            household.getId(),
+            household.getName(),
+            household.getAddress(),
+            ownerDto));  // This can now be null safely
 
     List<UserResponseDto> userResponseDtos = userRepository.getUsersByHousehold(household).stream()
-        .map(u -> new UserResponseDto(u.getId(), u.getEmail(), u.getFullName(), u.getTlf(),
-            u.getRole())).collect(Collectors.toList());
+        .map(u -> new UserResponseDto(
+            u.getId(),
+            u.getEmail(),
+            u.getFullName(),
+            u.getTlf(),
+            u.getRole()))
+        .collect(Collectors.toList());
     logger.debug("Found {} registered users in household", userResponseDtos.size());
 
     List<UnregisteredMemberResponseDto> unregisteredMemberResponseDtos =
         unregisteredHouseholdMemberRepository.findUnregisteredHouseholdMembersByHousehold(household)
-            .stream().map(
-                unregisteredMember -> new UnregisteredMemberResponseDto(unregisteredMember.getId(),
-                    unregisteredMember.getFullName())).collect(Collectors.toList());
+            .stream()
+            .map(unregisteredMember -> new UnregisteredMemberResponseDto(
+                unregisteredMember.getId(),
+                unregisteredMember.getFullName()))
+            .collect(Collectors.toList());
     logger.debug("Found {} unregistered members in household",
         unregisteredMemberResponseDtos.size());
 
@@ -537,6 +558,12 @@ public class HouseholdService {
     Household household = householdRepository.findById(currentUser.getHousehold().getId())
         .orElseThrow(() -> new IllegalArgumentException("Household not found"));
 
+    if (!household.getOwner().getId().equals(currentUser.getId())) {
+      logger.warn("User {} is not authorized to transfer ownership of household {}",
+          currentUser.getFullName(), household.getName());
+      throw new IllegalArgumentException("Only the owner can transfer ownership");
+    }
+
     if (household.getOwner().getId().equals(newOwner.getId())) {
       logger.warn("User {} is already the owner of household {}", newOwner.getFullName(),
           household.getName());
@@ -594,6 +621,10 @@ public class HouseholdService {
     Household household =
         householdRepository.findById(user.getHousehold().getId()).orElseThrow(() ->
             new IllegalArgumentException("Household not found"));
+
+    if (user.getHousehold() == null) {
+      throw new IllegalArgumentException("User is not associated with any household");
+    }
 
     if (!household.getOwner().getId().equals(user.getId())) {
       logger.warn("User {} is not authorized to edit household {}", user.getId(),

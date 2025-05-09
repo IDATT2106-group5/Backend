@@ -1,6 +1,5 @@
 package edu.ntnu.idatt2106.krisefikser.service;
 
-import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.notification.NotificationDto;
 import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserHouseholdAssignmentRequestDto;
@@ -46,10 +45,10 @@ public class MembershipRequestService {
    * @param householdService            the household service
    */
   public MembershipRequestService(MembershipRequestRepository membershipRequestRepository,
-                                  HouseholdRepository householdRepository,
-                                  UserRepository userRepository,
-                                  NotificationService notificationService,
-                                  HouseholdService householdService) {
+      HouseholdRepository householdRepository,
+      UserRepository userRepository,
+      NotificationService notificationService,
+      HouseholdService householdService) {
     this.membershipRequestRepository = membershipRequestRepository;
     this.householdRepository = householdRepository;
     this.userRepository = userRepository;
@@ -61,7 +60,7 @@ public class MembershipRequestService {
   /**
    * Send an invitation to a user to join a household.
    *
-   * @param email       the email
+   * @param email the email
    */
   public void sendInvitation(String email) {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -341,7 +340,8 @@ public class MembershipRequestService {
     List<MembershipRequest> requests =
         membershipRequestRepository.findAllByHouseholdIdAndTypeAndStatus(
             household.getId(), RequestType.JOIN_REQUEST, RequestStatus.PENDING);
-    logger.debug("Found {} pending join requests for household {}", requests.size(), household.getId());
+    logger.debug("Found {} pending join requests for household {}", requests.size(),
+        household.getId());
 
     List<MembershipRequestResponseDto> result = requests.stream().map(request ->
         new MembershipRequestResponseDto(
@@ -360,7 +360,8 @@ public class MembershipRequestService {
         )
     ).toList();
 
-    logger.info("Returning {} received join requests for household {}", result.size(), household.getId());
+    logger.info("Returning {} received join requests for household {}", result.size(),
+        household.getId());
     return result;
   }
 
@@ -379,7 +380,6 @@ public class MembershipRequestService {
         });
     Household household = user.getHousehold();
     String householdId = household.getId();
-
 
     logger.info("Getting accepted join requests for household with ID: {}", householdId);
 

@@ -9,8 +9,21 @@ public class UnregisteredMemberHouseholdAssignmentRequestDto {
 
   private String fullName;
 
+  /**
+   * Gets full name.
+   *
+   * @return the full name
+   */
   public String getFullName() {
     return fullName;
   }
 
+  /**
+   * Sets full name.
+   *
+   * @param fullName the full name
+   */
+  public void setFullName(String fullName) {
+    this.fullName = fullName;
+  }
 }

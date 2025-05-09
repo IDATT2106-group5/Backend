@@ -1,297 +1,621 @@
-//package edu.ntnu.idatt2106.krisefikser.api.controller;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertTrue;
-//import static org.mockito.Mockito.doThrow;
-//import static org.mockito.Mockito.mock;
-//import static org.mockito.Mockito.times;
-//import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.when;
-//
-//import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestDto;
-//import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
-//import java.util.Collections;
-//import java.util.Map;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Nested;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.http.ResponseEntity;
-//
-///**
-// * Test class for {@link MembershipRequestController}.
-// * It validates the controller responses for various scenarios using a mocked
-// * {@link MembershipRequestService}.
-// */
-//class MembershipRequestControllerTest {
-//
-//  private MembershipRequestService membershipRequestService;
-//  private MembershipRequestController controller;
-//
-//  /**
-//   * Initializes a mocked {@code MembershipRequestService} and creates an instance
-//   * of {@code MembershipRequestController} before each test.
-//   */
-//  @BeforeEach
-//  void setUp() {
-//    membershipRequestService = mock(MembershipRequestService.class);
-//    controller = new MembershipRequestController(membershipRequestService);
-//  }
-//
-//  /**
-//   * Nested class for testing the retrieval of active membership requests.
-//   */
-//  @Nested
-//  class GetActiveMembershipRequestsTests {
-//
-//    /**
-//     * Tests that a valid user email returns an OK status with an empty list.
-//     */
-//    @Test
-//    void getActiveMembershipRequestsWithValidUserReturnsOk() {
-//      Long userId = "user@example.com";
-//      when(membershipRequestService.getActiveRequestsByUser(userId))
-//          .thenReturn(Collections.emptyList());
-//      ResponseEntity<Map<String, Object>> response =
-//          controller.getActiveMembershipRequests(userId);
-//
-//      Map<String, Object> expected = Map.of("active requests", Collections.emptyList());
-//      assertEquals(200, response.getStatusCodeValue());
-//      assertEquals(expected, response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an invalid user email returns a Bad Request status with an error message.
-//     */
-//    @Test
-//    void getActiveMembershipRequestsWithInvalidUserReturnsBadRequest() {
-//      String userEmail = "invalid@example.com";
-//      when(membershipRequestService.getActiveRequestsByUser(userEmail))
-//          .thenThrow(new IllegalArgumentException("Invalid user email"));
-//      ResponseEntity<Map<String, Object>> response =
-//          controller.getActiveMembershipRequests(userEmail);
-//
-//      assertEquals(400, response.getStatusCodeValue());
-//      assertTrue(response.getBody().containsKey("error"));
-//      assertEquals("Invalid user email", response.getBody().get("error"));
-//    }
-//
-//    /**
-//     * Tests that an unexpected error during request retrieval returns an Internal Server Error.
-//     */
-//    @Test
-//    void getActiveMembershipRequestsWithUnexpectedErrorReturnsInternalServerError() {
-//      String userEmail = "error@example.com";
-//      when(membershipRequestService.getActiveRequestsByUser(userEmail))
-//          .thenThrow(new RuntimeException("Unexpected error"));
-//      ResponseEntity<Map<String, Object>> response =
-//          controller.getActiveMembershipRequests(userEmail);
-//
-//      assertEquals(500, response.getStatusCodeValue());
-//      assertTrue(response.getBody().containsKey("error"));
-//      assertEquals("Internal server error", response.getBody().get("error"));
-//    }
-//
-//  }
-//
-//  /**
-//   * Nested class for testing the sending invitation functionality.
-//   */
-//  @Nested
-//  class SendInvitationTests {
-//
-//    /**
-//     * Tests that a valid invitation request returns an OK status and proper message.
-//     */
-//    @Test
-//    void sendInvitationWithValidRequestReturnsOk() {
-//      MembershipRequestDto request = new MembershipRequestDto();
-//      request.setUserEmail("user@example.com");
-//      ResponseEntity<String> response = controller.sendInvitation(request);
-//
-//      verify(membershipRequestService, times(1)).sendInvitation(request);
-//      assertEquals(200, response.getStatusCodeValue());
-//      assertEquals("Invitation sent successfully", response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an invalid invitation request returns a Bad Request status with an error message.
-//     */
-//    @Test
-//    void sendInvitationWithInvalidRequestReturnsBadRequest() {
-//      MembershipRequestDto request = new MembershipRequestDto();
-//      request.setUserEmail("user@example.com");
-//      doThrow(new IllegalArgumentException("Invalid invitation"))
-//          .when(membershipRequestService).sendInvitation(request);
-//      ResponseEntity<String> response = controller.sendInvitation(request);
-//
-//      assertEquals(400, response.getStatusCodeValue());
-//      assertEquals("Invalid invitation", response.getBody());
-//    }
-//
-//  }
-//
-//  /**
-//   * Nested class for testing the sending join request functionality.
-//   */
-//  @Nested
-//  class SendJoinRequestTests {
-//
-//    /**
-//     * Tests that a valid join request returns an OK status and proper message.
-//     */
-//    @Test
-//    void sendJoinRequestWithValidRequestReturnsOk() {
-//      MembershipRequestDto request = new MembershipRequestDto();
-//      request.setUserEmail("user@example.com");
-//      ResponseEntity<String> response = controller.sendJoinRequest(request);
-//
-//      verify(membershipRequestService, times(1)).sendJoinRequest(request);
-//      assertEquals(200, response.getStatusCodeValue());
-//      assertEquals("Join request sent successfully", response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an unexpected error while sending an invitation returns an Internal Server Error.
-//     */
-//    @Test
-//    void sendInvitationWithUnexpectedErrorReturnsInternalServerError() {
-//      MembershipRequestDto request = new MembershipRequestDto();
-//      request.setUserEmail("user@example.com");
-//      doThrow(new RuntimeException("Unexpected error"))
-//          .when(membershipRequestService).sendInvitation(request);
-//      ResponseEntity<String> response = controller.sendInvitation(request);
-//
-//      assertEquals(500, response.getStatusCodeValue());
-//      assertEquals("Internal server error", response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an invalid join request returns a Bad Request status with an error message.
-//     */
-//    @Test
-//    void sendJoinRequestWithInvalidRequestReturnsBadRequest() {
-//      MembershipRequestDto request = new MembershipRequestDto();
-//      request.setUserEmail("user@example.com");
-//      doThrow(new IllegalArgumentException("Invalid join request"))
-//          .when(membershipRequestService).sendJoinRequest(request);
-//      ResponseEntity<String> response = controller.sendJoinRequest(request);
-//
-//      assertEquals(400, response.getStatusCodeValue());
-//      assertEquals("Invalid join request", response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an unexpected error during a join request returns an Internal Server Error.
-//     */
-//    @Test
-//    void sendJoinRequestWithUnexpectedErrorReturnsInternalServerError() {
-//      MembershipRequestDto request = new MembershipRequestDto();
-//      request.setUserEmail("user@example.com");
-//      doThrow(new RuntimeException("Unexpected error"))
-//          .when(membershipRequestService).sendJoinRequest(request);
-//      ResponseEntity<String> response = controller.sendJoinRequest(request);
-//
-//      assertEquals(500, response.getStatusCodeValue());
-//      assertEquals("Internal server error", response.getBody());
-//    }
-//
-//  }
-//
-//  /**
-//   * Nested class for testing the request decline functionality.
-//   */
-//  @Nested
-//  class DeclineRequestTests {
-//
-//    /**
-//     * Tests that a valid request ID for declining a request returns an OK status.
-//     */
-//    @Test
-//    void declineRequestWithValidRequestIdReturnsOk() {
-//      Long requestId = 1L;
-//      ResponseEntity<String> response = controller.declineRequest(requestId);
-//
-//      verify(membershipRequestService, times(1)).declineRequest(requestId);
-//      assertEquals(200, response.getStatusCodeValue());
-//      assertEquals("Request declined successfully", response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an invalid request ID for declining a request returns a Bad Request status with an error message.
-//     */
-//    @Test
-//    void declineRequestWithInvalidRequestIdReturnsBadRequest() {
-//      Long requestId = 2L;
-//      doThrow(new IllegalArgumentException("Invalid request ID"))
-//          .when(membershipRequestService).declineRequest(requestId);
-//      ResponseEntity<String> response = controller.declineRequest(requestId);
-//
-//      assertEquals(400, response.getStatusCodeValue());
-//      assertEquals("Invalid request ID", response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an unexpected error while declining a request returns an Internal Server Error.
-//     */
-//    @Test
-//    void declineRequestWithUnexpectedErrorReturnsInternalServerError() {
-//      Long requestId = 3L;
-//      doThrow(new RuntimeException("Unexpected error"))
-//          .when(membershipRequestService).declineRequest(requestId);
-//      ResponseEntity<String> response = controller.declineRequest(requestId);
-//
-//      assertEquals(500, response.getStatusCodeValue());
-//      assertEquals("Internal server error", response.getBody());
-//    }
-//
-//  }
-//
-//  /**
-//   * Nested class for testing the request acceptance functionality.
-//   */
-//  @Nested
-//  class AcceptRequestTests {
-//
-//    /**
-//     * Tests that a valid request ID for accepting a request returns an OK status.
-//     */
-//    @Test
-//    void acceptRequestWithValidRequestIdReturnsOk() {
-//      Long requestId = 1L;
-//      ResponseEntity<String> response = controller.acceptRequest(requestId);
-//
-//      verify(membershipRequestService, times(1)).acceptRequest(requestId);
-//      assertEquals(200, response.getStatusCodeValue());
-//      assertEquals("Request accepted successfully", response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an invalid request ID for accepting a request returns a Bad Request status with an error message.
-//     */
-//    @Test
-//    void acceptRequestWithInvalidRequestIdReturnsBadRequest() {
-//      Long requestId = 2L;
-//      doThrow(new IllegalArgumentException("Invalid request ID"))
-//          .when(membershipRequestService).acceptRequest(requestId);
-//      ResponseEntity<String> response = controller.acceptRequest(requestId);
-//
-//      assertEquals(400, response.getStatusCodeValue());
-//      assertEquals("Invalid request ID", response.getBody());
-//    }
-//
-//    /**
-//     * Tests that an unexpected error while accepting a request returns an Internal Server Error.
-//     */
-//    @Test
-//    void acceptRequestWithUnexpectedErrorReturnsInternalServerError() {
-//      Long requestId = 3L;
-//      doThrow(new RuntimeException("Unexpected error"))
-//          .when(membershipRequestService).acceptRequest(requestId);
-//      ResponseEntity<String> response = controller.acceptRequest(requestId);
-//
-//      assertEquals(500, response.getStatusCodeValue());
-//      assertEquals("Internal server error", response.getBody());
-//    }
-//
-//  }
-//}
+package edu.ntnu.idatt2106.krisefikser.api.controller;
+
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipInviteDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.MembershipRequestResponseDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.membershiprequest.RequestOperationDto;
+import edu.ntnu.idatt2106.krisefikser.api.dto.user.UserResponseDto;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestStatus;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.RequestType;
+import edu.ntnu.idatt2106.krisefikser.persistance.enums.Role;
+import edu.ntnu.idatt2106.krisefikser.service.MembershipRequestService;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+@ExtendWith(MockitoExtension.class)
+class MembershipRequestControllerTest {
+
+  @Mock
+  private MembershipRequestService membershipRequestService;
+
+  @InjectMocks
+  private MembershipRequestController membershipRequestController;
+
+  private MockMvc mockMvc;
+  private ObjectMapper objectMapper;
+  private MembershipRequestResponseDto testResponse;
+  private UserResponseDto senderDto;
+  private UserResponseDto recipientDto;
+
+  @BeforeEach
+  void setUp() {
+    mockMvc = MockMvcBuilders.standaloneSetup(membershipRequestController).build();
+    objectMapper = new ObjectMapper();
+
+    senderDto = new UserResponseDto("sender-123", "sender@example.com", "John Sender",
+        "+4712345678", Role.USER);
+    recipientDto = new UserResponseDto("recipient-456", "recipient@example.com", "Jane Recipient",
+        "+4787654321", Role.USER);
+
+    testResponse = new MembershipRequestResponseDto(
+        1L,
+        "household-123",
+        "Test Household",
+        senderDto,
+        recipientDto,
+        RequestType.INVITATION,
+        RequestStatus.PENDING,
+        Timestamp.valueOf(LocalDateTime.now())
+    );
+  }
+
+  @Test
+  void getActiveInvitations_shouldReturnOkWithInvitations() throws Exception {
+    // Arrange
+    List<MembershipRequestResponseDto> invitations = List.of(testResponse);
+    when(membershipRequestService.getReceivedInvitationsByUser()).thenReturn(invitations);
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/received")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(1L))
+        .andExpect(jsonPath("$[0].householdId").value("household-123"))
+        .andExpect(jsonPath("$[0].householdName").value("Test Household"))
+        .andExpect(jsonPath("$[0].requestType").value(RequestType.INVITATION.toString()));
+
+    verify(membershipRequestService).getReceivedInvitationsByUser();
+  }
+
+  @Test
+  void getActiveInvitations_shouldReturnBadRequest_whenIllegalArgumentException() throws Exception {
+    // Arrange
+    when(membershipRequestService.getReceivedInvitationsByUser())
+        .thenThrow(new IllegalArgumentException("Invalid request"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/received")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Invalid request"));
+  }
+
+  @Test
+  void getActiveInvitations_shouldReturnInternalServerError_whenGeneralException()
+      throws Exception {
+    // Arrange
+    when(membershipRequestService.getReceivedInvitationsByUser())
+        .thenThrow(new RuntimeException("Server error"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/received")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.error").value("Internal server error"));
+  }
+
+  @Test
+  void getActiveJoinRequests_shouldReturnOkWithRequests() throws Exception {
+    // Arrange
+    MembershipRequestResponseDto joinRequest = new MembershipRequestResponseDto(
+        2L,
+        "household-123",
+        "Test Household",
+        senderDto,
+        recipientDto,
+        RequestType.JOIN_REQUEST,
+        RequestStatus.PENDING,
+        Timestamp.valueOf(LocalDateTime.now())
+    );
+    List<MembershipRequestResponseDto> requests = List.of(joinRequest);
+    when(membershipRequestService.getReceivedJoinRequestsByHousehold()).thenReturn(requests);
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/join-requests/received")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(2L))
+        .andExpect(jsonPath("$[0].requestType").value(RequestType.JOIN_REQUEST.toString()));
+
+    verify(membershipRequestService).getReceivedJoinRequestsByHousehold();
+  }
+
+  @Test
+  void getActiveJoinRequests_shouldReturnBadRequest_whenIllegalArgumentException()
+      throws Exception {
+    // Arrange
+    when(membershipRequestService.getReceivedJoinRequestsByHousehold())
+        .thenThrow(new IllegalArgumentException("Invalid request"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/join-requests/received")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Invalid request"));
+  }
+
+  @Test
+  void getActiveJoinRequests_shouldReturnInternalServerError_whenGeneralException()
+      throws Exception {
+    // Arrange
+    when(membershipRequestService.getReceivedJoinRequestsByHousehold())
+        .thenThrow(new RuntimeException("Server error"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/join-requests/received")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.error").value("Internal server error"));
+  }
+
+  @Test
+  void getActiveAcceptedJoinRequests_shouldReturnOkWithRequests() throws Exception {
+    // Arrange
+    MembershipRequestResponseDto acceptedRequest = new MembershipRequestResponseDto(
+        3L,
+        "household-123",
+        "Test Household",
+        senderDto,
+        recipientDto,
+        RequestType.JOIN_REQUEST,
+        RequestStatus.ACCEPTED,
+        Timestamp.valueOf(LocalDateTime.now())
+    );
+    List<MembershipRequestResponseDto> requests = List.of(acceptedRequest);
+    when(membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold()).thenReturn(
+        requests);
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/join-requests/received/accepted")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(3L))
+        .andExpect(jsonPath("$[0].status").value(RequestStatus.ACCEPTED.toString()));
+
+    verify(membershipRequestService).getAcceptedReceivedJoinRequestsByHousehold();
+  }
+
+  @Test
+  void getActiveAcceptedJoinRequests_shouldReturnBadRequest_whenIllegalArgumentException()
+      throws Exception {
+    // Arrange
+    when(membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold())
+        .thenThrow(new IllegalArgumentException("Invalid request"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/join-requests/received/accepted")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Invalid request"));
+  }
+
+  @Test
+  void getActiveAcceptedJoinRequests_shouldReturnInternalServerError_whenGeneralException()
+      throws Exception {
+    // Arrange
+    when(membershipRequestService.getAcceptedReceivedJoinRequestsByHousehold())
+        .thenThrow(new RuntimeException("Server error"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/join-requests/received/accepted")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.error").value("Internal server error"));
+  }
+
+  @Test
+  void getActiveRequests_shouldReturnOkWithRequests() throws Exception {
+    // Arrange
+    List<MembershipRequestResponseDto> requests = List.of(testResponse);
+    when(membershipRequestService.getReceivedInvitationsByUser()).thenReturn(requests);
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/sent")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(1L))
+        .andExpect(jsonPath("$[0].householdName").value("Test Household"));
+
+    verify(membershipRequestService).getReceivedInvitationsByUser();
+  }
+
+  @Test
+  void getActiveRequests_shouldReturnBadRequest_whenIllegalArgumentException() throws Exception {
+    // Arrange
+    when(membershipRequestService.getReceivedInvitationsByUser())
+        .thenThrow(new IllegalArgumentException("Invalid request"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/sent")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Invalid request"));
+  }
+
+  @Test
+  void getActiveRequests_shouldReturnInternalServerError_whenGeneralException() throws Exception {
+    // Arrange
+    when(membershipRequestService.getReceivedInvitationsByUser())
+        .thenThrow(new RuntimeException("Server error"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/sent")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.error").value("Internal server error"));
+  }
+
+  @Test
+  void sendInvitation_shouldReturnOk() throws Exception {
+    // Arrange
+    MembershipInviteDto inviteDto = new MembershipInviteDto("test@example.com");
+    doNothing().when(membershipRequestService).sendInvitation(anyString());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/send-invitation")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(inviteDto)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.Message").value("Invitation sent successfully"));
+
+    verify(membershipRequestService).sendInvitation("test@example.com");
+  }
+
+  @Test
+  void sendInvitation_shouldReturnBadRequest_whenIllegalArgumentException() throws Exception {
+    // Arrange
+    MembershipInviteDto inviteDto = new MembershipInviteDto("invalid@example.com");
+    doThrow(new IllegalArgumentException("User not found"))
+        .when(membershipRequestService).sendInvitation(anyString());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/send-invitation")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(inviteDto)))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("User not found"));
+  }
+
+  @Test
+  void sendInvitation_shouldReturnInternalServerError_whenGeneralException() throws Exception {
+    // Arrange
+    MembershipInviteDto inviteDto = new MembershipInviteDto("error@example.com");
+    doThrow(new RuntimeException("Server error"))
+        .when(membershipRequestService).sendInvitation(anyString());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/send-invitation")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(inviteDto)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.error").value("Internal server error"));
+  }
+
+  @Test
+  void getInvitationsSentByHousehold_shouldReturnOkWithInvitations() throws Exception {
+    // Arrange
+    List<MembershipRequestResponseDto> invitations = List.of(testResponse);
+    when(membershipRequestService.getInvitationsSentByHousehold()).thenReturn(invitations);
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/sent/by-household")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(1L))
+        .andExpect(jsonPath("$[0].householdName").value("Test Household"));
+
+    verify(membershipRequestService).getInvitationsSentByHousehold();
+  }
+
+  @Test
+  void getInvitationsSentByHousehold_shouldReturnBadRequest_whenIllegalArgumentException()
+      throws Exception {
+    // Arrange
+    when(membershipRequestService.getInvitationsSentByHousehold())
+        .thenThrow(new IllegalArgumentException("Invalid request"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/sent/by-household")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.error").value("Invalid request"));
+  }
+
+  @Test
+  void getInvitationsSentByHousehold_shouldReturnInternalServerError_whenGeneralException()
+      throws Exception {
+    // Arrange
+    when(membershipRequestService.getInvitationsSentByHousehold())
+        .thenThrow(new RuntimeException("Server error"));
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/invitations/sent/by-household")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.error").value("Internal server error"));
+  }
+
+  @Test
+  void sendJoinRequest_shouldReturnOk() throws Exception {
+    // Arrange
+    Map<String, String> requestBody = Map.of("householdId", "household-123");
+    doNothing().when(membershipRequestService).sendJoinRequest(anyString());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/send-join-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestBody)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Join request sent successfully"));
+
+    verify(membershipRequestService).sendJoinRequest("household-123");
+  }
+
+  @Test
+  void sendJoinRequest_shouldReturnBadRequest_whenIllegalArgumentException() throws Exception {
+    // Arrange
+    Map<String, String> requestBody = Map.of("householdId", "invalid-id");
+    doThrow(new IllegalArgumentException("Household not found"))
+        .when(membershipRequestService).sendJoinRequest(anyString());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/send-join-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestBody)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Household not found"));
+  }
+
+  @Test
+  void sendJoinRequest_shouldReturnInternalServerError_whenGeneralException() throws Exception {
+    // Arrange
+    Map<String, String> requestBody = Map.of("householdId", "error-id");
+    doThrow(new RuntimeException("Server error"))
+        .when(membershipRequestService).sendJoinRequest(anyString());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/send-join-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(requestBody)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().string("Internal server error"));
+  }
+
+  @Test
+  void declineRequest_shouldReturnOk() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 1L);
+
+    doNothing().when(membershipRequestService).declineRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/decline")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Request declined successfully"));
+
+    verify(membershipRequestService).declineRequest(1L);
+  }
+
+  // Helper method to set private fields using reflection
+  private void setPrivateField(Object object, String fieldName, Object value) throws Exception {
+    java.lang.reflect.Field field = object.getClass().getDeclaredField(fieldName);
+    field.setAccessible(true);
+    field.set(object, value);
+  }
+
+  @Test
+  void declineRequest_shouldReturnBadRequest_whenIllegalArgumentException() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 999L);
+
+    doThrow(new IllegalArgumentException("Request not found"))
+        .when(membershipRequestService).declineRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/decline")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Request not found"));
+  }
+
+  @Test
+  void declineRequest_shouldReturnInternalServerError_whenGeneralException() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 1L);
+
+    doThrow(new RuntimeException("Server error"))
+        .when(membershipRequestService).declineRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/decline")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().string("Internal server error"));
+  }
+
+  @Test
+  void acceptJoinRequest_shouldReturnOk() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 1L);
+
+    doNothing().when(membershipRequestService).acceptJoinRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/accept-join-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Request accepted successfully"));
+
+    verify(membershipRequestService).acceptJoinRequest(1L);
+  }
+
+  @Test
+  void acceptJoinRequest_shouldReturnBadRequest_whenIllegalArgumentException() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 999L);
+
+    doThrow(new IllegalArgumentException("Request not found"))
+        .when(membershipRequestService).acceptJoinRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/accept-join-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Request not found"));
+  }
+
+  @Test
+  void acceptJoinRequest_shouldReturnInternalServerError_whenGeneralException() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 1L);
+
+    doThrow(new RuntimeException("Server error"))
+        .when(membershipRequestService).acceptJoinRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/accept-join-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().string("Internal server error"));
+  }
+
+  @Test
+  void acceptInvitationRequest_shouldReturnOk() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 1L);
+
+    doNothing().when(membershipRequestService).acceptInvitationRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/accept-invitation-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Request accepted successfully"));
+
+    verify(membershipRequestService).acceptInvitationRequest(1L);
+  }
+
+  @Test
+  void acceptInvitationRequest_shouldReturnBadRequest_whenIllegalArgumentException()
+      throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 999L);
+
+    doThrow(new IllegalArgumentException("Request not found"))
+        .when(membershipRequestService).acceptInvitationRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/accept-invitation-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Request not found"));
+  }
+
+  @Test
+  void acceptInvitationRequest_shouldReturnInternalServerError_whenGeneralException()
+      throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 1L);
+
+    doThrow(new RuntimeException("Server error"))
+        .when(membershipRequestService).acceptInvitationRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/accept-invitation-request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().string("Internal server error"));
+  }
+
+  @Test
+  void cancelRequest_shouldReturnOk() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 1L);
+
+    doNothing().when(membershipRequestService).cancelRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/cancel")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isOk())
+        .andExpect(content().string("Request accepted successfully"));
+
+    verify(membershipRequestService).cancelRequest(1L);
+  }
+
+  @Test
+  void cancelRequest_shouldReturnBadRequest_whenIllegalArgumentException() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 999L);
+
+    doThrow(new IllegalArgumentException("Request not found"))
+        .when(membershipRequestService).cancelRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/cancel")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Request not found"));
+  }
+
+  @Test
+  void cancelRequest_shouldReturnInternalServerError_whenGeneralException() throws Exception {
+    // Arrange
+    RequestOperationDto request = new RequestOperationDto();
+    setPrivateField(request, "requestId", 1L);
+
+    doThrow(new RuntimeException("Server error"))
+        .when(membershipRequestService).cancelRequest(anyLong());
+
+    // Act & Assert
+    mockMvc.perform(post("/api/membership-requests/cancel")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(content().string("Internal server error"));
+  }
+}

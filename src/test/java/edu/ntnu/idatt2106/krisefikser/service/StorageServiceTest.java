@@ -2,14 +2,16 @@ package edu.ntnu.idatt2106.krisefikser.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Household;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.Item;
 import edu.ntnu.idatt2106.krisefikser.persistance.entity.StorageItem;
@@ -38,12 +40,16 @@ class StorageServiceTest {
   private final String householdId = "1L";
   private final Long itemId = 2L;
   private final Long storageItemId = 3L;
+
   @Mock
   private StorageItemRepository storageItemRepository;
+
   @Mock
   private ItemRepository itemRepository;
+
   @Mock
   private UserRepository userRepository;
+
   @InjectMocks
   private StorageService storageService;
 
@@ -53,65 +59,52 @@ class StorageServiceTest {
   }
 
   @Nested
-  class GetHouseholdStorageTests {
+  class GetStorageItemsByHouseholdTests {
 
-    @Test
-    void getHouseholdStorage_shouldReturnItems() {
-//      // Arrange
-//      StorageItem item1 = new StorageItem();
-//      item1.setId(1L);
-//      StorageItem item2 = new StorageItem();
-//      item2.setId(2L);
-//      List<StorageItem> expectedItems = Arrays.asList(item1, item2);
-//
-//      when(storageItemRepository.findByHouseholdId(householdId)).thenReturn(expectedItems);
-//
-//      // Act
-//      List<StorageItem> result = storageService.getHouseholdStorage(householdId);
-//
-//      // Assert
-//      assertEquals(expectedItems.size(), result.size());
-//      assertEquals(expectedItems, result);
-//      verify(storageItemRepository).findByHouseholdId(householdId);
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+      Authentication authentication = mock(Authentication.class);
+      SecurityContext securityContext = mock(SecurityContext.class);
+      SecurityContextHolder.setContext(securityContext);
+
+      user = new User();
+      Household household = new Household();
+      household.setId(householdId);
+      user.setHousehold(household);
+
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("user@example.com");
     }
 
-    @Test
-    void getHouseholdStorage_shouldReturnEmptyList_whenNoItemsFound() {
-//      // Arrange
-//      when(storageItemRepository.findByHouseholdId(householdId)).thenReturn(
-//          Collections.emptyList());
-//
-//      // Act
-//      List<StorageItem> result = storageService.getHouseholdStorage(householdId);
-//
-//      // Assert
-//      assertTrue(result.isEmpty());
-//      verify(storageItemRepository).findByHouseholdId(householdId);
+    @AfterEach
+    void tearDown() {
+      SecurityContextHolder.clearContext();
     }
   }
 
   @Nested
-  class GetHouseholdStorageByItemTypeTests {
+  class GetStorageItemsByHouseholdAndTypeTests {
 
-    @Test
-    void getHouseholdStorageByItemType_shouldReturnFilteredItems() {
-//      // Arrange
-//      ItemType itemType = ItemType.WATER;
-//      StorageItem item1 = new StorageItem();
-//      item1.setId(1L);
-//      List<StorageItem> expectedItems = Collections.singletonList(item1);
-//
-//      when(storageItemRepository.findByHouseholdIdAndItemItemType(householdId, itemType))
-//          .thenReturn(expectedItems);
-//
-//      // Act
-//      List<StorageItem> result = storageService.getHouseholdStorageByItemType(householdId,
-//          itemType);
-//
-//      // Assert
-//      assertEquals(expectedItems.size(), result.size());
-//      assertEquals(expectedItems, result);
-//      verify(storageItemRepository).findByHouseholdIdAndItemItemType(householdId, itemType);
+    @BeforeEach
+    void setUp() {
+      Authentication authentication = mock(Authentication.class);
+      SecurityContext securityContext = mock(SecurityContext.class);
+      SecurityContextHolder.setContext(securityContext);
+
+      User user = new User();
+      Household household = new Household();
+      household.setId(householdId);
+      user.setHousehold(household);
+
+      when(securityContext.getAuthentication()).thenReturn(authentication);
+      when(authentication.getName()).thenReturn("user@example.com");
+    }
+
+    @AfterEach
+    void tearDown() {
+      SecurityContextHolder.clearContext();
     }
   }
 
@@ -144,15 +137,13 @@ class StorageServiceTest {
   @Nested
   class AddItemToStorageTests {
 
-    private Authentication authentication;
-    private SecurityContext securityContext;
     private User user;
 
     @BeforeEach
     void setUp() {
       // Create and set up security context mock
-      authentication = mock(Authentication.class);
-      securityContext = mock(SecurityContext.class);
+      Authentication authentication = mock(Authentication.class);
+      SecurityContext securityContext = mock(SecurityContext.class);
       SecurityContextHolder.setContext(securityContext);
 
       // Create user with household
@@ -251,6 +242,95 @@ class StorageServiceTest {
 
       // Assert
       verify(storageItemRepository).deleteById(storageItemId);
+    }
+  }
+
+  @Nested
+  class UpdateStorageItemTests {
+
+    @Test
+    void updateStorageItem_shouldUpdateAndReturnItem() {
+      // Arrange
+      String newUnit = "kilograms";
+      Integer newAmount = 10;
+      LocalDateTime newExpirationDate = LocalDateTime.now().plusDays(14);
+
+      StorageItem existingItem = new StorageItem();
+      existingItem.setId(storageItemId);
+      existingItem.setUnit("grams");
+      existingItem.setAmount(5);
+      existingItem.setExpirationDate(LocalDateTime.now().plusDays(7));
+
+      when(storageItemRepository.findById(storageItemId)).thenReturn(Optional.of(existingItem));
+      when(storageItemRepository.save(any(StorageItem.class))).thenAnswer(
+          invocation -> invocation.getArgument(0));
+
+      // Act
+      StorageItem result = storageService.updateStorageItem(storageItemId, newUnit, newAmount,
+          newExpirationDate);
+
+      // Assert
+      assertNotNull(result);
+      assertEquals(newUnit, result.getUnit());
+      assertEquals(newAmount, result.getAmount());
+      assertEquals(newExpirationDate, result.getExpirationDate());
+
+      ArgumentCaptor<StorageItem> captor = ArgumentCaptor.forClass(StorageItem.class);
+      verify(storageItemRepository).save(captor.capture());
+
+      StorageItem capturedItem = captor.getValue();
+      assertEquals(newUnit, capturedItem.getUnit());
+      assertEquals(newAmount, capturedItem.getAmount());
+      assertEquals(newExpirationDate, capturedItem.getExpirationDate());
+    }
+
+    @Test
+    void updateStorageItem_shouldUpdateOnlyProvidedFields() {
+      // Arrange
+      String newUnit = "kilograms";
+
+      StorageItem existingItem = new StorageItem();
+      existingItem.setId(storageItemId);
+      existingItem.setUnit("grams");
+      existingItem.setAmount(5);
+      LocalDateTime originalExpirationDate = LocalDateTime.now().plusDays(7);
+      existingItem.setExpirationDate(originalExpirationDate);
+
+      when(storageItemRepository.findById(storageItemId)).thenReturn(Optional.of(existingItem));
+      when(storageItemRepository.save(any(StorageItem.class))).thenAnswer(
+          invocation -> invocation.getArgument(0));
+
+      // Act
+      StorageItem result = storageService.updateStorageItem(storageItemId, newUnit, null,
+          null);
+
+      // Assert
+      assertNotNull(result);
+      assertEquals(newUnit, result.getUnit());
+      assertEquals(existingItem.getAmount(), result.getAmount());
+      assertNull(result.getExpirationDate());
+
+      ArgumentCaptor<StorageItem> captor = ArgumentCaptor.forClass(StorageItem.class);
+      verify(storageItemRepository).save(captor.capture());
+
+      StorageItem capturedItem = captor.getValue();
+      assertEquals(newUnit, capturedItem.getUnit());
+      assertEquals(existingItem.getAmount(), capturedItem.getAmount());
+      assertNull(capturedItem.getExpirationDate());
+    }
+
+    @Test
+    void updateStorageItem_shouldThrowException_whenItemNotFound() {
+      // Arrange
+      when(storageItemRepository.findById(storageItemId)).thenReturn(Optional.empty());
+
+      // Act & Assert
+      IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+          storageService.updateStorageItem(storageItemId, "kg", 10, LocalDateTime.now()));
+
+      assertEquals("Storage item not found", exception.getMessage());
+      verify(storageItemRepository).findById(storageItemId);
+      verify(storageItemRepository, never()).save(any());
     }
   }
 
